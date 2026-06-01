@@ -28,6 +28,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class CardapioController extends Controller
 {
@@ -403,7 +404,7 @@ class CardapioController extends Controller
                     'email' => $custEmail,
                     'phone' => $custPhone,
                     'document' => $custCpf,
-                    'password' => Hash::make('password123'),
+                    'password' => Hash::make(Str::random(40)),
                     'status' => CustomerStatusEnum::ACTIVE,
                 ]);
             }

@@ -18,6 +18,7 @@ use App\Models\Product;
 use App\Services\SSE\SseQueueService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -450,5 +451,62 @@ class DeliveryCheckoutTest extends TestCase
                 'success' => false,
                 'message' => 'CEP inválido.',
             ]);
+    }
+
+    #[Test]
+    public function it_does_not_create_delivery_customer_with_predictable_or_default_password()
+    {
+        $this->withoutMiddleware();
+        $company = Company::factory()->create();
+        $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
+        $employee = Employee::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id]);
+
+        $category = Category::create([
+            'company_id' => $company->id,
+            'name' => 'Bebidas',
+            'status' => 'active',
+            'sort_order' => 1,
+        ]);
+
+        $product = Product::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'code' => 'SUCO-01',
+            'name' => 'Suco de Laranja',
+            'price_cents' => 800,
+            'status' => 'active',
+        ]);
+
+        $response = $this->postJson('/api/v1/delivery/checkout', [
+            'items' => [
+                ['uuid' => $product->uuid, 'quantity' => 1],
+            ],
+            'customer_name' => 'Safe Customer',
+            'customer_phone' => '11999999999',
+            'customer_email' => 'safe.customer@example.com',
+            'customer_cpf' => '444.555.666-77',
+            'street' => 'Av. Paulista',
+            'number' => '1000',
+            'neighborhood' => 'Bela Vista',
+            'city' => 'São Paulo',
+            'state' => 'SP',
+            'zip_code' => '01310-100',
+            'delivery_fee' => 10.00,
+            'lgpd_consent' => true,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true]);
+
+        /** @var Customer $customer */
+        $customer = Customer::where('document', '444.555.666-77')->firstOrFail();
+
+        // Garante que a senha gerada NÃO é password123 nem vazia
+        $this->assertNotEmpty($customer->password);
+        $this->assertFalse(Hash::check('password123', $customer->password));
+        $this->assertFalse(Hash::check('', $customer->password));
+
+        // A senha deve ser uma hash bcrypt/argon forte aleatória e inutilizável
+        $this->assertStringStartsWith('$', $customer->password);
     }
 }

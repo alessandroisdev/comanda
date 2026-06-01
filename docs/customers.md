@@ -21,9 +21,12 @@ O módulo de **Clientes** (`customers`) armazena os registros de consumidores do
 
 ---
 
-## 2. Conformidade com a LGPD (Marketing Opt-In)
+## 2. Conformidade com a LGPD (Marketing Opt-In e Proteção de Credenciais)
 
-Em estreito alinhamento com a Lei Geral de Proteção de Dados (LGPD), o consentimento de marketing (`marketing_opt_in`) é explícito e armazenado como booleano no banco de dados. O tratamento dos dados do cliente (CPF, e-mail e telefone) é restrito à finalidade operacional de faturamento e entrega de pedidos.
+Em estreito alinhamento com a Lei Geral de Proteção de Dados (LGPD):
+* O consentimento de marketing (`marketing_opt_in`) é explícito e armazenado como booleano no banco de dados.
+* O tratamento dos dados do cliente (CPF, e-mail e telefone) é restrito à finalidade operacional de faturamento e entrega de pedidos (base legal de execução de contrato).
+* **Criação de Clientes no Checkout de Delivery:** Clientes criados automaticamente pelo checkout de delivery **não possuem senhas padrão previsíveis**. Para fins de segurança máxima e minimização da superfície de ataque, eles nascem com uma senha gerada aleatoriamente de alta entropia (inutilizável, contendo 40 caracteres randômicos criptográficos), impedindo qualquer tipo de acesso não autorizado baseado em credenciais fixas ou de teste. O acesso subsequente é projetado para operar sob fluxos de OTP (One-Time Password) ou Magic Links.
 
 ---
 
@@ -31,3 +34,5 @@ Em estreito alinhamento com a Lei Geral de Proteção de Dados (LGPD), o consent
 
 * O isolamento relacional garante que o cadastro de clientes pertença de forma exclusiva ao tenant cadastrador (`company_id`).
 * Operadores de loja (funcionários) podem gerenciar o cadastro de clientes se possuírem a permissão `customers.view` / `customers.create` / `customers.update`.
+* A senha do cliente (`password`) é marcada como oculta (`$hidden` na model `Customer`) e jamais é exposta em logs, auditorias, respostas de API JSON ou eventos SSE.
+
