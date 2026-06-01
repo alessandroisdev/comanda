@@ -14,11 +14,12 @@ class RemoveOrderItemAction
     {
         return DB::transaction(function () use ($item) {
             $order = $item->order;
-            
+
             $item->delete();
 
             // Recalcula totais do pedido
             $recalculator = app(RecalculateOrderTotalsAction::class);
+
             return $recalculator->execute($order);
         });
     }

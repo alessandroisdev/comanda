@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\OrderSessionStatusEnum;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,19 +22,26 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $opened_by_employee_id
  * @property int|null $closed_by_employee_id
  * @property OrderSessionStatusEnum $status
- * @property \Carbon\Carbon $opened_at
- * @property \Carbon\Carbon|null $closed_at
+ * @property Carbon $opened_at
+ * @property Carbon|null $closed_at
  * @property int $people_count
  * @property string|null $notes
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ *
+ * @property-read \App\Models\Company $company
+ * @property-read \App\Models\CompanyUnit $unit
+ * @property-read \App\Models\Table|null $table
+ * @property-read \App\Models\Employee $openedBy
+ * @property-read \App\Models\Employee|null $closedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
  *
  * @method static \Illuminate\Database\Eloquent\Builder|OrderSession where(string $column, mixed $value)
  */
 class OrderSession extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $table = 'orders_sessions';
 

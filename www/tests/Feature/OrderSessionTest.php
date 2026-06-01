@@ -9,13 +9,15 @@ use App\Actions\OrderSession\CloseOrderSessionAction;
 use App\Actions\OrderSession\MergeOrderSessionsAction;
 use App\Actions\OrderSession\OpenOrderSessionAction;
 use App\Actions\OrderSession\TransferTableAction;
-use App\Models\OrderSession;
-use App\Models\Table;
+use App\Enums\OrderSessionStatusEnum;
+use App\Enums\OrderStatusEnum;
+use App\Enums\TableStatusEnum;
 use App\Models\Company;
 use App\Models\CompanyUnit;
 use App\Models\Employee;
-use App\Enums\OrderSessionStatusEnum;
-use App\Enums\TableStatusEnum;
+use App\Models\Order;
+use App\Models\OrderSession;
+use App\Models\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -25,9 +27,13 @@ class OrderSessionTest extends TestCase
     use RefreshDatabase;
 
     private OpenOrderSessionAction $openAction;
+
     private CloseOrderSessionAction $closeAction;
+
     private CancelOrderSessionAction $cancelAction;
+
     private TransferTableAction $transferAction;
+
     private MergeOrderSessionsAction $mergeAction;
 
     protected function setUp(): void
@@ -64,7 +70,7 @@ class OrderSessionTest extends TestCase
         $this->assertInstanceOf(OrderSession::class, $session);
         $this->assertEquals(OrderSessionStatusEnum::OPEN, $session->status);
         $this->assertEquals(TableStatusEnum::OCCUPIED, $table->fresh()->status);
-        
+
         $this->assertDatabaseHas('orders_sessions', [
             'id' => $session->id,
             'table_id' => $table->id,
@@ -83,7 +89,7 @@ class OrderSessionTest extends TestCase
             'status' => TableStatusEnum::OCCUPIED,
         ]);
         $employee = Employee::factory()->create(['company_id' => $company->id]);
-        
+
         $session = OrderSession::factory()->create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -103,7 +109,7 @@ class OrderSessionTest extends TestCase
     {
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
-        
+
         $table1 = Table::factory()->create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -146,7 +152,7 @@ class OrderSessionTest extends TestCase
             'status' => OrderSessionStatusEnum::OPEN,
             'people_count' => 2,
         ]);
-        
+
         $session2 = OrderSession::factory()->create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -156,11 +162,11 @@ class OrderSessionTest extends TestCase
         ]);
 
         // Cria um pedido na comanda 1
-        $order = \App\Models\Order::factory()->create([
+        $order = Order::factory()->create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
             'session_id' => $session1->id,
-            'status' => \App\Enums\OrderStatusEnum::DRAFT,
+            'status' => OrderStatusEnum::DRAFT,
         ]);
 
         $this->mergeAction->execute($session1, $session2, $employee->id);

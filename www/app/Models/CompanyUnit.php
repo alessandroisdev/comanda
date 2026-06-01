@@ -36,7 +36,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class CompanyUnit extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'uuid',

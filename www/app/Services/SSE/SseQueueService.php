@@ -14,7 +14,7 @@ class SseQueueService
     public static function publish(string $channel, string $event, array $data): void
     {
         $key = "sse_events:{$channel}";
-        
+
         // Usamos um lock simples ou operação atômica de array no Cache
         $events = Cache::get($key, []);
         $events[] = [
@@ -22,7 +22,7 @@ class SseQueueService
             'data' => $data,
             'timestamp' => time(),
         ];
-        
+
         Cache::put($key, $events, 60); // Expira em 60 segundos
     }
 
@@ -33,11 +33,11 @@ class SseQueueService
     {
         $key = "sse_events:{$channel}";
         $events = Cache::get($key, []);
-        
+
         if (! empty($events)) {
             Cache::forget($key);
         }
-        
+
         return $events;
     }
 }

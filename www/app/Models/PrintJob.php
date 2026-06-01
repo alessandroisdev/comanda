@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\PrintJobStatusEnum;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,8 +20,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array $payload
  * @property PrintJobStatusEnum $status
  * @property int $attempts
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ *
+ * @property-read \App\Models\Company $company
+ * @property-read \App\Models\CompanyUnit $unit
  *
  * @method static \Illuminate\Database\Eloquent\Builder|PrintJob where(string $column, mixed $value)
  */

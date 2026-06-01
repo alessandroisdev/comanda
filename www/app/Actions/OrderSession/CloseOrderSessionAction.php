@@ -31,7 +31,7 @@ class CloseOrderSessionAction
                 $table = Table::find($session->table_id);
                 if ($table) {
                     $table->update(['status' => TableStatusEnum::CLEANING]);
-                    
+
                     // Publicar SSE de alteração da mesa
                     SseQueueService::publish('admin.tables', 'tables.status_changed', [
                         'uuid' => $table->uuid,

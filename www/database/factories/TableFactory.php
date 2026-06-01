@@ -19,8 +19,8 @@ class TableFactory extends Factory
         return [
             'company_id' => Company::factory(),
             'unit_id' => CompanyUnit::factory(),
-            'code' => 'M-' . $this->faker->unique()->numberBetween(1, 999),
-            'name' => 'Mesa ' . $this->faker->numberBetween(1, 100),
+            'code' => 'M-'.$this->faker->unique()->numberBetween(1, 999),
+            'name' => 'Mesa '.$this->faker->numberBetween(1, 100),
             'capacity' => $this->faker->randomElement([2, 4, 6, 8]),
             'sector' => $this->faker->randomElement(['Salão Principal', 'Varanda', 'Área VIP']),
             'status' => TableStatusEnum::AVAILABLE,

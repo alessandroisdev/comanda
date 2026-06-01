@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\OrderStatusEnum;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,15 +27,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $discount_cents
  * @property int $total_cents
  * @property string|null $notes
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ *
+ * @property-read \App\Models\Company $company
+ * @property-read \App\Models\CompanyUnit $unit
+ * @property-read \App\Models\OrderSession $session
+ * @property-read \App\Models\Employee $employee
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderItem> $items
+ * @property-read \App\Models\KitchenTicket|null $kitchenTicket
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Order where(string $column, mixed $value)
  */
 class Order extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'uuid',

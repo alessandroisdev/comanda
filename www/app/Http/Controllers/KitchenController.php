@@ -10,7 +10,6 @@ use App\Actions\KitchenTicket\MarkKitchenReadyAction;
 use App\Actions\KitchenTicket\StartKitchenPreparoAction;
 use App\Models\KitchenTicket;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -22,10 +21,11 @@ class KitchenController extends Controller
         Gate::authorize('viewAny', KitchenTicket::class);
 
         // Carrega tickets de cozinha pendentes, preparando ou prontos do tenant do funcionário logado
+        /** @var \App\Models\Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $companyId = $employee ? $employee->company_id : null;
 
-        $tickets = KitchenTicket::whereIn('status', ['pending', 'preparing', 'ready'])
+        $tickets = KitchenTicket::query()->whereIn('status', ['pending', 'preparing', 'ready'])
             ->with(['order.items.product', 'order.session.table']);
 
         if ($companyId) {
@@ -41,6 +41,7 @@ class KitchenController extends Controller
 
     public function start(string $uuid, StartKitchenPreparoAction $action): JsonResponse
     {
+        /** @var KitchenTicket $ticket */
         $ticket = KitchenTicket::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $ticket);
 
@@ -61,6 +62,7 @@ class KitchenController extends Controller
 
     public function ready(string $uuid, MarkKitchenReadyAction $action): JsonResponse
     {
+        /** @var KitchenTicket $ticket */
         $ticket = KitchenTicket::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $ticket);
 
@@ -81,6 +83,7 @@ class KitchenController extends Controller
 
     public function complete(string $uuid, CompleteKitchenTicketAction $action): JsonResponse
     {
+        /** @var KitchenTicket $ticket */
         $ticket = KitchenTicket::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $ticket);
 
@@ -101,6 +104,7 @@ class KitchenController extends Controller
 
     public function cancel(string $uuid, CancelKitchenTicketAction $action): JsonResponse
     {
+        /** @var KitchenTicket $ticket */
         $ticket = KitchenTicket::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $ticket);
 

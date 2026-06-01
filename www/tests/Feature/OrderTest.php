@@ -10,14 +10,14 @@ use App\Actions\Order\SendOrderToKitchenAction;
 use App\Actions\OrderItem\AddOrderItemAction;
 use App\Actions\OrderItem\RemoveOrderItemAction;
 use App\Actions\OrderItem\UpdateOrderItemQuantityAction;
+use App\Enums\OrderStatusEnum;
+use App\Models\Company;
+use App\Models\CompanyUnit;
+use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderSession;
 use App\Models\Product;
-use App\Models\Company;
-use App\Models\CompanyUnit;
-use App\Models\Employee;
-use App\Enums\OrderStatusEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -27,10 +27,15 @@ class OrderTest extends TestCase
     use RefreshDatabase;
 
     private CreateOrderAction $createOrderAction;
+
     private CancelOrderAction $cancelOrderAction;
+
     private SendOrderToKitchenAction $sendToKitchenAction;
+
     private AddOrderItemAction $addItemAction;
+
     private RemoveOrderItemAction $removeItemAction;
+
     private UpdateOrderItemQuantityAction $updateItemQtyAction;
 
     protected function setUp(): void
@@ -75,7 +80,7 @@ class OrderTest extends TestCase
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
         $session = OrderSession::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id]);
         $employee = Employee::factory()->create(['company_id' => $company->id]);
-        
+
         $order = Order::factory()->create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -97,7 +102,7 @@ class OrderTest extends TestCase
         $this->assertEquals(2, $item->quantity);
         $this->assertEquals(1500, $item->unit_price_cents);
         $this->assertEquals(3000, $item->total_price_cents);
-        
+
         // O pedido total deve ser R$ 30,00 (3000 centavos)
         $this->assertEquals(3000, $order->fresh()->total_cents);
     }
@@ -108,10 +113,10 @@ class OrderTest extends TestCase
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
         $session = OrderSession::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id]);
-        
+
         $order = Order::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id, 'session_id' => $session->id]);
         $product = Product::factory()->create(['company_id' => $company->id, 'price_cents' => 1000]);
-        
+
         $item = OrderItem::create([
             'order_id' => $order->id,
             'product_id' => $product->id,
@@ -133,10 +138,10 @@ class OrderTest extends TestCase
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
         $session = OrderSession::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id]);
-        
+
         $order = Order::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id, 'session_id' => $session->id]);
         $product = Product::factory()->create(['company_id' => $company->id, 'price_cents' => 1200]);
-        
+
         $item = OrderItem::create([
             'order_id' => $order->id,
             'product_id' => $product->id,
@@ -160,7 +165,7 @@ class OrderTest extends TestCase
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
         $session = OrderSession::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id]);
         $employee = Employee::factory()->create(['company_id' => $company->id]);
-        
+
         $order = Order::factory()->create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -168,7 +173,7 @@ class OrderTest extends TestCase
             'employee_id' => $employee->id,
             'status' => OrderStatusEnum::DRAFT,
         ]);
-        
+
         $product = Product::factory()->create(['company_id' => $company->id]);
         OrderItem::create([
             'order_id' => $order->id,

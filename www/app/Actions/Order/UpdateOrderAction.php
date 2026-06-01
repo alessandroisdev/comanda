@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Order;
 
+use App\Actions\OrderItem\RecalculateOrderTotalsAction;
 use App\Models\Order;
 use App\Services\Audit\AuditService;
 use App\Services\SSE\SseQueueService;
@@ -22,7 +23,7 @@ class UpdateOrderAction
             ]);
 
             // Recalcula totais usando a action de recalcular
-            $recalculator = app(\App\Actions\OrderItem\RecalculateOrderTotalsAction::class);
+            $recalculator = app(RecalculateOrderTotalsAction::class);
             $order = $recalculator->execute($order);
 
             // Registrar log de auditoria

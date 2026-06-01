@@ -293,6 +293,66 @@ paths:
         '404':
           description: Produto não encontrado.
 
+  /tables/{table_uuid}:
+    delete:
+      operationId: deleteTable
+      summary: Excluir Mesa (Soft Delete)
+      description: Executa a deleção lógica da mesa física vinculada à unidade.
+      parameters:
+        - name: table_uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Mesa excluída com sucesso.
+        '403':
+          description: Sem permissão.
+        '404':
+          description: Mesa não encontrada.
+
+  /sessions:
+    post:
+      operationId: openSession
+      summary: Abrir Nova Comanda
+      description: Inicia uma sessão de atendimento (comanda operacional), associando opcionalmente a uma mesa física.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - company_id
+                - unit_id
+                - people_count
+              properties:
+                company_id:
+                  type: integer
+                unit_id:
+                  type: integer
+                table_id:
+                  type: integer
+                people_count:
+                  type: integer
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Comanda aberta com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  session_uuid:
+                    type: string
+                    format: uuid
+
 components:
   securitySchemes:
     bearerAuth:

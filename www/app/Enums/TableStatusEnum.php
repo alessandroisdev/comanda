@@ -11,4 +11,15 @@ enum TableStatusEnum: string
     case RESERVED = 'reserved';
     case BLOCKED = 'blocked';
     case CLEANING = 'cleaning';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::AVAILABLE => 'Disponível',
+            self::OCCUPIED => 'Ocupada',
+            self::RESERVED => 'Reservada',
+            self::BLOCKED => 'Bloqueada',
+            self::CLEANING => 'Limpeza',
+        };
+    }
 }

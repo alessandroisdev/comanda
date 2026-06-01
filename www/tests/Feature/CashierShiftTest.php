@@ -6,11 +6,11 @@ namespace Tests\Feature;
 
 use App\Actions\CashierShift\CloseCashierShiftAction;
 use App\Actions\CashierShift\OpenCashierShiftAction;
+use App\Enums\CashierShiftStatusEnum;
 use App\Models\CashierShift;
 use App\Models\Company;
 use App\Models\CompanyUnit;
 use App\Models\Employee;
-use App\Enums\CashierShiftStatusEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -20,6 +20,7 @@ class CashierShiftTest extends TestCase
     use RefreshDatabase;
 
     private OpenCashierShiftAction $openAction;
+
     private CloseCashierShiftAction $closeAction;
 
     protected function setUp(): void
@@ -47,13 +48,13 @@ class CashierShiftTest extends TestCase
         $this->assertEquals(CashierShiftStatusEnum::OPEN, $shift->status);
         $this->assertEquals(15000, $shift->opening_amount_cents);
         $this->assertNull($shift->closing_amount_cents);
-        
+
         $this->assertDatabaseHas('cashier_shifts', [
             'id' => $shift->id,
             'status' => 'open',
             'opening_amount_cents' => 15000,
         ]);
-        
+
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'cashier.open_shift',
         ]);
@@ -79,7 +80,7 @@ class CashierShiftTest extends TestCase
         $this->assertEquals(CashierShiftStatusEnum::CLOSED, $shift->fresh()->status);
         $this->assertEquals(10000, $shift->fresh()->closing_amount_cents);
         $this->assertNotNull($shift->fresh()->closed_at);
-        
+
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'cashier.close_shift',
         ]);

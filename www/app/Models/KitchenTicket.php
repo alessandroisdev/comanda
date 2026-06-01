@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\KitchenTicketStatusEnum;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,12 +16,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $uuid
  * @property int $order_id
  * @property KitchenTicketStatusEnum $status
- * @property \Carbon\Carbon $sent_at
- * @property \Carbon\Carbon|null $started_at
- * @property \Carbon\Carbon|null $ready_at
- * @property \Carbon\Carbon|null $completed_at
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon $sent_at
+ * @property Carbon|null $started_at
+ * @property Carbon|null $ready_at
+ * @property Carbon|null $completed_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Order $order
  *
  * @method static \Illuminate\Database\Eloquent\Builder|KitchenTicket where(string $column, mixed $value)
  */

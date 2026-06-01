@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Actions\CashierShift\CloseCashierShiftAction;
 use App\Actions\CashierShift\OpenCashierShiftAction;
 use App\Models\CashierShift;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -19,6 +18,7 @@ class CashierController extends Controller
     {
         Gate::authorize('viewAny', CashierShift::class);
 
+        /** @var \App\Models\Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $companyId = $employee ? $employee->company_id : null;
 
@@ -43,8 +43,9 @@ class CashierController extends Controller
     {
         Gate::authorize('create', CashierShift::class);
 
+        /** @var \App\Models\Employee|null $employee */
         $employee = Auth::guard('employee')->user();
-        
+
         $validated = $request->validate([
             'company_id' => 'required|exists:companies,id',
             'unit_id' => 'required|exists:company_units,id',
@@ -64,6 +65,7 @@ class CashierController extends Controller
                     'message' => 'Já existe um turno de caixa aberto para esta unidade.',
                 ], 422);
             }
+
             return redirect()->back()->withErrors(['error' => 'Já existe um turno de caixa aberto para esta unidade.']);
         }
 
@@ -89,6 +91,7 @@ class CashierController extends Controller
 
     public function close(Request $request, string $uuid, CloseCashierShiftAction $action)
     {
+        /** @var \App\Models\CashierShift $shift */
         $shift = CashierShift::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $shift);
 
@@ -96,6 +99,7 @@ class CashierController extends Controller
             'closing_amount' => 'required|numeric|min:0',
         ]);
 
+        /** @var \App\Models\Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $employeeId = $employee ? $employee->id : 1;
         $closingAmountCents = (int) round($validated['closing_amount'] * 100);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\CashierShiftStatusEnum;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,20 +19,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $unit_id
  * @property int $opened_by
  * @property int|null $closed_by
- * @property \Carbon\Carbon $opened_at
- * @property \Carbon\Carbon|null $closed_at
+ * @property Carbon $opened_at
+ * @property Carbon|null $closed_at
  * @property int $opening_amount_cents
  * @property int|null $closing_amount_cents
  * @property CashierShiftStatusEnum $status
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|CashierShift where(string $column, mixed $value)
  */
 class CashierShift extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $table = 'cashier_shifts';
 

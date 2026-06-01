@@ -10,6 +10,7 @@ use App\Actions\OrderSession\MergeOrderSessionsAction;
 use App\Actions\OrderSession\OpenOrderSessionAction;
 use App\Actions\OrderSession\TransferTableAction;
 use App\DataTables\OrderSessionsDataTable;
+use App\Models\Employee;
 use App\Models\OrderSession;
 use App\Models\Table;
 use App\Services\DataTables\DataTableQueryService;
@@ -29,6 +30,7 @@ class OrderSessionController extends Controller
     public function index(): View
     {
         Gate::authorize('viewAny', OrderSession::class);
+
         return view('admin.sessions.index');
     }
 
@@ -45,12 +47,12 @@ class OrderSessionController extends Controller
     public function create(): View
     {
         Gate::authorize('create', OrderSession::class);
-        
+
         // Carrega mesas livres do tenant do usuário logado
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $companyId = $employee ? $employee->company_id : null;
-        
+
         $tables = Table::where('status', 'available');
         if ($companyId) {
             $tables->where('company_id', $companyId);
@@ -64,9 +66,9 @@ class OrderSessionController extends Controller
     {
         Gate::authorize('create', OrderSession::class);
 
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
-        
+
         $validated = $request->validate([
             'company_id' => 'required|exists:companies,id',
             'unit_id' => 'required|exists:company_units,id',
@@ -119,7 +121,7 @@ class OrderSessionController extends Controller
         $session = OrderSession::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $session);
 
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $employeeId = $employee ? $employee->id : 1;
 
@@ -137,7 +139,7 @@ class OrderSessionController extends Controller
         $session = OrderSession::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $session);
 
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $employeeId = $employee ? $employee->id : 1;
 
@@ -161,7 +163,7 @@ class OrderSessionController extends Controller
 
         /** @var Table $newTable */
         $newTable = Table::where('uuid', $request->input('table_uuid'))->firstOrFail();
-        
+
         // Verifica se a nova mesa está disponível
         if ($newTable->status->value !== 'available') {
             return response()->json([
@@ -190,7 +192,7 @@ class OrderSessionController extends Controller
 
         /** @var OrderSession $targetSession */
         $targetSession = OrderSession::where('uuid', $request->input('target_session_uuid'))->firstOrFail();
-        
+
         // Verifica se a comanda destino está aberta
         if ($targetSession->status->value !== 'open') {
             return response()->json([
@@ -207,7 +209,7 @@ class OrderSessionController extends Controller
             ], 422);
         }
 
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $employeeId = $employee ? $employee->id : 1;
 

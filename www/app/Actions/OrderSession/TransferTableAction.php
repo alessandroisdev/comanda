@@ -19,7 +19,7 @@ class TransferTableAction
     {
         return DB::transaction(function () use ($session, $newTable) {
             $oldTableId = $session->table_id;
-            
+
             // Atualiza a sessão operacional com a nova mesa
             $session->update(['table_id' => $newTable->id]);
 
@@ -28,7 +28,7 @@ class TransferTableAction
                 $oldTable = Table::find($oldTableId);
                 if ($oldTable) {
                     $oldTable->update(['status' => TableStatusEnum::AVAILABLE]);
-                    
+
                     SseQueueService::publish('admin.tables', 'tables.status_changed', [
                         'uuid' => $oldTable->uuid,
                         'code' => $oldTable->code,

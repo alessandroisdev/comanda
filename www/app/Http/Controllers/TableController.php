@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\Table\ChangeTableStatusAction;
 use App\Actions\Table\CreateTableAction;
 use App\Actions\Table\DeleteTableAction;
 use App\Actions\Table\UpdateTableAction;
-use App\Actions\Table\ChangeTableStatusAction;
 use App\DataTables\TablesDataTable;
 use App\DTOs\Table\CreateTableDTO;
 use App\DTOs\Table\UpdateTableDTO;
+use App\Enums\TableStatusEnum;
 use App\Models\Table;
 use App\Services\DataTables\DataTableQueryService;
 use App\Services\DataTables\DataTableResponseFactory;
-use App\Enums\TableStatusEnum;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -29,6 +29,7 @@ class TableController extends Controller
     public function index(): View
     {
         Gate::authorize('viewAny', Table::class);
+
         return view('admin.tables.index');
     }
 
@@ -45,6 +46,7 @@ class TableController extends Controller
     public function create(): View
     {
         Gate::authorize('create', Table::class);
+
         return view('admin.tables.create');
     }
 

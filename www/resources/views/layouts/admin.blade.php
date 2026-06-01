@@ -186,6 +186,24 @@
                 <a href="/admin/products" class="nav-link-custom {{ Request::is('admin/products*') ? 'active' : '' }}">
                     <i class="bi bi-box-seam-fill"></i> Catálogo Produtos
                 </a>
+
+                <div class="text-uppercase text-muted fw-bold px-3 pt-3 pb-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Operacional</div>
+                
+                <a href="/admin/tables" class="nav-link-custom {{ Request::is('admin/tables*') ? 'active' : '' }}">
+                    <i class="bi bi-grid-3x3-gap-fill"></i> Controle de Mesas
+                </a>
+                <a href="/admin/sessions" class="nav-link-custom {{ Request::is('admin/sessions*') ? 'active' : '' }}">
+                    <i class="bi bi-receipt-cutoff"></i> Comandas Operacionais
+                </a>
+                <a href="/admin/kitchen" class="nav-link-custom {{ Request::is('admin/kitchen*') ? 'active' : '' }}">
+                    <i class="bi bi-fire"></i> Fila Cozinha
+                </a>
+                <a href="/admin/cashier" class="nav-link-custom {{ Request::is('admin/cashier*') ? 'active' : '' }}">
+                    <i class="bi bi-cash-register"></i> Caixa Operacional
+                </a>
+
+                <div class="text-uppercase text-muted fw-bold px-3 pt-3 pb-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Configuração</div>
+
                 <a href="/admin/modules" class="nav-link-custom {{ Request::is('admin/modules*') ? 'active' : '' }}">
                     <i class="bi bi-plugin"></i> Módulos & Licença
                 </a>

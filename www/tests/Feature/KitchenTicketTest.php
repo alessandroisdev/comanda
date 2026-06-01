@@ -9,12 +9,12 @@ use App\Actions\KitchenTicket\CompleteKitchenTicketAction;
 use App\Actions\KitchenTicket\CreateKitchenTicketAction;
 use App\Actions\KitchenTicket\MarkKitchenReadyAction;
 use App\Actions\KitchenTicket\StartKitchenPreparoAction;
-use App\Models\KitchenTicket;
-use App\Models\Order;
-use App\Models\Company;
-use App\Models\CompanyUnit;
 use App\Enums\KitchenTicketStatusEnum;
 use App\Enums\OrderStatusEnum;
+use App\Models\Company;
+use App\Models\CompanyUnit;
+use App\Models\KitchenTicket;
+use App\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -24,9 +24,13 @@ class KitchenTicketTest extends TestCase
     use RefreshDatabase;
 
     private CreateKitchenTicketAction $createAction;
+
     private StartKitchenPreparoAction $startAction;
+
     private MarkKitchenReadyAction $readyAction;
+
     private CompleteKitchenTicketAction $completeAction;
+
     private CancelKitchenTicketAction $cancelAction;
 
     protected function setUp(): void

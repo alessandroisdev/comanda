@@ -14,7 +14,7 @@ class AddOrderItemAction
     public function execute(Order $order, Product $product, int $quantity, ?string $notes = null): OrderItem
     {
         return DB::transaction(function () use ($order, $product, $quantity, $notes) {
-            
+
             /** @var OrderItem|null $item */
             $item = $order->items()->where('product_id', $product->id)->first();
 

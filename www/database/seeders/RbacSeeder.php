@@ -62,6 +62,32 @@ class RbacSeeder extends Seeder
             'products.create' => 'Cadastrar novos produtos',
             'products.update' => 'Editar produtos',
             'products.delete' => 'Excluir produtos',
+
+            // Mesas
+            'tables.view' => 'Visualizar mesas do salão',
+            'tables.create' => 'Cadastrar novas mesas',
+            'tables.update' => 'Editar mesas',
+            'tables.delete' => 'Excluir mesas',
+
+            // Comandas / Sessões
+            'sessions.view' => 'Visualizar comandas',
+            'sessions.open' => 'Abrir novas comandas',
+            'sessions.update' => 'Editar comandas',
+            'sessions.close' => 'Fechar comandas',
+
+            // Pedidos
+            'orders.view' => 'Visualizar pedidos',
+            'orders.create' => 'Lançar novos pedidos',
+            'orders.update' => 'Editar pedidos',
+
+            // Cozinha
+            'kitchen.view' => 'Visualizar fila da cozinha',
+            'kitchen.update' => 'Gerenciar fila da cozinha',
+
+            // Caixa
+            'cashier.view' => 'Visualizar turno de caixa',
+            'cashier.open' => 'Abrir turno de caixa',
+            'cashier.close' => 'Fechar turno de caixa',
         ];
 
         $permissionModels = [];

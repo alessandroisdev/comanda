@@ -20,7 +20,7 @@ class MergeOrderSessionsAction
     public function execute(OrderSession $sourceSession, OrderSession $targetSession, int $employeeId): OrderSession
     {
         return DB::transaction(function () use ($sourceSession, $targetSession, $employeeId) {
-            
+
             // Move todos os pedidos da comanda de origem para a de destino
             $sourceSession->orders()->update([
                 'session_id' => $targetSession->id,
@@ -31,7 +31,7 @@ class MergeOrderSessionsAction
                 'status' => OrderSessionStatusEnum::CANCELLED,
                 'closed_by_employee_id' => $employeeId,
                 'closed_at' => Carbon::now(),
-                'notes' => 'Mesclada com a sessão ' . $targetSession->uuid,
+                'notes' => 'Mesclada com a sessão '.$targetSession->uuid,
             ]);
 
             // Se a comanda de origem possuir mesa, libera a mesa correspondente
@@ -39,7 +39,7 @@ class MergeOrderSessionsAction
                 $table = Table::find($sourceSession->table_id);
                 if ($table) {
                     $table->update(['status' => TableStatusEnum::AVAILABLE]);
-                    
+
                     SseQueueService::publish('admin.tables', 'tables.status_changed', [
                         'uuid' => $table->uuid,
                         'code' => $table->code,
@@ -49,7 +49,8 @@ class MergeOrderSessionsAction
             }
 
             // Somar contagem de pessoas na de destino
-            $targetSession->increment('people_count', $sourceSession->people_count);
+            $targetSession->people_count += $sourceSession->people_count;
+            $targetSession->save();
 
             // Registrar log de auditoria
             $this->auditService->log('session.merge', [

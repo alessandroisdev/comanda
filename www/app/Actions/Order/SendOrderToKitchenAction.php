@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Order;
 
+use App\Actions\KitchenTicket\CreateKitchenTicketAction;
+use App\Actions\PrintJob\EnqueuePrintJobAction;
 use App\Enums\OrderStatusEnum;
 use App\Models\Order;
 use App\Services\Audit\AuditService;
@@ -20,11 +22,11 @@ class SendOrderToKitchenAction
             $order->update(['status' => OrderStatusEnum::SENT_TO_KITCHEN]);
 
             // Criar ticket de cozinha usando a Action correspondente
-            $kitchenAction = app(\App\Actions\KitchenTicket\CreateKitchenTicketAction::class);
+            $kitchenAction = app(CreateKitchenTicketAction::class);
             $kitchenAction->execute($order);
 
             // Gerar job de impressão térmica usando a Action correspondente
-            $printAction = app(\App\Actions\PrintJob\EnqueuePrintJobAction::class);
+            $printAction = app(EnqueuePrintJobAction::class);
             $itemsPayload = [];
             foreach ($order->items as $item) {
                 $itemsPayload[] = [

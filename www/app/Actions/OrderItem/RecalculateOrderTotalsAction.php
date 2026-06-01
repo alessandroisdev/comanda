@@ -12,10 +12,10 @@ class RecalculateOrderTotalsAction
     public function execute(Order $order): Order
     {
         return DB::transaction(function () use ($order) {
-            
+
             // Soma todos os itens em centavos
             $subtotal = (int) $order->items()->sum('total_price_cents');
-            
+
             $discount = (int) $order->discount_cents;
             $total = max(0, $subtotal - $discount);
 

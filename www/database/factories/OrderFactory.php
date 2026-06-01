@@ -23,7 +23,7 @@ class OrderFactory extends Factory
             'unit_id' => CompanyUnit::factory(),
             'session_id' => OrderSession::factory(),
             'employee_id' => Employee::factory(),
-            'order_number' => 'PED-' . $this->faker->unique()->numberBetween(1000, 9999),
+            'order_number' => 'PED-'.$this->faker->unique()->numberBetween(1000, 9999),
             'status' => OrderStatusEnum::DRAFT,
             'subtotal_cents' => 0,
             'discount_cents' => 0,

@@ -26,7 +26,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'uuid',

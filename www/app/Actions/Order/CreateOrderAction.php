@@ -17,9 +17,9 @@ class CreateOrderAction
     public function execute(array $data): Order
     {
         return DB::transaction(function () use ($data) {
-            
+
             // Gerar número de pedido único por unidade
-            $orderNumber = 'PED-' . str_pad((string) mt_rand(1, 999999), 6, '0', STR_PAD_LEFT);
+            $orderNumber = 'PED-'.str_pad((string) mt_rand(1, 999999), 6, '0', STR_PAD_LEFT);
 
             $order = Order::create([
                 'company_id' => $data['company_id'],

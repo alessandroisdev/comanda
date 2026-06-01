@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Actions\Table\ChangeTableStatusAction;
 use App\Actions\Table\CreateTableAction;
 use App\Actions\Table\DeleteTableAction;
 use App\Actions\Table\UpdateTableAction;
-use App\Actions\Table\ChangeTableStatusAction;
 use App\DTOs\Table\CreateTableDTO;
 use App\DTOs\Table\UpdateTableDTO;
-use App\Models\Table;
+use App\Enums\TableStatusEnum;
 use App\Models\Company;
 use App\Models\CompanyUnit;
 use App\Models\Employee;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\Table;
 use App\Models\User;
-use App\Enums\TableStatusEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
@@ -28,8 +28,11 @@ class TableTest extends TestCase
     use RefreshDatabase;
 
     private CreateTableAction $createAction;
+
     private UpdateTableAction $updateAction;
+
     private DeleteTableAction $deleteAction;
+
     private ChangeTableStatusAction $changeStatusAction;
 
     protected function setUp(): void

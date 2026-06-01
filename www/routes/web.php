@@ -16,13 +16,18 @@ Route::get('/readiness', [HealthCheckController::class, 'readiness'])->name('rea
 // Importação das rotas de Realtime Server-Sent Events (SSE)
 require base_path('routes/sse.php');
 
-// Controllers Administrativos da Fase 2
+// Controllers Administrativos da Fase 2 e 3
+use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderSessionController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TableController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 
@@ -58,6 +63,42 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Produtos
     Route::post('products/datatable', [ProductController::class, 'datatable'])->name('products.datatable');
     Route::resource('products', ProductController::class)->parameters(['products' => 'product']);
+
+    // --- ROTAS DA FASE 3 (OPERACIONAL) ---
+
+    // Mesas
+    Route::post('tables/datatable', [TableController::class, 'datatable'])->name('tables.datatable');
+    Route::post('tables/{table}/change-status', [TableController::class, 'changeStatus'])->name('tables.change-status');
+    Route::resource('tables', TableController::class)->parameters(['tables' => 'table']);
+
+    // Comandas
+    Route::post('sessions/datatable', [OrderSessionController::class, 'datatable'])->name('sessions.datatable');
+    Route::post('sessions/{session}/close', [OrderSessionController::class, 'close'])->name('sessions.close');
+    Route::post('sessions/{session}/cancel', [OrderSessionController::class, 'cancel'])->name('sessions.cancel');
+    Route::post('sessions/{session}/transfer', [OrderSessionController::class, 'transfer'])->name('sessions.transfer');
+    Route::post('sessions/{session}/merge', [OrderSessionController::class, 'merge'])->name('sessions.merge');
+    Route::resource('sessions', OrderSessionController::class)->parameters(['sessions' => 'session']);
+
+    // Pedidos e Itens
+    Route::post('orders/{order}/send-to-kitchen', [OrderController::class, 'sendToKitchen'])->name('orders.send-to-kitchen');
+    Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('orders/{order}/items', [OrderController::class, 'addItem'])->name('orders.items.add');
+    Route::delete('orders/{order}/items/{item}', [OrderController::class, 'removeItem'])->name('orders.items.remove');
+    Route::patch('orders/{order}/items/{item}/quantity', [OrderController::class, 'updateItemQuantity'])->name('orders.items.update-quantity');
+    Route::resource('orders', OrderController::class)->only(['store', 'show'])->parameters(['orders' => 'order']);
+
+    // Cozinha / Produção
+    Route::get('kitchen', [KitchenController::class, 'index'])->name('kitchen.index');
+    Route::post('kitchen/{ticket}/start', [KitchenController::class, 'start'])->name('kitchen.start');
+    Route::post('kitchen/{ticket}/ready', [KitchenController::class, 'ready'])->name('kitchen.ready');
+    Route::post('kitchen/{ticket}/complete', [KitchenController::class, 'complete'])->name('kitchen.complete');
+    Route::post('kitchen/{ticket}/cancel', [KitchenController::class, 'cancel'])->name('kitchen.cancel');
+
+    // Caixa Operacional
+    Route::get('cashier', [CashierController::class, 'index'])->name('cashier.index');
+    Route::post('cashier', [CashierController::class, 'store'])->name('cashier.store');
+    Route::get('cashier/{shift}', [CashierController::class, 'show'])->name('cashier.show');
+    Route::post('cashier/{shift}/close', [CashierController::class, 'close'])->name('cashier.close');
 });
 
 // Rotas API para Deleção via AJAX nos DataTables
@@ -69,4 +110,7 @@ Route::prefix('api/v1')->group(function () {
     Route::delete('customers/{customer}', [CustomerController::class, 'destroy']);
     Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
     Route::delete('products/{product}', [ProductController::class, 'destroy']);
+
+    // API da Fase 3
+    Route::delete('tables/{table}', [TableController::class, 'destroy']);
 });

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\KitchenTicket;
 
 use App\Enums\KitchenTicketStatusEnum;
+use App\Enums\OrderStatusEnum;
 use App\Models\KitchenTicket;
 use App\Services\Audit\AuditService;
 use App\Services\SSE\SseQueueService;
@@ -24,7 +25,7 @@ class StartKitchenPreparoAction
             ]);
 
             // Atualiza status do pedido para preparando
-            $ticket->order->update(['status' => \App\Enums\OrderStatusEnum::PREPARING]);
+            $ticket->order->update(['status' => OrderStatusEnum::PREPARING]);
 
             // Registrar log de auditoria
             $this->auditService->log('kitchen.start_preparing', [

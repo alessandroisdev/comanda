@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Order;
 
+use App\Enums\KitchenTicketStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Models\Order;
 use App\Services\Audit\AuditService;
@@ -21,7 +22,7 @@ class CancelOrderAction
 
             // Cancela ticket de cozinha associado
             if ($order->kitchenTicket) {
-                $order->kitchenTicket->update(['status' => \App\Enums\KitchenTicketStatusEnum::CANCELLED]);
+                $order->kitchenTicket->update(['status' => KitchenTicketStatusEnum::CANCELLED]);
             }
 
             // Registrar log de auditoria
