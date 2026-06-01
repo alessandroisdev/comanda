@@ -17,6 +17,10 @@
     <!-- Vite Assets (Vite compilará localmente Bootstrap 5, DataTables.net e TypeScript) -->
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
 
+    <!-- Link do Manifesto PWA -->
+    <link rel="manifest" href="/manifest.json">
+
+
     <style>
         body {
             font-family: 'Outfit', sans-serif;
@@ -261,5 +265,17 @@
 
     <!-- Scripts Bootstrap carregados dinamicamente via Vite global window -->
     @yield('scripts')
+
+    <!-- Registro do Service Worker PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((reg) => console.log('[PWA] Service Worker registrado com sucesso:', reg.scope))
+                    .catch((err) => console.error('[PWA] Falha ao registrar Service Worker:', err));
+            });
+        }
+    </script>
 </body>
 </html>
+

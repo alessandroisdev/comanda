@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\Table;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -114,3 +116,51 @@ Route::prefix('api/v1')->group(function () {
     // API da Fase 3
     Route::delete('tables/{table}', [TableController::class, 'destroy']);
 });
+
+// --- ROTAS PÚBLICAS E CANAIS DIGITAIS (FASE 4) ---
+use App\Http\Controllers\Public\CardapioController;
+use App\Http\Controllers\Public\MenuCategoryController;
+use App\Http\Controllers\Public\MenuProductController;
+
+// Cardápio Digital & Deep Links
+Route::get('/cardapio', [CardapioController::class, 'index'])->name('public.menu');
+Route::get('/mesa/{slug}', [CardapioController::class, 'index'])->name('public.menu.table');
+Route::get('/qrcode/{public_uuid}', [CardapioController::class, 'qrcode'])->name('public.menu.qrcode');
+
+// APIs públicas para PWA/Tablet
+Route::prefix('api/v1')->group(function () {
+    Route::get('menu/categories', [MenuCategoryController::class, 'index']);
+    Route::get('menu/products', [MenuProductController::class, 'index']);
+    Route::get('menu/products/{uuid}', [MenuProductController::class, 'show']);
+
+    // Chamados e Reações de Mesa reativas via SSE
+    Route::post('tables/{tableUuid}/call-waiter', function (string $tableUuid) {
+        /** @var Table $table */
+        $table = Table::where('public_uuid', $tableUuid)->firstOrFail();
+        
+        // Publicar evento SSE no canal admin
+        App\Services\SSE\SseQueueService::publish('admin.tables', 'waiter.called', [
+            'table_uuid' => $table->uuid,
+            'table_code' => $table->code,
+            'timestamp' => now()->toIso8601String(),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Garçom chamado.']);
+    });
+
+    Route::post('tables/{tableUuid}/request-bill', function (string $tableUuid) {
+        /** @var Table $table */
+        $table = Table::where('public_uuid', $tableUuid)->firstOrFail();
+        
+        // Publicar evento SSE no canal admin
+        App\Services\SSE\SseQueueService::publish('admin.tables', 'bill.requested', [
+            'table_uuid' => $table->uuid,
+            'table_code' => $table->code,
+            'timestamp' => now()->toIso8601String(),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Conta solicitada.']);
+    });
+
+});
+
