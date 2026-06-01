@@ -8,3 +8,4 @@
 .agents/
 /**/*/logs/
 /**/*/tmp/
+composer.phar
