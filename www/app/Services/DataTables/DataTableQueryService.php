@@ -33,9 +33,9 @@ class DataTableQueryService
                 $query->where(function (Builder $subQuery) use ($searchableColumns, $searchValue) {
                     foreach ($searchableColumns as $index => $column) {
                         if ($index === 0) {
-                            $subQuery->where($column, 'like', '%' . $searchValue . '%');
+                            $subQuery->where($column, 'like', '%'.$searchValue.'%');
                         } else {
-                            $subQuery->orWhere($column, 'like', '%' . $searchValue . '%');
+                            $subQuery->orWhere($column, 'like', '%'.$searchValue.'%');
                         }
                     }
                 });
@@ -66,13 +66,13 @@ class DataTableQueryService
             }
         } else {
             // Ordenação padrão decrescente por ID se nenhuma for enviada
-            $query->orderBy($query->getModel()->getTable() . '.id', 'desc');
+            $query->orderBy($query->getModel()->getTable().'.id', 'desc');
         }
 
         // 6. Aplicar paginação física no banco
         $start = (int) $request->input('start', 0);
         $length = (int) $request->input('length', 10);
-        
+
         // Limitar comprimento máximo para evitar esgotamento de memória (DoS)
         if ($length < 1 || $length > 100) {
             $length = 10;
@@ -102,7 +102,7 @@ class DataTableQueryService
         // Tratamento genérico de filtros de status
         $status = $request->input('filter_status');
         if (! empty($status)) {
-            $query->where($query->getModel()->getTable() . '.status', $status);
+            $query->where($query->getModel()->getTable().'.status', $status);
         }
 
         // Tratamento genérico de filtros por empresa

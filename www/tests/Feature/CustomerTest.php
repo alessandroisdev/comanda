@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Actions\Customer\CreateCustomerAction;
-use App\Actions\Customer\UpdateCustomerAction;
 use App\Actions\Customer\DeleteCustomerAction;
+use App\Actions\Customer\UpdateCustomerAction;
 use App\DTOs\Customer\CreateCustomerDTO;
 use App\DTOs\Customer\UpdateCustomerDTO;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Employee;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
@@ -24,7 +26,9 @@ class CustomerTest extends TestCase
     use RefreshDatabase;
 
     private CreateCustomerAction $createAction;
+
     private UpdateCustomerAction $updateAction;
+
     private DeleteCustomerAction $deleteAction;
 
     protected function setUp(): void
@@ -49,7 +53,7 @@ class CustomerTest extends TestCase
             'document' => '222.333.444-55',
             'birth_date' => '1990-10-10',
             'marketing_opt_in' => true,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $customer = $this->createAction->execute($dto);
@@ -90,14 +94,14 @@ class CustomerTest extends TestCase
         $company = Company::factory()->create();
         $customer = Customer::factory()->create([
             'company_id' => $company->id,
-            'name' => 'Old Name'
+            'name' => 'Old Name',
         ]);
 
         $dto = UpdateCustomerDTO::fromArray([
             'name' => 'Updated Name',
             'email' => $customer->email,
             'status' => 'active',
-            'marketing_opt_in' => false
+            'marketing_opt_in' => false,
         ]);
 
         $updated = $this->updateAction->execute($customer, $dto);
@@ -137,7 +141,7 @@ class CustomerTest extends TestCase
         $this->deleteAction->execute($customer);
 
         $this->assertSoftDeleted('customers', [
-            'id' => $customer->id
+            'id' => $customer->id,
         ]);
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'customer.delete',
@@ -160,8 +164,8 @@ class CustomerTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'customers.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'customers.view']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 
@@ -177,8 +181,8 @@ class CustomerTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company1->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'customers.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'customers.view']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 
@@ -203,8 +207,8 @@ class CustomerTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'customers.delete']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'customers.delete']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 

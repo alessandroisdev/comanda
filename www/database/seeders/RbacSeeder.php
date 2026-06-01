@@ -70,7 +70,7 @@ class RbacSeeder extends Seeder
                 ['slug' => $slug],
                 [
                     'uuid' => (string) Str::uuid(),
-                    'description' => $description
+                    'description' => $description,
                 ]
             );
         }
@@ -90,7 +90,7 @@ class RbacSeeder extends Seeder
                 ['name' => $name],
                 [
                     'uuid' => (string) Str::uuid(),
-                    'description' => $description
+                    'description' => $description,
                 ]
             );
         }

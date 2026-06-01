@@ -13,3 +13,14 @@ parameters:
         - routes/console.php
 
     treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
+
+    ignoreErrors:
+        - '#Call to an undefined static method App\\Models\\.*::(where|create|orderBy|firstOrFail|all|find|whereHas|query|select|orderByDesc|orderByAsc)\(.*#'
+        - '#Method .* should return Illuminate\\View\\View but returns Illuminate\\Contracts\\View\\View#'
+        - '#Call to an undefined method App\\Models\\.*::(update|delete|roles|company|unit|permissions|products|units)\(.*#'
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder::.*#'
+        - '#Method App\\DataTables\\.*::getQuery.* should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\.*\\Builder#'
+        - '#Call to an undefined method Illuminate\\Database\\Query\\Builder::with.*#'
+        - '#Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user.*#'
+

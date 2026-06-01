@@ -7,7 +7,6 @@ namespace Database\Seeders;
 use App\Enums\EmployeeRoleEnum;
 use App\Enums\EmployeeStatusEnum;
 use App\Models\Company;
-use App\Models\CompanyUnit;
 use App\Models\Employee;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -39,9 +38,9 @@ class EmployeeSeeder extends Seeder
                     'uuid' => (string) Str::uuid(),
                     'company_id' => $company->id,
                     'unit_id' => $unit->id,
-                    'employee_number' => 'EMP-' . $company->id . $unit->id . '01',
-                    'name' => 'Gerente ' . $unit->name,
-                    'email' => 'gerente.' . Str::slug($unit->name) . '@' . Str::slug($company->trade_name) . '.com',
+                    'employee_number' => 'EMP-'.$company->id.$unit->id.'01',
+                    'name' => 'Gerente '.$unit->name,
+                    'email' => 'gerente.'.Str::slug($unit->name).'@'.Str::slug($company->trade_name).'.com',
                     'password' => Hash::make('password123'),
                     'phone' => '11988888888',
                     'document' => '11122233344',
@@ -56,9 +55,9 @@ class EmployeeSeeder extends Seeder
                     'uuid' => (string) Str::uuid(),
                     'company_id' => $company->id,
                     'unit_id' => $unit->id,
-                    'employee_number' => 'EMP-' . $company->id . $unit->id . '02',
-                    'name' => 'Garçom ' . $unit->name,
-                    'email' => 'garcom.' . Str::slug($unit->name) . '@' . Str::slug($company->trade_name) . '.com',
+                    'employee_number' => 'EMP-'.$company->id.$unit->id.'02',
+                    'name' => 'Garçom '.$unit->name,
+                    'email' => 'garcom.'.Str::slug($unit->name).'@'.Str::slug($company->trade_name).'.com',
                     'password' => Hash::make('password123'),
                     'phone' => '11977777777',
                     'document' => '55566677788',
@@ -73,9 +72,9 @@ class EmployeeSeeder extends Seeder
                     'uuid' => (string) Str::uuid(),
                     'company_id' => $company->id,
                     'unit_id' => $unit->id,
-                    'employee_number' => 'EMP-' . $company->id . $unit->id . '03',
-                    'name' => 'Caixa ' . $unit->name,
-                    'email' => 'caixa.' . Str::slug($unit->name) . '@' . Str::slug($company->trade_name) . '.com',
+                    'employee_number' => 'EMP-'.$company->id.$unit->id.'03',
+                    'name' => 'Caixa '.$unit->name,
+                    'email' => 'caixa.'.Str::slug($unit->name).'@'.Str::slug($company->trade_name).'.com',
                     'password' => Hash::make('password123'),
                     'phone' => '11966666666',
                     'document' => '88899900011',
@@ -90,9 +89,9 @@ class EmployeeSeeder extends Seeder
                     'uuid' => (string) Str::uuid(),
                     'company_id' => $company->id,
                     'unit_id' => $unit->id,
-                    'employee_number' => 'EMP-' . $company->id . $unit->id . '04',
-                    'name' => 'Cozinheiro ' . $unit->name,
-                    'email' => 'cozinha.' . Str::slug($unit->name) . '@' . Str::slug($company->trade_name) . '.com',
+                    'employee_number' => 'EMP-'.$company->id.$unit->id.'04',
+                    'name' => 'Cozinheiro '.$unit->name,
+                    'email' => 'cozinha.'.Str::slug($unit->name).'@'.Str::slug($company->trade_name).'.com',
                     'password' => Hash::make('password123'),
                     'phone' => '11955555555',
                     'document' => '33344455566',

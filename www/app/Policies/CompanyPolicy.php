@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\Company;
+use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CompanyPolicy
@@ -17,12 +19,12 @@ class CompanyPolicy
     private function hasPermission(mixed $user, string $permission): bool
     {
         // Se for um Administrador Geral da tabela 'users', ele tem acesso total
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
         // Se for um funcionário da tabela 'employees'
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             // Verificar no relacionamento do RBAC se alguma de suas roles possui a permissão
             return $user->roles()->whereHas('permissions', function ($query) use ($permission) {
                 $query->where('slug', $permission);
@@ -46,12 +48,12 @@ class CompanyPolicy
     public function view(mixed $user, Company $company): bool
     {
         // Administradores globais visualizam tudo
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
         // Funcionários só visualizam a sua própria empresa
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $company->id && $this->hasPermission($user, 'companies.view');
         }
 
@@ -64,7 +66,7 @@ class CompanyPolicy
     public function create(mixed $user): bool
     {
         // Apenas Administradores do Painel Geral (users) podem criar novas empresas/tenants no sistema
-        return $user instanceof \App\Models\User || $this->hasPermission($user, 'companies.create');
+        return $user instanceof User || $this->hasPermission($user, 'companies.create');
     }
 
     /**
@@ -72,11 +74,11 @@ class CompanyPolicy
      */
     public function update(mixed $user, Company $company): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $company->id && $this->hasPermission($user, 'companies.update');
         }
 
@@ -88,11 +90,11 @@ class CompanyPolicy
      */
     public function delete(mixed $user, Company $company): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $company->id && $this->hasPermission($user, 'companies.delete');
         }
 

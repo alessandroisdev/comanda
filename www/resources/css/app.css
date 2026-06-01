@@ -10,3 +10,55 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* Customização Dark Mode Premium para Formulários e DataTables */
+.form-control, .form-select, .form-control:focus, .form-select:focus {
+    background-color: #0f172a !important; /* Slate 900 */
+    border-color: #1e293b !important; /* Slate 800 */
+    color: #f8fafc !important; /* Slate 50 */
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important; /* Blue glow */
+    border-color: #3b82f6 !important;
+}
+
+.form-label {
+    color: #94a3b8 !important; /* Slate 400 */
+    font-weight: 500;
+}
+
+.card-premium {
+    background: #0f172a !important;
+    border: 1px solid #1e293b !important;
+}
+
+/* Ajustes no DataTables */
+.dataTables_wrapper {
+    color: #f8fafc !important;
+}
+
+.table {
+    color: #f8fafc !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(30, 41, 59, 0.4) !important;
+}
+
+.page-link {
+    background-color: #0f172a !important;
+    border-color: #1e293b !important;
+    color: #94a3b8 !important;
+}
+
+.page-item.active .page-link {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: #fff !important;
+}
+
+.text-slate-400 {
+    color: #94a3b8 !important;
+}
+

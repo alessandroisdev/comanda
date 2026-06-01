@@ -35,10 +35,10 @@ class UpdateUnitRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'document_number' => [
-                'nullable', 
-                'string', 
-                'max:30', 
-                Rule::unique('company_units', 'document_number')->ignore($unitId)
+                'nullable',
+                'string',
+                'max:30',
+                Rule::unique('company_units', 'document_number')->ignore($unitId),
             ],
             'email' => ['nullable', 'email', 'max:150'],
             'phone' => ['nullable', 'string', 'max:30'],

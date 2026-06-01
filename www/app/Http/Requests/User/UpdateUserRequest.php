@@ -35,10 +35,10 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
-                'required', 
-                'email', 
-                'max:150', 
-                Rule::unique('users', 'email')->ignore($userId)
+                'required',
+                'email',
+                'max:150',
+                Rule::unique('users', 'email')->ignore($userId),
             ],
             'password' => ['nullable', 'string', 'min:8', 'max:100'],
             'status' => ['nullable', new Enum(UserStatusEnum::class)],

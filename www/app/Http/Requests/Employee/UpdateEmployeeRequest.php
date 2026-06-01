@@ -21,7 +21,7 @@ class UpdateEmployeeRequest extends FormRequest
     public function rules(): array
     {
         $employeeUuid = $this->route('employee');
-        
+
         // Buscar o registro pelo UUID para obter o ID numérico e o company_id associado
         $employee = Employee::where('uuid', $employeeUuid)->firstOrFail();
         $employeeId = $employee->id;

@@ -28,10 +28,10 @@ class UpdateCustomerDTO
         return new self(
             name: trim($data['name']),
             email: strtolower(trim($data['email'])),
-            password: !empty($data['password']) ? $data['password'] : null,
+            password: ! empty($data['password']) ? $data['password'] : null,
             phone: isset($data['phone']) ? preg_replace('/[^0-9]/', '', $data['phone']) : null,
             document: isset($data['document']) ? preg_replace('/[^0-9]/', '', $data['document']) : null,
-            birth_date: !empty($data['birth_date']) ? Carbon::parse($data['birth_date']) : null,
+            birth_date: ! empty($data['birth_date']) ? Carbon::parse($data['birth_date']) : null,
             marketing_opt_in: (bool) ($data['marketing_opt_in'] ?? false),
             status: isset($data['status'])
                 ? (is_string($data['status']) ? CustomerStatusEnum::from($data['status']) : $data['status'])

@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Product\CreateProductAction;
-use App\Actions\Product\UpdateProductAction;
 use App\Actions\Product\DeleteProductAction;
+use App\Actions\Product\UpdateProductAction;
 use App\DataTables\ProductsDataTable;
 use App\DTOs\Product\CreateProductDTO;
 use App\DTOs\Product\UpdateProductDTO;
 use App\Http\Requests\Product\CreateProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
-use App\Models\Company;
 use App\Models\Category;
-use App\Models\Product;
+use App\Models\Company;
 use App\Models\Employee;
-use App\Services\ProductService;
+use App\Models\Product;
 use App\Services\DataTables\DataTableQueryService;
 use App\Services\DataTables\DataTableResponseFactory;
+use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -48,8 +48,8 @@ class ProductController extends Controller
     {
         Gate::authorize('viewAny', Product::class);
 
-        $provider = new ProductsDataTable();
-        
+        $provider = new ProductsDataTable;
+
         $user = $request->user();
         $result = $this->dataTableService->process($request, $provider, function ($query) use ($user) {
             if ($user instanceof Employee) {
@@ -87,7 +87,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('products.messages.create_success'),
-                'product_uuid' => $product->uuid
+                'product_uuid' => $product->uuid,
             ], 201);
         }
 
@@ -136,7 +136,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('products.messages.update_success'),
-                'product_uuid' => $updatedProduct->uuid
+                'product_uuid' => $updatedProduct->uuid,
             ]);
         }
 
@@ -156,7 +156,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('products.messages.delete_success')
+            'message' => __('products.messages.delete_success'),
         ]);
     }
 }

@@ -63,7 +63,7 @@ class UsersDataTable implements DataTableProviderInterface
             'name' => $row->name,
             'email' => $row->email,
             'created_at' => $row->created_at->toIso8601String(),
-            'actions' => $this->renderActions($row)
+            'actions' => $this->renderActions($row),
         ];
     }
 
@@ -72,18 +72,18 @@ class UsersDataTable implements DataTableProviderInterface
      */
     private function renderActions(User $user): string
     {
-        $viewBtn = '<a href="/admin/users/' . $user->uuid . '" class="btn btn-sm btn-info me-1" title="Visualizar"><i class="bi bi-eye"></i></a>';
-        $editBtn = '<a href="/admin/users/' . $user->uuid . '/edit" class="btn btn-sm btn-primary me-1" title="Editar / Reset de Senha"><i class="bi bi-pencil"></i></a>';
-        
-        $deleteUrl = '/api/v1/users/' . $user->uuid;
-        
+        $viewBtn = '<a href="/admin/users/'.$user->uuid.'" class="btn btn-sm btn-info me-1" title="Visualizar"><i class="bi bi-eye"></i></a>';
+        $editBtn = '<a href="/admin/users/'.$user->uuid.'/edit" class="btn btn-sm btn-primary me-1" title="Editar / Reset de Senha"><i class="bi bi-pencil"></i></a>';
+
+        $deleteUrl = '/api/v1/users/'.$user->uuid;
+
         // Evitar que o usuário logado veja o botão de apagar a si mesmo no datatable
         $currentUser = auth()->user();
         $deleteBtn = '';
         if ($currentUser && $currentUser->getKey() !== $user->id) {
-            $deleteBtn = '<button type="button" class="btn btn-sm btn-danger btn-delete-row" data-uuid="' . $user->uuid . '" data-url="' . $deleteUrl . '" title="Excluir"><i class="bi bi-trash"></i></button>';
+            $deleteBtn = '<button type="button" class="btn btn-sm btn-danger btn-delete-row" data-uuid="'.$user->uuid.'" data-url="'.$deleteUrl.'" title="Excluir"><i class="bi bi-trash"></i></button>';
         }
 
-        return '<div class="btn-group">' . $viewBtn . $editBtn . $deleteBtn . '</div>';
+        return '<div class="btn-group">'.$viewBtn.$editBtn.$deleteBtn.'</div>';
     }
 }

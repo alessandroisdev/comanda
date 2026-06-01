@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Unit\CreateUnitAction;
-use App\Actions\Unit\UpdateUnitAction;
 use App\Actions\Unit\DeleteUnitAction;
+use App\Actions\Unit\UpdateUnitAction;
 use App\DataTables\UnitsDataTable;
 use App\DTOs\Unit\CreateUnitDTO;
 use App\DTOs\Unit\UpdateUnitDTO;
 use App\Http\Requests\Unit\CreateUnitRequest;
 use App\Http\Requests\Unit\UpdateUnitRequest;
 use App\Models\CompanyUnit;
-use App\Services\UnitService;
+use App\Models\Employee;
 use App\Services\CompanyService;
 use App\Services\DataTables\DataTableQueryService;
 use App\Services\DataTables\DataTableResponseFactory;
+use App\Services\UnitService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -50,7 +51,7 @@ class UnitController extends Controller
         // Se for um funcionário, restringir as unidades à sua própria empresa
         $companyId = null;
         $actor = $request->user();
-        if ($actor instanceof \App\Models\Employee) {
+        if ($actor instanceof Employee) {
             $companyId = (int) $actor->company_id;
         }
 
@@ -86,7 +87,7 @@ class UnitController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('units.messages.create_success'),
-                'unit_uuid' => $unit->uuid
+                'unit_uuid' => $unit->uuid,
             ], 201);
         }
 
@@ -131,7 +132,7 @@ class UnitController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('units.messages.update_success'),
-                'unit_uuid' => $updatedUnit->uuid
+                'unit_uuid' => $updatedUnit->uuid,
             ]);
         }
 
@@ -151,7 +152,7 @@ class UnitController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('units.messages.delete_success')
+            'message' => __('units.messages.delete_success'),
         ]);
     }
 }

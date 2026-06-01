@@ -6,8 +6,8 @@ namespace App\Actions\User;
 
 use App\DTOs\User\UpdateUserDTO;
 use App\Models\User;
-use App\Services\UserService;
 use App\Services\Audit\AuditService;
+use App\Services\UserService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateUserAction
@@ -34,7 +34,7 @@ class UpdateUserAction
                 context: [
                     'user_uuid' => $updatedUser->uuid,
                     'email' => $updatedUser->email,
-                    'password_reset' => ! empty($dto->password) // Flag de alteração de senha
+                    'password_reset' => ! empty($dto->password), // Flag de alteração de senha
                 ]
             );
 

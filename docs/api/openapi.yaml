@@ -153,6 +153,139 @@ paths:
         '403':
           description: Acesso negado por falta ou invalidez de licença comercial.
 
+  /companies/{company_uuid}:
+    delete:
+      summary: Excluir Empresa (Soft Delete)
+      description: Executa a deleção lógica da empresa e registra a ação de forma imutável nos logs de auditoria.
+      parameters:
+        - name: company_uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Empresa excluída com sucesso.
+        '403':
+          description: Sem permissão ou restrição de tenant.
+        '404':
+          description: Empresa não encontrada.
+
+  /units/{unit_uuid}:
+    delete:
+      summary: Excluir Unidade Física (Soft Delete)
+      description: Executa a deleção lógica da unidade/filial física vinculada à empresa proprietária.
+      parameters:
+        - name: unit_uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Unidade excluída com sucesso.
+        '403':
+          description: Sem permissão.
+        '404':
+          description: Unidade não encontrada.
+
+  /users/{user_uuid}:
+    delete:
+      summary: Excluir Usuário Administrativo (Soft Delete)
+      description: Executa a deleção lógica do operador de painel (users). Impede que o próprio usuário se autoexclua.
+      parameters:
+        - name: user_uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Usuário excluído com sucesso.
+        '403':
+          description: Tentativa de autoexclusão ou falta de permissão.
+        '404':
+          description: Usuário não encontrado.
+
+  /employees/{employee_uuid}:
+    delete:
+      summary: Excluir Funcionário (Soft Delete)
+      description: Executa a deleção lógica do funcionário de loja e registra nos logs de auditoria.
+      parameters:
+        - name: employee_uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Funcionário excluído com sucesso.
+        '403':
+          description: Sem permissão.
+        '404':
+          description: Funcionário não encontrado.
+
+  /customers/{customer_uuid}:
+    delete:
+      summary: Excluir Cliente (Soft Delete)
+      description: Executa a deleção lógica do cliente/consumidor final do ecossistema.
+      parameters:
+        - name: customer_uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Cliente excluído com sucesso.
+        '403':
+          description: Sem permissão.
+        '404':
+          description: Cliente não encontrado.
+
+  /categories/{category_uuid}:
+    delete:
+      summary: Excluir Categoria (Soft Delete)
+      description: Executa a deleção lógica da categoria de cardápio.
+      parameters:
+        - name: category_uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Categoria excluída com sucesso.
+        '403':
+          description: Sem permissão.
+        '404':
+          description: Categoria não encontrada.
+
+  /products/{product_uuid}:
+    delete:
+      summary: Excluir Produto (Soft Delete)
+      description: Executa a deleção lógica do produto do catálogo de vendas.
+      parameters:
+        - name: product_uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Produto excluído com sucesso.
+        '403':
+          description: Sem permissão.
+        '404':
+          description: Produto não encontrado.
+
 components:
   securitySchemes:
     bearerAuth:

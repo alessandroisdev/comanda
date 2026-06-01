@@ -7,6 +7,7 @@ namespace App\Services;
 use App\DTOs\User\CreateUserDTO;
 use App\DTOs\User\UpdateUserDTO;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
@@ -14,7 +15,7 @@ class UserService
     /**
      * Busca um usuário pelo seu UUID público.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public function findByUuid(string $uuid): User
     {

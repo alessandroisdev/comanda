@@ -6,16 +6,17 @@ namespace App\Services;
 
 use App\DTOs\Company\CreateCompanyDTO;
 use App\DTOs\Company\UpdateCompanyDTO;
-use App\Models\Company;
 use App\Enums\CompanyStatusEnum;
+use App\Models\Company;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CompanyService
 {
     /**
      * Busca uma empresa pelo seu UUID público.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public function findByUuid(string $uuid): Company
     {

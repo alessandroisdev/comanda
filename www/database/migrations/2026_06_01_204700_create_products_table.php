@@ -32,7 +32,7 @@ return new class extends Migration
 
             // SKU único por empresa
             $table->unique(['company_id', 'sku']);
-            
+
             // Índices para buscas rápidas
             $table->index('status');
             $table->index('barcode');

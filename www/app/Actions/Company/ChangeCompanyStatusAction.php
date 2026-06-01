@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Company;
 
-use App\Models\Company;
 use App\Enums\CompanyStatusEnum;
+use App\Models\Company;
 use App\Services\Audit\AuditService;
 use Illuminate\Support\Facades\DB;
 
@@ -33,7 +33,7 @@ class ChangeCompanyStatusAction
                 context: [
                     'company_uuid' => $company->uuid,
                     'old_status' => $before['status'],
-                    'new_status' => $newStatus->value
+                    'new_status' => $newStatus->value,
                 ]
             );
 

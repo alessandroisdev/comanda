@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Actions\Company\CreateCompanyAction;
-use App\Actions\Company\UpdateCompanyAction;
 use App\Actions\Company\DeleteCompanyAction;
+use App\Actions\Company\UpdateCompanyAction;
 use App\DTOs\Company\CreateCompanyDTO;
 use App\DTOs\Company\UpdateCompanyDTO;
-use App\Enums\CompanyStatusEnum;
-use App\Enums\DocumentTypeEnum;
 use App\Models\Company;
-use App\Models\User;
 use App\Models\Employee;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
@@ -24,7 +24,9 @@ class CompanyTest extends TestCase
     use RefreshDatabase;
 
     private CreateCompanyAction $createAction;
+
     private UpdateCompanyAction $updateAction;
+
     private DeleteCompanyAction $deleteAction;
 
     protected function setUp(): void
@@ -45,7 +47,7 @@ class CompanyTest extends TestCase
             'document_number' => '12.345.678/0001-90',
             'email' => 'financeiro@empresateste.com',
             'phone' => '11988887777',
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $company = $this->createAction->execute($dto);
@@ -84,7 +86,7 @@ class CompanyTest extends TestCase
     public function it_can_update_a_company_with_action_and_dto()
     {
         $company = Company::factory()->create([
-            'trade_name' => 'Original Name'
+            'trade_name' => 'Original Name',
         ]);
 
         $dto = UpdateCompanyDTO::fromArray([
@@ -94,7 +96,7 @@ class CompanyTest extends TestCase
             'document_number' => $company->document_number,
             'email' => $company->email,
             'phone' => $company->phone,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $updated = $this->updateAction->execute($company, $dto);
@@ -135,7 +137,7 @@ class CompanyTest extends TestCase
         $this->deleteAction->execute($company);
 
         $this->assertSoftDeleted('companies', [
-            'id' => $company->id
+            'id' => $company->id,
         ]);
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'company.delete',
@@ -146,7 +148,7 @@ class CompanyTest extends TestCase
     public function general_panel_admin_users_can_create_companies_policy()
     {
         $user = User::factory()->create(); // Usuário da tabela 'users' (Admin Geral)
-        
+
         $this->assertTrue(Gate::forUser($user)->allows('create', Company::class));
     }
 
@@ -163,10 +165,10 @@ class CompanyTest extends TestCase
     {
         $company = Company::factory()->create();
         $employee = Employee::factory()->create(['company_id' => $company->id]);
-        
+
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'companies.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'companies.view']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 
@@ -179,10 +181,10 @@ class CompanyTest extends TestCase
         $company1 = Company::factory()->create();
         $company2 = Company::factory()->create();
         $employee = Employee::factory()->create(['company_id' => $company1->id]);
-        
+
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'companies.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'companies.view']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 

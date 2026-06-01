@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class EmployeePolicy
@@ -17,12 +18,12 @@ class EmployeePolicy
     private function hasPermission(mixed $user, string $permission): bool
     {
         // Administradores Gerais do painel (tabela 'users') têm acesso irrestrito
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
         // Funcionários da tabela 'employees'
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->roles()->whereHas('permissions', function ($query) use ($permission) {
                 $query->where('slug', $permission);
             })->exists();
@@ -44,11 +45,11 @@ class EmployeePolicy
      */
     public function view(mixed $user, Employee $employee): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $employee->company_id && $this->hasPermission($user, 'employees.view');
         }
 
@@ -68,11 +69,11 @@ class EmployeePolicy
      */
     public function update(mixed $user, Employee $employee): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $employee->company_id && $this->hasPermission($user, 'employees.update');
         }
 
@@ -84,12 +85,12 @@ class EmployeePolicy
      */
     public function delete(mixed $user, Employee $employee): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             // Um admin não pode deletar a si mesmo (se ele estivesse na mesma tabela, mas como está em 'users', ele pode deletar qualquer employee)
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             // Impedir que o funcionário se autoexclua
             if ($user->id === $employee->id) {
                 return false;

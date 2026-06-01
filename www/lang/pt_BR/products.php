@@ -34,5 +34,5 @@ return [
         'create_success' => 'Produto cadastrado com sucesso!',
         'update_success' => 'Produto atualizado com sucesso!',
         'delete_success' => 'Produto excluído com sucesso!',
-    ]
+    ],
 ];

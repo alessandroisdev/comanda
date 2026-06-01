@@ -32,8 +32,8 @@ class CreateCompanyDTO
         return new self(
             legal_name: $data['legal_name'],
             trade_name: $data['trade_name'],
-            document_type: is_string($data['document_type']) 
-                ? DocumentTypeEnum::from($data['document_type']) 
+            document_type: is_string($data['document_type'])
+                ? DocumentTypeEnum::from($data['document_type'])
                 : $data['document_type'],
             document_number: preg_replace('/[^0-9]/', '', $data['document_number']), // Limpar pontuações
             email: strtolower(trim($data['email'])),
@@ -43,7 +43,7 @@ class CreateCompanyDTO
             language: $data['language'] ?? 'pt_BR',
             logo: $data['logo'] ?? null,
             settings_json: $data['settings_json'] ?? null,
-            status: isset($data['status']) 
+            status: isset($data['status'])
                 ? (is_string($data['status']) ? CompanyStatusEnum::from($data['status']) : $data['status'])
                 : CompanyStatusEnum::ACTIVE
         );

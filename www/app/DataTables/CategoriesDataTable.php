@@ -25,7 +25,7 @@ class CategoriesDataTable implements DataTableProviderInterface
                 'categories.status',
                 'categories.sort_order',
                 'categories.created_at',
-                'companies.trade_name as company_name'
+                'companies.trade_name as company_name',
             ])
             ->leftJoin('companies', 'companies.id', '=', 'categories.company_id');
     }
@@ -72,7 +72,7 @@ class CategoriesDataTable implements DataTableProviderInterface
             'sort_order' => $row->sort_order,
             'company_name' => $row->getAttribute('company_name') ?? '-',
             'created_at' => $row->created_at->toIso8601String(),
-            'actions' => $this->renderActions($row)
+            'actions' => $this->renderActions($row),
         ];
     }
 
@@ -81,12 +81,12 @@ class CategoriesDataTable implements DataTableProviderInterface
      */
     private function renderActions(Category $category): string
     {
-        $viewBtn = '<a href="/admin/categories/' . $category->uuid . '" class="btn btn-sm btn-info me-1" title="Visualizar"><i class="bi bi-eye"></i></a>';
-        $editBtn = '<a href="/admin/categories/' . $category->uuid . '/edit" class="btn btn-sm btn-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>';
-        
-        $deleteUrl = '/api/v1/categories/' . $category->uuid;
-        $deleteBtn = '<button type="button" class="btn btn-sm btn-danger btn-delete-row" data-uuid="' . $category->uuid . '" data-url="' . $deleteUrl . '" title="Excluir"><i class="bi bi-trash"></i></button>';
+        $viewBtn = '<a href="/admin/categories/'.$category->uuid.'" class="btn btn-sm btn-info me-1" title="Visualizar"><i class="bi bi-eye"></i></a>';
+        $editBtn = '<a href="/admin/categories/'.$category->uuid.'/edit" class="btn btn-sm btn-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>';
 
-        return '<div class="btn-group">' . $viewBtn . $editBtn . $deleteBtn . '</div>';
+        $deleteUrl = '/api/v1/categories/'.$category->uuid;
+        $deleteBtn = '<button type="button" class="btn btn-sm btn-danger btn-delete-row" data-uuid="'.$category->uuid.'" data-url="'.$deleteUrl.'" title="Excluir"><i class="bi bi-trash"></i></button>';
+
+        return '<div class="btn-group">'.$viewBtn.$editBtn.$deleteBtn.'</div>';
     }
 }

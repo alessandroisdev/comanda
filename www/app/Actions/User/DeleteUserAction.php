@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\User;
 
 use App\Models\User;
-use App\Services\UserService;
 use App\Services\Audit\AuditService;
+use App\Services\UserService;
 use Illuminate\Support\Facades\DB;
 
 class DeleteUserAction
@@ -34,7 +34,7 @@ class DeleteUserAction
                 after: null,
                 context: [
                     'user_uuid' => $uuid,
-                    'email' => $email
+                    'email' => $email,
                 ]
             );
 

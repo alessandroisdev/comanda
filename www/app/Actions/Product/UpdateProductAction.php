@@ -6,8 +6,8 @@ namespace App\Actions\Product;
 
 use App\DTOs\Product\UpdateProductDTO;
 use App\Models\Product;
-use App\Services\ProductService;
 use App\Services\Audit\AuditService;
+use App\Services\ProductService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateProductAction

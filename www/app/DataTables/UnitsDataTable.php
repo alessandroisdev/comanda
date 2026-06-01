@@ -87,9 +87,9 @@ class UnitsDataTable implements DataTableProviderInterface
             'document_number' => $row->document_number ?? '-',
             'email' => $row->email ?? '-',
             'phone' => $row->phone ?? '-',
-            'location' => $row->city . ' / ' . $row->state,
+            'location' => $row->city.' / '.$row->state,
             'created_at' => $row->created_at->toIso8601String(),
-            'actions' => $this->renderActions($row)
+            'actions' => $this->renderActions($row),
         ];
     }
 
@@ -98,12 +98,12 @@ class UnitsDataTable implements DataTableProviderInterface
      */
     private function renderActions(CompanyUnit $unit): string
     {
-        $viewBtn = '<a href="/admin/units/' . $unit->uuid . '" class="btn btn-sm btn-info me-1" title="Visualizar"><i class="bi bi-eye"></i></a>';
-        $editBtn = '<a href="/admin/units/' . $unit->uuid . '/edit" class="btn btn-sm btn-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>';
-        
-        $deleteUrl = '/api/v1/units/' . $unit->uuid;
-        $deleteBtn = '<button type="button" class="btn btn-sm btn-danger btn-delete-row" data-uuid="' . $unit->uuid . '" data-url="' . $deleteUrl . '" title="Excluir"><i class="bi bi-trash"></i></button>';
+        $viewBtn = '<a href="/admin/units/'.$unit->uuid.'" class="btn btn-sm btn-info me-1" title="Visualizar"><i class="bi bi-eye"></i></a>';
+        $editBtn = '<a href="/admin/units/'.$unit->uuid.'/edit" class="btn btn-sm btn-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>';
 
-        return '<div class="btn-group">' . $viewBtn . $editBtn . $deleteBtn . '</div>';
+        $deleteUrl = '/api/v1/units/'.$unit->uuid;
+        $deleteBtn = '<button type="button" class="btn btn-sm btn-danger btn-delete-row" data-uuid="'.$unit->uuid.'" data-url="'.$deleteUrl.'" title="Excluir"><i class="bi bi-trash"></i></button>';
+
+        return '<div class="btn-group">'.$viewBtn.$editBtn.$deleteBtn.'</div>';
     }
 }

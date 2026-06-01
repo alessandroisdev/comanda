@@ -31,7 +31,7 @@ class ProductsDataTable implements DataTableProviderInterface
                 'products.preparation_time',
                 'products.created_at',
                 'companies.trade_name as company_name',
-                'categories.name as category_name'
+                'categories.name as category_name',
             ])
             ->leftJoin('companies', 'companies.id', '=', 'products.company_id')
             ->leftJoin('categories', 'categories.id', '=', 'products.category_id');
@@ -91,7 +91,7 @@ class ProductsDataTable implements DataTableProviderInterface
             'company_name' => $row->getAttribute('company_name') ?? '-',
             'category_name' => $row->getAttribute('category_name') ?? '-',
             'created_at' => $row->created_at->toIso8601String(),
-            'actions' => $this->renderActions($row)
+            'actions' => $this->renderActions($row),
         ];
     }
 
@@ -100,12 +100,12 @@ class ProductsDataTable implements DataTableProviderInterface
      */
     private function renderActions(Product $product): string
     {
-        $viewBtn = '<a href="/admin/products/' . $product->uuid . '" class="btn btn-sm btn-info me-1" title="Visualizar"><i class="bi bi-eye"></i></a>';
-        $editBtn = '<a href="/admin/products/' . $product->uuid . '/edit" class="btn btn-sm btn-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>';
-        
-        $deleteUrl = '/api/v1/products/' . $product->uuid;
-        $deleteBtn = '<button type="button" class="btn btn-sm btn-danger btn-delete-row" data-uuid="' . $product->uuid . '" data-url="' . $deleteUrl . '" title="Excluir"><i class="bi bi-trash"></i></button>';
+        $viewBtn = '<a href="/admin/products/'.$product->uuid.'" class="btn btn-sm btn-info me-1" title="Visualizar"><i class="bi bi-eye"></i></a>';
+        $editBtn = '<a href="/admin/products/'.$product->uuid.'/edit" class="btn btn-sm btn-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>';
 
-        return '<div class="btn-group">' . $viewBtn . $editBtn . $deleteBtn . '</div>';
+        $deleteUrl = '/api/v1/products/'.$product->uuid;
+        $deleteBtn = '<button type="button" class="btn btn-sm btn-danger btn-delete-row" data-uuid="'.$product->uuid.'" data-url="'.$deleteUrl.'" title="Excluir"><i class="bi bi-trash"></i></button>';
+
+        return '<div class="btn-group">'.$viewBtn.$editBtn.$deleteBtn.'</div>';
     }
 }

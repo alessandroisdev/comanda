@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\Product;
 
 use App\Models\Product;
-use App\Services\ProductService;
 use App\Services\Audit\AuditService;
+use App\Services\ProductService;
 use Illuminate\Support\Facades\DB;
 
 class DeleteProductAction

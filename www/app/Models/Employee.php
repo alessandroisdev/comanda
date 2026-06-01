@@ -6,6 +6,8 @@ namespace App\Models;
 
 use App\Enums\EmployeeRoleEnum;
 use App\Enums\EmployeeStatusEnum;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -24,16 +26,16 @@ use Illuminate\Notifications\Notifiable;
  * @property string $password
  * @property string|null $phone
  * @property string|null $document
- * @property \Carbon\Carbon|null $birth_date
- * @property \Carbon\Carbon|null $hire_date
+ * @property Carbon|null $birth_date
+ * @property Carbon|null $hire_date
  * @property EmployeeStatusEnum $status
  * @property EmployeeRoleEnum $role
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  * @property-read Company|null $company
  * @property-read CompanyUnit|null $unit
- * @property-read \Illuminate\Database\Eloquent\Collection|Role[] $roles
+ * @property-read Collection|Role[] $roles
  */
 class Employee extends Authenticatable
 {
@@ -113,4 +115,3 @@ class Employee extends Authenticatable
         return $this->belongsToMany(Role::class, 'employee_role');
     }
 }
-

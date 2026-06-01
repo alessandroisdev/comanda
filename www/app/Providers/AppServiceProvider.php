@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,16 +23,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('viewAnyModule', function (mixed $user) {
-            if ($user instanceof \App\Models\User) {
+            if ($user instanceof User) {
                 return true;
             }
-            if ($user instanceof \App\Models\Employee) {
+            if ($user instanceof Employee) {
                 return $user->roles()->whereHas('permissions', function ($query) {
                     $query->where('slug', 'modules.view');
                 })->exists();
             }
+
             return false;
         });
     }
 }
-

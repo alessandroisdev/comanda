@@ -7,13 +7,14 @@ namespace App\Services;
 use App\DTOs\Product\CreateProductDTO;
 use App\DTOs\Product\UpdateProductDTO;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductService
 {
     /**
      * Busca um produto pelo seu UUID público.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public function findByUuid(string $uuid): Product
     {

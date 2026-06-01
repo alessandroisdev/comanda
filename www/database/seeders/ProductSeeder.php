@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\ProductStatusEnum;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
@@ -52,13 +53,13 @@ class ProductSeeder extends Seeder
                     'uuid' => (string) Str::uuid(),
                     'company_id' => $category->company_id,
                     'category_id' => $category->id,
-                    'sku' => 'PROD-' . $category->company_id . $category->id . $index,
-                    'barcode' => '7890000' . $category->company_id . $category->id . $index,
+                    'sku' => 'PROD-'.$category->company_id.$category->id.$index,
+                    'barcode' => '7890000'.$category->company_id.$category->id.$index,
                     'name' => $item['name'],
                     'description' => $item['desc'],
                     'price_cents' => (int) round($item['price'] * 100),
                     'cost_cents' => (int) round($item['cost'] * 100),
-                    'status' => \App\Enums\ProductStatusEnum::ACTIVE,
+                    'status' => ProductStatusEnum::ACTIVE,
                     'preparation_time' => $item['prep'],
                 ]);
             }

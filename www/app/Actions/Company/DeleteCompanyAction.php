@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\Company;
 
 use App\Models\Company;
-use App\Services\CompanyService;
 use App\Services\Audit\AuditService;
+use App\Services\CompanyService;
 use Illuminate\Support\Facades\DB;
 
 class DeleteCompanyAction
@@ -34,7 +34,7 @@ class DeleteCompanyAction
                 after: null,
                 context: [
                     'company_uuid' => $uuid,
-                    'document_number' => $doc
+                    'document_number' => $doc,
                 ]
             );
 

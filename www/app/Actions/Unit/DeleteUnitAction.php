@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\Unit;
 
 use App\Models\CompanyUnit;
-use App\Services\UnitService;
 use App\Services\Audit\AuditService;
+use App\Services\UnitService;
 use Illuminate\Support\Facades\DB;
 
 class DeleteUnitAction
@@ -36,7 +36,7 @@ class DeleteUnitAction
                 context: [
                     'unit_uuid' => $uuid,
                     'company_id' => $companyId,
-                    'name' => $name
+                    'name' => $name,
                 ]
             );
 

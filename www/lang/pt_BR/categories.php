@@ -29,5 +29,5 @@ return [
         'create_success' => 'Categoria cadastrada com sucesso!',
         'update_success' => 'Categoria atualizada com sucesso!',
         'delete_success' => 'Categoria excluída com sucesso!',
-    ]
+    ],
 ];

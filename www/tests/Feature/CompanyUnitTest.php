@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Actions\Unit\CreateUnitAction;
-use App\Actions\Unit\UpdateUnitAction;
 use App\Actions\Unit\DeleteUnitAction;
+use App\Actions\Unit\UpdateUnitAction;
 use App\DTOs\Unit\CreateUnitDTO;
 use App\DTOs\Unit\UpdateUnitDTO;
 use App\Models\Company;
 use App\Models\CompanyUnit;
-use App\Models\User;
 use App\Models\Employee;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
@@ -23,7 +25,9 @@ class CompanyUnitTest extends TestCase
     use RefreshDatabase;
 
     private CreateUnitAction $createAction;
+
     private UpdateUnitAction $updateAction;
+
     private DeleteUnitAction $deleteAction;
 
     protected function setUp(): void
@@ -52,7 +56,7 @@ class CompanyUnitTest extends TestCase
             'city' => 'São Paulo',
             'state' => 'SP',
             'country' => 'Brasil',
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $unit = $this->createAction->execute($dto);
@@ -96,7 +100,7 @@ class CompanyUnitTest extends TestCase
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create([
             'company_id' => $company->id,
-            'name' => 'Old Name'
+            'name' => 'Old Name',
         ]);
 
         $dto = UpdateUnitDTO::fromArray([
@@ -111,7 +115,7 @@ class CompanyUnitTest extends TestCase
             'city' => $unit->city,
             'state' => $unit->state,
             'country' => $unit->country,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $updated = $this->updateAction->execute($unit, $dto);
@@ -156,7 +160,7 @@ class CompanyUnitTest extends TestCase
         $this->deleteAction->execute($unit);
 
         $this->assertSoftDeleted('company_units', [
-            'id' => $unit->id
+            'id' => $unit->id,
         ]);
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'unit.delete',
@@ -179,8 +183,8 @@ class CompanyUnitTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'units.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'units.view']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 
@@ -206,8 +210,8 @@ class CompanyUnitTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company1->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'units.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'units.view']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 

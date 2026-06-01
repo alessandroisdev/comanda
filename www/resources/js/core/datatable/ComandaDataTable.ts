@@ -1,5 +1,5 @@
 import jQuery from 'jquery';
-import DataTable from 'datatables.net-bs5';
+import 'datatables.net-bs5';
 
 export interface ComandaDataTableConfig {
     tableId: string;
@@ -143,7 +143,7 @@ export class ComandaDataTable {
                 headers: {
                     'X-CSRF-TOKEN': csrfToken
                 },
-                success: (response) => {
+                success: () => {
                     bootstrapModal.hide();
                     modalElement.remove();
                     this.showToast('Registro excluído com sucesso!', 'success');

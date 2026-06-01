@@ -6,8 +6,8 @@ namespace App\Actions\User;
 
 use App\DTOs\User\CreateUserDTO;
 use App\Models\User;
-use App\Services\UserService;
 use App\Services\Audit\AuditService;
+use App\Services\UserService;
 use Illuminate\Support\Facades\DB;
 
 class CreateUserAction
@@ -31,7 +31,7 @@ class CreateUserAction
                 after: $user->makeHidden('password')->toArray(), // Nunca auditar o hash da senha
                 context: [
                     'user_uuid' => $user->uuid,
-                    'email' => $user->email
+                    'email' => $user->email,
                 ]
             );
 

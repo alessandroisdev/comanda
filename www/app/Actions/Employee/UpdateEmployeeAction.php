@@ -6,8 +6,8 @@ namespace App\Actions\Employee;
 
 use App\DTOs\Employee\UpdateEmployeeDTO;
 use App\Models\Employee;
-use App\Services\EmployeeService;
 use App\Services\Audit\AuditService;
+use App\Services\EmployeeService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateEmployeeAction
@@ -24,7 +24,7 @@ class UpdateEmployeeAction
     {
         return DB::transaction(function () use ($employee, $dto) {
             $before = $employee->toArray();
-            
+
             $updatedEmployee = $this->service->update($employee, $dto);
 
             $this->auditService->log(

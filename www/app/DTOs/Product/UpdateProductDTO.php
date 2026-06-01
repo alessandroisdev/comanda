@@ -10,11 +10,11 @@ class UpdateProductDTO
 {
     public function __construct(
         public readonly int $category_id,
+        public readonly string $name,
+        public readonly int $price_cents,
         public readonly ?string $sku = null,
         public readonly ?string $barcode = null,
-        public readonly string $name,
         public readonly ?string $description = null,
-        public readonly int $price_cents,
         public readonly ?int $cost_cents = null,
         public readonly ProductStatusEnum $status = ProductStatusEnum::ACTIVE,
         public readonly ?string $image = null,
@@ -28,8 +28,8 @@ class UpdateProductDTO
     {
         return new self(
             category_id: (int) $data['category_id'],
-            sku: !empty($data['sku']) ? trim($data['sku']) : null,
-            barcode: !empty($data['barcode']) ? trim($data['barcode']) : null,
+            sku: ! empty($data['sku']) ? trim($data['sku']) : null,
+            barcode: ! empty($data['barcode']) ? trim($data['barcode']) : null,
             name: trim($data['name']),
             description: isset($data['description']) ? trim($data['description']) : null,
             price_cents: (int) $data['price_cents'],
@@ -37,7 +37,7 @@ class UpdateProductDTO
             status: isset($data['status'])
                 ? (is_string($data['status']) ? ProductStatusEnum::from($data['status']) : $data['status'])
                 : ProductStatusEnum::ACTIVE,
-            image: !empty($data['image']) ? trim($data['image']) : null,
+            image: ! empty($data['image']) ? trim($data['image']) : null,
             preparation_time: (int) ($data['preparation_time'] ?? 0)
         );
     }

@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Category\CreateCategoryAction;
-use App\Actions\Category\UpdateCategoryAction;
 use App\Actions\Category\DeleteCategoryAction;
+use App\Actions\Category\UpdateCategoryAction;
 use App\DataTables\CategoriesDataTable;
 use App\DTOs\Category\CreateCategoryDTO;
 use App\DTOs\Category\UpdateCategoryDTO;
 use App\Http\Requests\Category\CreateCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
-use App\Models\Company;
 use App\Models\Category;
+use App\Models\Company;
 use App\Models\Employee;
 use App\Services\CategoryService;
 use App\Services\DataTables\DataTableQueryService;
@@ -47,8 +47,8 @@ class CategoryController extends Controller
     {
         Gate::authorize('viewAny', Category::class);
 
-        $provider = new CategoriesDataTable();
-        
+        $provider = new CategoriesDataTable;
+
         $user = $request->user();
         $result = $this->dataTableService->process($request, $provider, function ($query) use ($user) {
             if ($user instanceof Employee) {
@@ -85,7 +85,7 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('categories.messages.create_success'),
-                'category_uuid' => $category->uuid
+                'category_uuid' => $category->uuid,
             ], 201);
         }
 
@@ -132,7 +132,7 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('categories.messages.update_success'),
-                'category_uuid' => $updatedCategory->uuid
+                'category_uuid' => $updatedCategory->uuid,
             ]);
         }
 
@@ -152,7 +152,7 @@ class CategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('categories.messages.delete_success')
+            'message' => __('categories.messages.delete_success'),
         ]);
     }
 }

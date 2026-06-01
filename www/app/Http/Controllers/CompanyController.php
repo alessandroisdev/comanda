@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Company\CreateCompanyAction;
-use App\Actions\Company\UpdateCompanyAction;
 use App\Actions\Company\DeleteCompanyAction;
+use App\Actions\Company\UpdateCompanyAction;
 use App\DataTables\CompaniesDataTable;
 use App\DTOs\Company\CreateCompanyDTO;
 use App\DTOs\Company\UpdateCompanyDTO;
@@ -45,7 +45,7 @@ class CompanyController extends Controller
     {
         Gate::authorize('viewAny', Company::class);
 
-        $provider = new CompaniesDataTable();
+        $provider = new CompaniesDataTable;
         $result = $this->dataTableService->process($request, $provider);
 
         return DataTableResponseFactory::create($result);
@@ -75,7 +75,7 @@ class CompanyController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('companies.messages.create_success'),
-                'company_uuid' => $company->uuid
+                'company_uuid' => $company->uuid,
             ], 201);
         }
 
@@ -120,7 +120,7 @@ class CompanyController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('companies.messages.update_success'),
-                'company_uuid' => $updatedCompany->uuid
+                'company_uuid' => $updatedCompany->uuid,
             ]);
         }
 
@@ -140,7 +140,7 @@ class CompanyController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('companies.messages.delete_success')
+            'message' => __('companies.messages.delete_success'),
         ]);
     }
 }

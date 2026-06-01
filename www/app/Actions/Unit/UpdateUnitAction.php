@@ -6,8 +6,8 @@ namespace App\Actions\Unit;
 
 use App\DTOs\Unit\UpdateUnitDTO;
 use App\Models\CompanyUnit;
-use App\Services\UnitService;
 use App\Services\Audit\AuditService;
+use App\Services\UnitService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateUnitAction
@@ -34,7 +34,7 @@ class UpdateUnitAction
                 context: [
                     'unit_uuid' => $updatedUnit->uuid,
                     'company_id' => $updatedUnit->company_id,
-                    'name' => $updatedUnit->name
+                    'name' => $updatedUnit->name,
                 ]
             );
 

@@ -6,8 +6,8 @@ namespace App\Actions\Customer;
 
 use App\DTOs\Customer\CreateCustomerDTO;
 use App\Models\Customer;
-use App\Services\CustomerService;
 use App\Services\Audit\AuditService;
+use App\Services\CustomerService;
 use Illuminate\Support\Facades\DB;
 
 class CreateCustomerAction

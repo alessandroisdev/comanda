@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\Customer;
 
 use App\Models\Customer;
-use App\Services\CustomerService;
 use App\Services\Audit\AuditService;
+use App\Services\CustomerService;
 use Illuminate\Support\Facades\DB;
 
 class DeleteCustomerAction

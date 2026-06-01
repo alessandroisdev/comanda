@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Customer>
+ * @extends Factory<Customer>
  */
 class CustomerFactory extends Factory
 {
@@ -31,7 +31,7 @@ class CustomerFactory extends Factory
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => Hash::make('password123'),
-            'phone' => '119' . $this->faker->numberBetween(10000000, 99999999),
+            'phone' => '119'.$this->faker->numberBetween(10000000, 99999999),
             'document' => $this->faker->unique()->cpf(false),
             'birth_date' => $this->faker->dateTimeBetween('-60 years', '-15 years')->format('Y-m-d'),
             'marketing_opt_in' => $this->faker->boolean(40), // 40% de chance de aceitar marketing

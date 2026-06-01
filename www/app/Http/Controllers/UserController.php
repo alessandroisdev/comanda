@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\User\CreateUserAction;
-use App\Actions\User\UpdateUserAction;
 use App\Actions\User\DeleteUserAction;
+use App\Actions\User\UpdateUserAction;
 use App\DataTables\UsersDataTable;
 use App\DTOs\User\CreateUserDTO;
 use App\DTOs\User\UpdateUserDTO;
 use App\Http\Requests\User\CreateUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
-use App\Services\UserService;
 use App\Services\DataTables\DataTableQueryService;
 use App\Services\DataTables\DataTableResponseFactory;
+use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -45,7 +45,7 @@ class UserController extends Controller
     {
         Gate::authorize('viewAny', User::class);
 
-        $provider = new UsersDataTable();
+        $provider = new UsersDataTable;
         $result = $this->dataTableService->process($request, $provider);
 
         return DataTableResponseFactory::create($result);
@@ -75,7 +75,7 @@ class UserController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('users.messages.create_success'),
-                'user_uuid' => $user->uuid
+                'user_uuid' => $user->uuid,
             ], 201);
         }
 
@@ -120,7 +120,7 @@ class UserController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('users.messages.update_success'),
-                'user_uuid' => $updatedUser->uuid
+                'user_uuid' => $updatedUser->uuid,
             ]);
         }
 
@@ -140,7 +140,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('users.messages.delete_success')
+            'message' => __('users.messages.delete_success'),
         ]);
     }
 }

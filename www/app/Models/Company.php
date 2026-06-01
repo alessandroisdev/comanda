@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\CompanyStatusEnum;
 use App\Enums\DocumentTypeEnum;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -26,9 +27,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $language
  * @property string|null $logo
  * @property array|null $settings_json
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  */
 class Company extends Model
 {

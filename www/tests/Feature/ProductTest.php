@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Actions\Product\CreateProductAction;
-use App\Actions\Product\UpdateProductAction;
 use App\Actions\Product\DeleteProductAction;
+use App\Actions\Product\UpdateProductAction;
 use App\DTOs\Product\CreateProductDTO;
 use App\DTOs\Product\UpdateProductDTO;
-use App\Models\Company;
 use App\Models\Category;
-use App\Models\Product;
+use App\Models\Company;
 use App\Models\Employee;
+use App\Models\Permission;
+use App\Models\Product;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
@@ -24,7 +26,9 @@ class ProductTest extends TestCase
     use RefreshDatabase;
 
     private CreateProductAction $createAction;
+
     private UpdateProductAction $updateAction;
+
     private DeleteProductAction $deleteAction;
 
     protected function setUp(): void
@@ -52,7 +56,7 @@ class ProductTest extends TestCase
             'cost_cents' => 1250,  // R$ 12,50
             'status' => 'active',
             'image' => 'hamburguer.jpg',
-            'preparation_time' => 15
+            'preparation_time' => 15,
         ]);
 
         $product = $this->createAction->execute($dto);
@@ -114,14 +118,14 @@ class ProductTest extends TestCase
         $product = Product::factory()->create([
             'company_id' => $company->id,
             'category_id' => $category->id,
-            'name' => 'Old Name'
+            'name' => 'Old Name',
         ]);
 
         $dto = UpdateProductDTO::fromArray([
             'category_id' => $category->id,
             'name' => 'Updated Name',
             'price_cents' => 4200,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $updated = $this->updateAction->execute($product, $dto);
@@ -170,7 +174,7 @@ class ProductTest extends TestCase
         $this->deleteAction->execute($product);
 
         $this->assertSoftDeleted('products', [
-            'id' => $product->id
+            'id' => $product->id,
         ]);
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'product.delete',
@@ -197,8 +201,8 @@ class ProductTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'products.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'products.view']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 
@@ -218,8 +222,8 @@ class ProductTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company1->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'products.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'products.view']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 
@@ -238,8 +242,8 @@ class ProductTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'products.delete']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'products.delete']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 

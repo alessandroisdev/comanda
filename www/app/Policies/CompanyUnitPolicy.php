@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\CompanyUnit;
+use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CompanyUnitPolicy
@@ -16,11 +18,11 @@ class CompanyUnitPolicy
      */
     private function hasPermission(mixed $user, string $permission): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->roles()->whereHas('permissions', function ($query) use ($permission) {
                 $query->where('slug', $permission);
             })->exists();
@@ -42,11 +44,11 @@ class CompanyUnitPolicy
      */
     public function view(mixed $user, CompanyUnit $unit): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $unit->company_id && $this->hasPermission($user, 'units.view');
         }
 
@@ -58,7 +60,7 @@ class CompanyUnitPolicy
      */
     public function create(mixed $user): bool
     {
-        return $user instanceof \App\Models\User || $this->hasPermission($user, 'units.create');
+        return $user instanceof User || $this->hasPermission($user, 'units.create');
     }
 
     /**
@@ -66,11 +68,11 @@ class CompanyUnitPolicy
      */
     public function update(mixed $user, CompanyUnit $unit): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $unit->company_id && $this->hasPermission($user, 'units.update');
         }
 
@@ -82,11 +84,11 @@ class CompanyUnitPolicy
      */
     public function delete(mixed $user, CompanyUnit $unit): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $unit->company_id && $this->hasPermission($user, 'units.delete');
         }
 

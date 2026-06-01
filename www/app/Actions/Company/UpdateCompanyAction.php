@@ -6,8 +6,8 @@ namespace App\Actions\Company;
 
 use App\DTOs\Company\UpdateCompanyDTO;
 use App\Models\Company;
-use App\Services\CompanyService;
 use App\Services\Audit\AuditService;
+use App\Services\CompanyService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateCompanyAction
@@ -33,7 +33,7 @@ class UpdateCompanyAction
                 after: $updatedCompany->toArray(),
                 context: [
                     'company_uuid' => $updatedCompany->uuid,
-                    'document_number' => $updatedCompany->document_number
+                    'document_number' => $updatedCompany->document_number,
                 ]
             );
 

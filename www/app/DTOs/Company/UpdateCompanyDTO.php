@@ -32,8 +32,8 @@ class UpdateCompanyDTO
         return new self(
             legal_name: $data['legal_name'],
             trade_name: $data['trade_name'],
-            document_type: is_string($data['document_type']) 
-                ? DocumentTypeEnum::from($data['document_type']) 
+            document_type: is_string($data['document_type'])
+                ? DocumentTypeEnum::from($data['document_type'])
                 : $data['document_type'],
             document_number: preg_replace('/[^0-9]/', '', $data['document_number']),
             email: strtolower(trim($data['email'])),

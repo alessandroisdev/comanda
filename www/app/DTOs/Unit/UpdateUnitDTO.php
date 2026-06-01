@@ -38,8 +38,8 @@ class UpdateUnitDTO
             city: $data['city'],
             state: $data['state'],
             country: $data['country'] ?? 'Brasil',
-            document_number: ! empty($data['document_number']) 
-                ? preg_replace('/[^0-9]/', '', $data['document_number']) 
+            document_number: ! empty($data['document_number'])
+                ? preg_replace('/[^0-9]/', '', $data['document_number'])
                 : null,
             email: ! empty($data['email']) ? strtolower(trim($data['email'])) : null,
             phone: ! empty($data['phone']) ? preg_replace('/[^0-9]/', '', $data['phone']) : null,

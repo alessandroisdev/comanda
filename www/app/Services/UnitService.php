@@ -6,16 +6,17 @@ namespace App\Services;
 
 use App\DTOs\Unit\CreateUnitDTO;
 use App\DTOs\Unit\UpdateUnitDTO;
-use App\Models\CompanyUnit;
 use App\Enums\UnitStatusEnum;
+use App\Models\CompanyUnit;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UnitService
 {
     /**
      * Busca uma unidade pelo seu UUID público.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public function findByUuid(string $uuid): CompanyUnit
     {

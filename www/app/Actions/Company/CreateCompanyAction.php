@@ -6,8 +6,8 @@ namespace App\Actions\Company;
 
 use App\DTOs\Company\CreateCompanyDTO;
 use App\Models\Company;
-use App\Services\CompanyService;
 use App\Services\Audit\AuditService;
+use App\Services\CompanyService;
 use Illuminate\Support\Facades\DB;
 
 class CreateCompanyAction
@@ -32,7 +32,7 @@ class CreateCompanyAction
                 after: $company->toArray(),
                 context: [
                     'company_uuid' => $company->uuid,
-                    'document_number' => $company->document_number
+                    'document_number' => $company->document_number,
                 ]
             );
 

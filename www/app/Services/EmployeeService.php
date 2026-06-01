@@ -7,14 +7,14 @@ namespace App\Services;
 use App\DTOs\Employee\CreateEmployeeDTO;
 use App\DTOs\Employee\UpdateEmployeeDTO;
 use App\Models\Employee;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EmployeeService
 {
     /**
      * Busca um funcionário pelo seu UUID público.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public function findByUuid(string $uuid): Employee
     {

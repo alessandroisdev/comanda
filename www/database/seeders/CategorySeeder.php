@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Company;
+use App\Enums\CategoryStatusEnum;
 use App\Models\Category;
+use App\Models\Company;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -37,7 +38,7 @@ class CategorySeeder extends Seeder
                     'name' => $cat['name'],
                     'description' => $cat['description'],
                     'sort_order' => $cat['sort_order'],
-                    'status' => \App\Enums\CategoryStatusEnum::ACTIVE,
+                    'status' => CategoryStatusEnum::ACTIVE,
                 ]);
             }
         }

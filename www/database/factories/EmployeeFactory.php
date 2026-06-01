@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Employee>
+ * @extends Factory<Employee>
  */
 class EmployeeFactory extends Factory
 {
@@ -33,11 +33,11 @@ class EmployeeFactory extends Factory
             'unit_id' => function (array $attributes) {
                 return CompanyUnit::factory()->create(['company_id' => $attributes['company_id']])->id;
             },
-            'employee_number' => 'EMP-' . $this->faker->unique()->numberBetween(1000, 9999),
+            'employee_number' => 'EMP-'.$this->faker->unique()->numberBetween(1000, 9999),
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => Hash::make('password123'),
-            'phone' => '119' . $this->faker->numberBetween(10000000, 99999999),
+            'phone' => '119'.$this->faker->numberBetween(10000000, 99999999),
             'document' => $this->faker->unique()->cpf(false),
             'birth_date' => $this->faker->dateTimeBetween('-50 years', '-18 years')->format('Y-m-d'),
             'hire_date' => $this->faker->dateTimeBetween('-5 years', 'now')->format('Y-m-d'),

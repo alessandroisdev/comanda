@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Actions\Employee\CreateEmployeeAction;
-use App\Actions\Employee\UpdateEmployeeAction;
 use App\Actions\Employee\DeleteEmployeeAction;
+use App\Actions\Employee\UpdateEmployeeAction;
 use App\DTOs\Employee\CreateEmployeeDTO;
 use App\DTOs\Employee\UpdateEmployeeDTO;
 use App\Enums\EmployeeRoleEnum;
-use App\Enums\EmployeeStatusEnum;
 use App\Models\Company;
 use App\Models\CompanyUnit;
 use App\Models\Employee;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
@@ -26,7 +27,9 @@ class EmployeeTest extends TestCase
     use RefreshDatabase;
 
     private CreateEmployeeAction $createAction;
+
     private UpdateEmployeeAction $updateAction;
+
     private DeleteEmployeeAction $deleteAction;
 
     protected function setUp(): void
@@ -55,7 +58,7 @@ class EmployeeTest extends TestCase
             'birth_date' => '1995-05-15',
             'hire_date' => '2026-06-01',
             'role' => 'waiter',
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $employee = $this->createAction->execute($dto);
@@ -93,7 +96,7 @@ class EmployeeTest extends TestCase
                 'employee_uuid' => $employee->uuid,
                 'company_id' => $company->id,
                 'unit_id' => null,
-                'role' => 'cashier'
+                'role' => 'cashier',
             ]),
         ]);
     }
@@ -104,7 +107,7 @@ class EmployeeTest extends TestCase
         $company = Company::factory()->create();
         $employee = Employee::factory()->create([
             'company_id' => $company->id,
-            'name' => 'Old Name'
+            'name' => 'Old Name',
         ]);
 
         $dto = UpdateEmployeeDTO::fromArray([
@@ -113,7 +116,7 @@ class EmployeeTest extends TestCase
             'name' => 'Updated Name',
             'email' => $employee->email,
             'role' => 'kitchen',
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $updated = $this->updateAction->execute($employee, $dto);
@@ -156,7 +159,7 @@ class EmployeeTest extends TestCase
         $this->deleteAction->execute($employee);
 
         $this->assertSoftDeleted('employees', [
-            'id' => $employee->id
+            'id' => $employee->id,
         ]);
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'employee.delete',
@@ -179,8 +182,8 @@ class EmployeeTest extends TestCase
         $employee2 = Employee::factory()->create(['company_id' => $company->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'employees.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'employees.view']);
         $role->permissions()->attach($permission);
         $employee1->roles()->attach($role);
 
@@ -196,8 +199,8 @@ class EmployeeTest extends TestCase
         $employee2 = Employee::factory()->create(['company_id' => $company2->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'employees.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'employees.view']);
         $role->permissions()->attach($permission);
         $employee1->roles()->attach($role);
 
@@ -211,8 +214,8 @@ class EmployeeTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'employees.delete']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'employees.delete']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 
@@ -227,8 +230,8 @@ class EmployeeTest extends TestCase
         $employee2 = Employee::factory()->create(['company_id' => $company->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'employees.delete']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'employees.delete']);
         $role->permissions()->attach($permission);
         $employee1->roles()->attach($role);
 

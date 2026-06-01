@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\CustomerStatusEnum;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,12 +21,12 @@ use Illuminate\Notifications\Notifiable;
  * @property string $password
  * @property string|null $phone
  * @property string|null $document
- * @property \Carbon\Carbon|null $birth_date
+ * @property Carbon|null $birth_date
  * @property bool $marketing_opt_in
  * @property CustomerStatusEnum $status
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  * @property-read Company|null $company
  */
 class Customer extends Authenticatable
@@ -86,4 +87,3 @@ class Customer extends Authenticatable
         return $this->belongsTo(Company::class);
     }
 }
-

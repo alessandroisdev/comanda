@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Employee\CreateEmployeeAction;
-use App\Actions\Employee\UpdateEmployeeAction;
 use App\Actions\Employee\DeleteEmployeeAction;
+use App\Actions\Employee\UpdateEmployeeAction;
 use App\DataTables\EmployeesDataTable;
 use App\DTOs\Employee\CreateEmployeeDTO;
 use App\DTOs\Employee\UpdateEmployeeDTO;
@@ -15,9 +15,9 @@ use App\Http\Requests\Employee\UpdateEmployeeRequest;
 use App\Models\Company;
 use App\Models\CompanyUnit;
 use App\Models\Employee;
-use App\Services\EmployeeService;
 use App\Services\DataTables\DataTableQueryService;
 use App\Services\DataTables\DataTableResponseFactory;
+use App\Services\EmployeeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -47,8 +47,8 @@ class EmployeeController extends Controller
     {
         Gate::authorize('viewAny', Employee::class);
 
-        $provider = new EmployeesDataTable();
-        
+        $provider = new EmployeesDataTable;
+
         // Se for um funcionário restrito (não admin global de users), aplicar escopo de empresa
         $user = $request->user();
         $result = $this->dataTableService->process($request, $provider, function ($query) use ($user) {
@@ -87,7 +87,7 @@ class EmployeeController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('employees.messages.create_success'),
-                'employee_uuid' => $employee->uuid
+                'employee_uuid' => $employee->uuid,
             ], 201);
         }
 
@@ -135,7 +135,7 @@ class EmployeeController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('employees.messages.update_success'),
-                'employee_uuid' => $updatedEmployee->uuid
+                'employee_uuid' => $updatedEmployee->uuid,
             ]);
         }
 
@@ -155,7 +155,7 @@ class EmployeeController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('employees.messages.delete_success')
+            'message' => __('employees.messages.delete_success'),
         ]);
     }
 }

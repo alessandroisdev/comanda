@@ -6,8 +6,8 @@ namespace App\Actions\Category;
 
 use App\DTOs\Category\UpdateCategoryDTO;
 use App\Models\Category;
-use App\Services\CategoryService;
 use App\Services\Audit\AuditService;
+use App\Services\CategoryService;
 use Illuminate\Support\Facades\DB;
 
 class UpdateCategoryAction

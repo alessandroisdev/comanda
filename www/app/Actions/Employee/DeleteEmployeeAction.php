@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\Employee;
 
 use App\Models\Employee;
-use App\Services\EmployeeService;
 use App\Services\Audit\AuditService;
+use App\Services\EmployeeService;
 use Illuminate\Support\Facades\DB;
 
 class DeleteEmployeeAction
@@ -23,7 +23,7 @@ class DeleteEmployeeAction
     {
         DB::transaction(function () use ($employee) {
             $before = $employee->toArray();
-            
+
             $this->service->delete($employee);
 
             $this->auditService->log(

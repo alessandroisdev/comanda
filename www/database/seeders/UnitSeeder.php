@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\UnitStatusEnum;
 use App\Models\Company;
 use App\Models\CompanyUnit;
-use App\Enums\UnitStatusEnum;
 use Illuminate\Database\Seeder;
 
 class UnitSeeder extends Seeder
@@ -36,8 +36,8 @@ class UnitSeeder extends Seeder
                 'country' => 'Brasil',
                 'settings_json' => [
                     'tables_count' => 30,
-                    'has_delivery' => true
-                ]
+                    'has_delivery' => true,
+                ],
             ]);
         }
     }

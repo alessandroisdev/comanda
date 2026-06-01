@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Actions\Category\CreateCategoryAction;
-use App\Actions\Category\UpdateCategoryAction;
 use App\Actions\Category\DeleteCategoryAction;
+use App\Actions\Category\UpdateCategoryAction;
 use App\DTOs\Category\CreateCategoryDTO;
 use App\DTOs\Category\UpdateCategoryDTO;
-use App\Models\Company;
 use App\Models\Category;
+use App\Models\Company;
 use App\Models\Employee;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
@@ -23,7 +25,9 @@ class CategoryTest extends TestCase
     use RefreshDatabase;
 
     private CreateCategoryAction $createAction;
+
     private UpdateCategoryAction $updateAction;
+
     private DeleteCategoryAction $deleteAction;
 
     protected function setUp(): void
@@ -44,7 +48,7 @@ class CategoryTest extends TestCase
             'name' => 'Bebidas Geladas',
             'description' => 'Sucos, refrigerantes e águas',
             'status' => 'active',
-            'sort_order' => 5
+            'sort_order' => 5,
         ]);
 
         $category = $this->createAction->execute($dto);
@@ -82,13 +86,13 @@ class CategoryTest extends TestCase
         $company = Company::factory()->create();
         $category = Category::factory()->create([
             'company_id' => $company->id,
-            'name' => 'Old Name'
+            'name' => 'Old Name',
         ]);
 
         $dto = UpdateCategoryDTO::fromArray([
             'name' => 'Updated Name',
             'status' => 'active',
-            'sort_order' => 10
+            'sort_order' => 10,
         ]);
 
         $updated = $this->updateAction->execute($category, $dto);
@@ -127,7 +131,7 @@ class CategoryTest extends TestCase
         $this->deleteAction->execute($category);
 
         $this->assertSoftDeleted('categories', [
-            'id' => $category->id
+            'id' => $category->id,
         ]);
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'category.delete',
@@ -150,8 +154,8 @@ class CategoryTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'categories.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'categories.view']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 
@@ -167,8 +171,8 @@ class CategoryTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company1->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'categories.view']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'categories.view']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 
@@ -193,8 +197,8 @@ class CategoryTest extends TestCase
         $employee = Employee::factory()->create(['company_id' => $company->id]);
 
         // Simular permissão RBAC
-        $role = \App\Models\Role::create(['name' => 'manager']);
-        $permission = \App\Models\Permission::create(['slug' => 'categories.delete']);
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'categories.delete']);
         $role->permissions()->attach($permission);
         $employee->roles()->attach($role);
 

@@ -24,7 +24,7 @@ class CustomerSeeder extends Seeder
         foreach ($companies as $company) {
             // Criar 10 clientes para cada empresa cadastrada
             Customer::factory()->count(10)->create([
-                'company_id' => $company->id
+                'company_id' => $company->id,
             ]);
         }
     }

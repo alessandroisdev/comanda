@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Actions\User\CreateUserAction;
-use App\Actions\User\UpdateUserAction;
 use App\Actions\User\DeleteUserAction;
+use App\Actions\User\UpdateUserAction;
 use App\DTOs\User\CreateUserDTO;
 use App\DTOs\User\UpdateUserDTO;
-use App\Models\User;
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
@@ -22,7 +22,9 @@ class UserTest extends TestCase
     use RefreshDatabase;
 
     private CreateUserAction $createAction;
+
     private UpdateUserAction $updateAction;
+
     private DeleteUserAction $deleteAction;
 
     protected function setUp(): void
@@ -40,7 +42,7 @@ class UserTest extends TestCase
             'name' => 'Admin Teste',
             'email' => 'admin.teste@comanda.com',
             'password' => 'password123',
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $user = $this->createAction->execute($dto);
@@ -76,14 +78,14 @@ class UserTest extends TestCase
     {
         $user = User::factory()->create([
             'name' => 'Old Name',
-            'password' => Hash::make('oldpassword')
+            'password' => Hash::make('oldpassword'),
         ]);
 
         $dto = UpdateUserDTO::fromArray([
             'name' => 'New Name',
             'email' => $user->email,
             'password' => 'newpassword123',
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $updated = $this->updateAction->execute($user, $dto);
@@ -117,7 +119,7 @@ class UserTest extends TestCase
         $this->deleteAction->execute($user);
 
         $this->assertSoftDeleted('users', [
-            'id' => $user->id
+            'id' => $user->id,
         ]);
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'user.delete',

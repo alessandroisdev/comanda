@@ -45,5 +45,5 @@ return [
         'create_success' => 'Funcionário cadastrado com sucesso!',
         'update_success' => 'Funcionário atualizado com sucesso!',
         'delete_success' => 'Funcionário excluído do sistema!',
-    ]
+    ],
 ];

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -20,7 +21,7 @@ class UserPolicy
             return true; // Administradores do Painel Geral têm controle irrestrito
         }
 
-        if ($actor instanceof \App\Models\Employee) {
+        if ($actor instanceof Employee) {
             return $actor->roles()->whereHas('permissions', function ($query) use ($permission) {
                 $query->where('slug', $permission);
             })->exists();

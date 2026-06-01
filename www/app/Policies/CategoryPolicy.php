@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\Category;
+use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CategoryPolicy
@@ -16,11 +18,11 @@ class CategoryPolicy
      */
     private function hasPermission(mixed $user, string $permission): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->roles()->whereHas('permissions', function ($query) use ($permission) {
                 $query->where('slug', $permission);
             })->exists();
@@ -42,11 +44,11 @@ class CategoryPolicy
      */
     public function view(mixed $user, Category $category): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $category->company_id && $this->hasPermission($user, 'categories.view');
         }
 
@@ -66,11 +68,11 @@ class CategoryPolicy
      */
     public function update(mixed $user, Category $category): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $category->company_id && $this->hasPermission($user, 'categories.update');
         }
 
@@ -82,11 +84,11 @@ class CategoryPolicy
      */
     public function delete(mixed $user, Category $category): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $category->company_id && $this->hasPermission($user, 'categories.delete');
         }
 

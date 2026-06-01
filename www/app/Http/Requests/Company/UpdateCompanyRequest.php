@@ -38,16 +38,16 @@ class UpdateCompanyRequest extends FormRequest
             'trade_name' => ['required', 'string', 'max:255'],
             'document_type' => ['required', new Enum(DocumentTypeEnum::class)],
             'document_number' => [
-                'required', 
-                'string', 
-                'max:30', 
-                Rule::unique('companies', 'document_number')->ignore($companyId)
+                'required',
+                'string',
+                'max:30',
+                Rule::unique('companies', 'document_number')->ignore($companyId),
             ],
             'email' => [
-                'required', 
-                'email', 
-                'max:150', 
-                Rule::unique('companies', 'email')->ignore($companyId)
+                'required',
+                'email',
+                'max:150',
+                Rule::unique('companies', 'email')->ignore($companyId),
             ],
             'phone' => ['required', 'string', 'max:30'],
             'timezone' => ['nullable', 'string', 'max:50'],

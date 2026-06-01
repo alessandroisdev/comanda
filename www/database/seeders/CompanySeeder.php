@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Company;
 use App\Enums\CompanyStatusEnum;
 use App\Enums\DocumentTypeEnum;
+use App\Models\Company;
 use Illuminate\Database\Seeder;
 
 class CompanySeeder extends Seeder
@@ -32,8 +32,8 @@ class CompanySeeder extends Seeder
                 'language' => 'pt_BR',
                 'settings_json' => [
                     'billing_plan' => 'enterprise',
-                    'sse_heartbeat_interval' => 15
-                ]
+                    'sse_heartbeat_interval' => 15,
+                ],
             ]);
         }
     }

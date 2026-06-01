@@ -29,7 +29,7 @@ class EmployeesDataTable implements DataTableProviderInterface
                 'employees.status',
                 'employees.created_at',
                 'companies.trade_name as company_name',
-                'company_units.name as unit_name'
+                'company_units.name as unit_name',
             ])
             ->leftJoin('companies', 'companies.id', '=', 'employees.company_id')
             ->leftJoin('company_units', 'company_units.id', '=', 'employees.unit_id');
@@ -87,7 +87,7 @@ class EmployeesDataTable implements DataTableProviderInterface
             'company_name' => $row->getAttribute('company_name') ?? '-',
             'unit_name' => $row->getAttribute('unit_name') ?? '-',
             'created_at' => $row->created_at->toIso8601String(),
-            'actions' => $this->renderActions($row)
+            'actions' => $this->renderActions($row),
         ];
     }
 
@@ -96,12 +96,12 @@ class EmployeesDataTable implements DataTableProviderInterface
      */
     private function renderActions(Employee $employee): string
     {
-        $viewBtn = '<a href="/admin/employees/' . $employee->uuid . '" class="btn btn-sm btn-info me-1" title="Visualizar"><i class="bi bi-eye"></i></a>';
-        $editBtn = '<a href="/admin/employees/' . $employee->uuid . '/edit" class="btn btn-sm btn-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>';
-        
-        $deleteUrl = '/api/v1/employees/' . $employee->uuid;
-        $deleteBtn = '<button type="button" class="btn btn-sm btn-danger btn-delete-row" data-uuid="' . $employee->uuid . '" data-url="' . $deleteUrl . '" title="Excluir"><i class="bi bi-trash"></i></button>';
+        $viewBtn = '<a href="/admin/employees/'.$employee->uuid.'" class="btn btn-sm btn-info me-1" title="Visualizar"><i class="bi bi-eye"></i></a>';
+        $editBtn = '<a href="/admin/employees/'.$employee->uuid.'/edit" class="btn btn-sm btn-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>';
 
-        return '<div class="btn-group">' . $viewBtn . $editBtn . $deleteBtn . '</div>';
+        $deleteUrl = '/api/v1/employees/'.$employee->uuid;
+        $deleteBtn = '<button type="button" class="btn btn-sm btn-danger btn-delete-row" data-uuid="'.$employee->uuid.'" data-url="'.$deleteUrl.'" title="Excluir"><i class="bi bi-trash"></i></button>';
+
+        return '<div class="btn-group">'.$viewBtn.$editBtn.$deleteBtn.'</div>';
     }
 }

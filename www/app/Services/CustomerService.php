@@ -7,14 +7,14 @@ namespace App\Services;
 use App\DTOs\Customer\CreateCustomerDTO;
 use App\DTOs\Customer\UpdateCustomerDTO;
 use App\Models\Customer;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CustomerService
 {
     /**
      * Busca um cliente pelo seu UUID público.
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws ModelNotFoundException
      */
     public function findByUuid(string $uuid): Customer
     {

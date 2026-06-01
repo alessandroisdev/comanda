@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\Customer;
+use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CustomerPolicy
@@ -16,11 +18,11 @@ class CustomerPolicy
      */
     private function hasPermission(mixed $user, string $permission): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->roles()->whereHas('permissions', function ($query) use ($permission) {
                 $query->where('slug', $permission);
             })->exists();
@@ -42,11 +44,11 @@ class CustomerPolicy
      */
     public function view(mixed $user, Customer $customer): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $customer->company_id && $this->hasPermission($user, 'customers.view');
         }
 
@@ -66,11 +68,11 @@ class CustomerPolicy
      */
     public function update(mixed $user, Customer $customer): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $customer->company_id && $this->hasPermission($user, 'customers.update');
         }
 
@@ -82,11 +84,11 @@ class CustomerPolicy
      */
     public function delete(mixed $user, Customer $customer): bool
     {
-        if ($user instanceof \App\Models\User) {
+        if ($user instanceof User) {
             return true;
         }
 
-        if ($user instanceof \App\Models\Employee) {
+        if ($user instanceof Employee) {
             return $user->company_id === $customer->company_id && $this->hasPermission($user, 'customers.delete');
         }
 

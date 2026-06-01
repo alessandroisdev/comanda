@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Customer\CreateCustomerAction;
-use App\Actions\Customer\UpdateCustomerAction;
 use App\Actions\Customer\DeleteCustomerAction;
+use App\Actions\Customer\UpdateCustomerAction;
 use App\DataTables\CustomersDataTable;
 use App\DTOs\Customer\CreateCustomerDTO;
 use App\DTOs\Customer\UpdateCustomerDTO;
@@ -47,8 +47,8 @@ class CustomerController extends Controller
     {
         Gate::authorize('viewAny', Customer::class);
 
-        $provider = new CustomersDataTable();
-        
+        $provider = new CustomersDataTable;
+
         // Aplicar restrição de locatário se o usuário for um funcionário de empresa
         $user = $request->user();
         $result = $this->dataTableService->process($request, $provider, function ($query) use ($user) {
@@ -86,7 +86,7 @@ class CustomerController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('customers.messages.create_success'),
-                'customer_uuid' => $customer->uuid
+                'customer_uuid' => $customer->uuid,
             ], 201);
         }
 
@@ -133,7 +133,7 @@ class CustomerController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('customers.messages.update_success'),
-                'customer_uuid' => $updatedCustomer->uuid
+                'customer_uuid' => $updatedCustomer->uuid,
             ]);
         }
 
@@ -153,7 +153,7 @@ class CustomerController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('customers.messages.delete_success')
+            'message' => __('customers.messages.delete_success'),
         ]);
     }
 }

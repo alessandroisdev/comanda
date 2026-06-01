@@ -17,14 +17,14 @@ Route::get('/readiness', [HealthCheckController::class, 'readiness'])->name('rea
 require base_path('routes/sse.php');
 
 // Controllers Administrativos da Fase 2
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\ModuleController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ProductController;
 
 // Rotas Administrativas em Blade
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -70,4 +70,3 @@ Route::prefix('api/v1')->group(function () {
     Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
     Route::delete('products/{product}', [ProductController::class, 'destroy']);
 });
-

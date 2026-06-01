@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ProductStatusEnum;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,11 +25,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property ProductStatusEnum $status
  * @property string|null $image
  * @property int $preparation_time
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  * @property-read Company $company
  * @property-read Category $category
+ * @property-read string $formatted_price
+ * @property-read string|null $formatted_cost
  */
 class Product extends Model
 {
@@ -98,7 +101,7 @@ class Product extends Model
      */
     public function getFormattedPriceAttribute(): string
     {
-        return 'R$ ' . number_format($this->price_cents / 100, 2, ',', '.');
+        return 'R$ '.number_format($this->price_cents / 100, 2, ',', '.');
     }
 
     /**
@@ -109,6 +112,7 @@ class Product extends Model
         if ($this->cost_cents === null) {
             return null;
         }
-        return 'R$ ' . number_format($this->cost_cents / 100, 2, ',', '.');
+
+        return 'R$ '.number_format($this->cost_cents / 100, 2, ',', '.');
     }
 }
