@@ -223,7 +223,7 @@ class EmployeeTest extends TestCase
     }
 
     #[Test]
-    public function employee_can_delete_other_company_employee_policy()
+    public function employee_can_delete_same_company_employee_policy()
     {
         $company = Company::factory()->create();
         $employee1 = Employee::factory()->create(['company_id' => $company->id]);
@@ -236,5 +236,22 @@ class EmployeeTest extends TestCase
         $employee1->roles()->attach($role);
 
         $this->assertTrue(Gate::forUser($employee1)->allows('delete', $employee2));
+    }
+
+    #[Test]
+    public function employee_cannot_delete_other_company_employee_policy()
+    {
+        $company1 = Company::factory()->create();
+        $company2 = Company::factory()->create();
+        $employee1 = Employee::factory()->create(['company_id' => $company1->id]);
+        $employee2 = Employee::factory()->create(['company_id' => $company2->id]);
+
+        // Simular permissão RBAC
+        $role = Role::create(['name' => 'manager']);
+        $permission = Permission::create(['slug' => 'employees.delete']);
+        $role->permissions()->attach($permission);
+        $employee1->roles()->attach($role);
+
+        $this->assertFalse(Gate::forUser($employee1)->allows('delete', $employee2));
     }
 }
