@@ -1,0 +1,213 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\Company;
+use App\Models\CompanyUnit;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Employee;
+use App\Models\Coupon;
+use App\Models\Order;
+use App\Models\DeliveryOrder;
+use App\Models\OrderSession;
+use App\Models\Customer;
+use App\Enums\OrderStatusEnum;
+use App\Services\SSE\SseQueueService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
+
+class DeliveryCheckoutTest extends TestCase
+{
+    use RefreshDatabase;
+
+    #[Test]
+    public function it_can_open_delivery_view()
+    {
+        $company = Company::factory()->create();
+
+        $response = $this->get(route('public.menu.delivery', ['company_id' => $company->id]));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('public.menu.delivery');
+    }
+
+    #[Test]
+    public function it_can_calculate_frete_via_endpoint()
+    {
+        $response = $this->getJson('/api/v1/delivery/frete?cep=01310-100');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'frete_cents' => 1000,
+                'logradouro' => 'Avenida Paulista',
+                'bairro' => 'Bela Vista',
+            ]);
+    }
+
+    #[Test]
+    public function it_can_process_delivery_checkout_with_coupon_and_gateway_payment()
+    {
+        $this->withoutMiddleware();
+        $company = Company::factory()->create();
+        $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
+        $employee = Employee::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id]);
+
+        $category = Category::create([
+            'company_id' => $company->id,
+            'name' => 'Pizzas',
+            'status' => 'active',
+            'sort_order' => 1,
+        ]);
+
+        $product = Product::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'code' => 'PIZZA-01',
+            'name' => 'Pizza Calabresa',
+            'price_cents' => 5000, // R$ 50,00
+            'status' => 'active',
+        ]);
+
+        $coupon = Coupon::create([
+            'company_id' => $company->id,
+            'code' => 'DELIVERY10',
+            'type' => 'percentage',
+            'value' => 10, // 10%
+            'is_active' => true,
+        ]);
+
+        $response = $this->postJson('/api/v1/delivery/checkout', [
+            'items' => [
+                ['uuid' => $product->uuid, 'quantity' => 2] // R$ 100,00 subtotal
+            ],
+            'customer_name' => 'Jane Doe',
+            'customer_phone' => '11977777777',
+            'customer_email' => 'jane@example.com',
+            'customer_cpf' => '123.456.789-00',
+            'street' => 'Rua Augusta',
+            'number' => '1500',
+            'complement' => 'Apto 42',
+            'neighborhood' => 'Consolação',
+            'city' => 'São Paulo',
+            'state' => 'SP',
+            'zip_code' => '01305-100',
+            'delivery_fee' => 12.00, // R$ 12,00 frete
+            'coupon_code' => 'DELIVERY10', // 10% de R$ 100 = R$ 10 de desc
+            'payment_method' => 'pix',
+            'gateway' => 'asaas',
+            'lgpd_consent' => true // consentimento opcional
+        ]);
+
+        // Total esperado: 100 (subtotal) + 12 (frete) - 10 (desconto) = 102 (R$ 102,00 ou 10200 centavos)
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true
+            ]);
+
+        $this->assertNotNull($response->json('payment_data.transaction_id'));
+
+        // Valida que o pedido e comanda local do totem foram salvos com o valor correto
+        $this->assertDatabaseHas('orders', [
+            'company_id' => $company->id,
+            'unit_id' => $unit->id,
+            'subtotal_cents' => 10000,
+            'discount_cents' => 1000,
+            'total_cents' => 10200,
+            'status' => 'draft', // Fica em draft até pagamento ser confirmado
+        ]);
+
+        // Valida que os dados pessoais de entrega e CPF foram cadastrados em conformidade LGPD
+        $this->assertDatabaseHas('customers', [
+            'document' => '123.456.789-00',
+            'email' => 'jane@example.com',
+        ]);
+
+        // Valida o registro da base legal obrigatória de execução de contrato e consentimento opcional
+        $this->assertDatabaseHas('privacy_audit_logs', [
+            'action' => 'privacy.legal_basis',
+        ]);
+        $this->assertDatabaseHas('privacy_audit_logs', [
+            'action' => 'privacy.consent_granted',
+        ]);
+    }
+
+    #[Test]
+    public function it_can_process_webhook_and_transition_order_status()
+    {
+        $this->withoutMiddleware();
+        $company = Company::factory()->create();
+        $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
+        $employee = Employee::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id]);
+
+        $session = OrderSession::create([
+            'company_id' => $company->id,
+            'unit_id' => $unit->id,
+            'opened_by_employee_id' => $employee->id,
+            'people_count' => 1,
+            'status' => 'open',
+            'opened_at' => now(),
+        ]);
+
+        $order = Order::create([
+            'company_id' => $company->id,
+            'unit_id' => $unit->id,
+            'session_id' => $session->id,
+            'employee_id' => $employee->id,
+            'order_number' => 'ORD-DEL-WEB',
+            'status' => OrderStatusEnum::DRAFT,
+        ]);
+
+        $customer = Customer::factory()->create(['company_id' => $company->id]);
+
+        $deliveryOrder = DeliveryOrder::create([
+            'company_id' => $company->id,
+            'unit_id' => $unit->id,
+            'order_id' => $order->id,
+            'customer_id' => $customer->id,
+            'recipient_name' => 'Webhook Recipient',
+            'recipient_phone' => '11999999999',
+            'street' => 'Av Paulista',
+            'number' => '1000',
+            'neighborhood' => 'Bela Vista',
+            'city' => 'São Paulo',
+            'state' => 'SP',
+            'zip_code' => '01310-100',
+            'delivery_fee' => 10.00,
+            'status' => 'pending',
+            'tracking_code' => 'asaas_tx_webhook_test',
+        ]);
+
+        Cache::forget("sse_events:admin.orders");
+
+        // Dispara a chamada do Webhook fingindo ser o Asaas confirmando o pagamento da transação
+        $response = $this->postJson('/api/v1/payments/webhooks/asaas', [
+            'event' => 'PAYMENT_CONFIRMED',
+            'payment' => [
+                'id' => 'asaas_tx_webhook_test',
+            ]
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true]);
+
+        // Valida que o delivery order mudou para confirmed
+        $deliveryOrder->refresh();
+        $this->assertEquals('confirmed', $deliveryOrder->status);
+
+        // Valida que o order mudou para PENDING (enviado à produção)
+        $order->refresh();
+        $this->assertEquals(OrderStatusEnum::PENDING, $order->status);
+
+        // Valida o SSE reativo publicado para a produção da cozinha
+        $events = SseQueueService::pull('admin.orders');
+        $this->assertNotEmpty($events);
+        $this->assertEquals('order.confirmed', $events[0]['event']);
+        $this->assertEquals('ORD-DEL-WEB', $events[0]['data']['order_number']);
+    }
+}
