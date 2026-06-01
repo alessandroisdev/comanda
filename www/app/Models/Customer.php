@@ -1,14 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Enums\CustomerStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 /**
+ * @property int $id
  * @property string $uuid
+ * @property int|null $company_id
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string|null $phone
+ * @property string|null $document
+ * @property \Carbon\Carbon|null $birth_date
+ * @property bool $marketing_opt_in
+ * @property CustomerStatusEnum $status
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ * @property-read Company|null $company
  */
 class Customer extends Authenticatable
 {
@@ -16,11 +34,14 @@ class Customer extends Authenticatable
 
     protected $fillable = [
         'uuid',
+        'company_id',
         'name',
         'email',
         'password',
         'phone',
         'document',
+        'birth_date',
+        'marketing_opt_in',
         'status',
     ];
 
@@ -33,11 +54,14 @@ class Customer extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'birth_date' => 'date',
+            'marketing_opt_in' => 'boolean',
+            'status' => CustomerStatusEnum::class,
         ];
     }
 
     /**
-     * Observer simples de criação para gerar o UUID automático.
+     * Geração automática de UUID na criação do cliente.
      */
     protected static function booted(): void
     {
@@ -53,4 +77,13 @@ class Customer extends Authenticatable
             }
         });
     }
+
+    /**
+     * Retorna a empresa onde o cliente se cadastrou originalmente.
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 }
+

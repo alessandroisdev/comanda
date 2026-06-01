@@ -1,14 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Enums\EmployeeRoleEnum;
+use App\Enums\EmployeeStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 /**
+ * @property int $id
  * @property string $uuid
+ * @property int|null $company_id
+ * @property int|null $unit_id
+ * @property string|null $employee_number
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string|null $phone
+ * @property string|null $document
+ * @property \Carbon\Carbon|null $birth_date
+ * @property \Carbon\Carbon|null $hire_date
+ * @property EmployeeStatusEnum $status
+ * @property EmployeeRoleEnum $role
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ * @property-read Company|null $company
+ * @property-read CompanyUnit|null $unit
+ * @property-read \Illuminate\Database\Eloquent\Collection|Role[] $roles
  */
 class Employee extends Authenticatable
 {
@@ -16,12 +41,18 @@ class Employee extends Authenticatable
 
     protected $fillable = [
         'uuid',
+        'company_id',
+        'unit_id',
+        'employee_number',
         'name',
         'email',
         'password',
         'phone',
         'document',
+        'birth_date',
+        'hire_date',
         'status',
+        'role',
     ];
 
     protected $hidden = [
@@ -33,11 +64,15 @@ class Employee extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'birth_date' => 'date',
+            'hire_date' => 'date',
+            'status' => EmployeeStatusEnum::class,
+            'role' => EmployeeRoleEnum::class,
         ];
     }
 
     /**
-     * Observer simples de criação para gerar o UUID automático.
+     * Geração automática de UUID na criação do funcionário.
      */
     protected static function booted(): void
     {
@@ -53,4 +88,29 @@ class Employee extends Authenticatable
             }
         });
     }
+
+    /**
+     * Retorna a empresa proprietária do funcionário.
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * Retorna a unidade física onde o funcionário está alocado.
+     */
+    public function unit(): BelongsTo
+    {
+        return $this->belongsTo(CompanyUnit::class);
+    }
+
+    /**
+     * Retorna os perfis (roles) do funcionário.
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'employee_role');
+    }
 }
+
