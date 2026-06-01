@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\OrderStatusEnum;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,13 +31,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- *
- * @property-read \App\Models\Company $company
- * @property-read \App\Models\CompanyUnit $unit
- * @property-read \App\Models\OrderSession $session
- * @property-read \App\Models\Employee $employee
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderItem> $items
- * @property-read \App\Models\KitchenTicket|null $kitchenTicket
+ * @property-read Company $company
+ * @property-read CompanyUnit $unit
+ * @property-read OrderSession $session
+ * @property-read Employee $employee
+ * @property-read Collection<int, OrderItem> $items
+ * @property-read KitchenTicket|null $kitchenTicket
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Order where(string $column, mixed $value)
  */

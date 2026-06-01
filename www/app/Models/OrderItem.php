@@ -21,9 +21,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $notes
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- *
- * @property-read \App\Models\Order $order
- * @property-read \App\Models\Product $product
+ * @property-read Order $order
+ * @property-read Product $product
  *
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem where(string $column, mixed $value)
  */

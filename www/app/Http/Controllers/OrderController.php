@@ -10,6 +10,7 @@ use App\Actions\Order\SendOrderToKitchenAction;
 use App\Actions\OrderItem\AddOrderItemAction;
 use App\Actions\OrderItem\RemoveOrderItemAction;
 use App\Actions\OrderItem\UpdateOrderItemQuantityAction;
+use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderSession;
@@ -26,7 +27,7 @@ class OrderController extends Controller
     {
         Gate::authorize('create', Order::class);
 
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
 
         $validated = $request->validate([
@@ -36,7 +37,7 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        /** @var \App\Models\OrderSession $session */
+        /** @var OrderSession $session */
         $session = OrderSession::where('uuid', $validated['session_uuid'])->firstOrFail();
 
         // Garante isolamento de tenant
@@ -69,7 +70,7 @@ class OrderController extends Controller
 
     public function show(string $uuid): View
     {
-        /** @var \App\Models\Order $order */
+        /** @var Order $order */
         $order = Order::where('uuid', $uuid)
             ->with(['session.table', 'items.product', 'employee'])
             ->firstOrFail();
@@ -77,7 +78,7 @@ class OrderController extends Controller
         Gate::authorize('view', $order);
 
         // Carrega produtos do tenant do usuário logado para poder adicionar itens
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $companyId = $employee ? $employee->company_id : $order->company_id;
 
@@ -92,7 +93,7 @@ class OrderController extends Controller
 
     public function sendToKitchen(Request $request, string $uuid, SendOrderToKitchenAction $action): JsonResponse
     {
-        /** @var \App\Models\Order $order */
+        /** @var Order $order */
         $order = Order::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $order);
 
@@ -113,7 +114,7 @@ class OrderController extends Controller
 
     public function cancel(Request $request, string $uuid, CancelOrderAction $action): JsonResponse
     {
-        /** @var \App\Models\Order $order */
+        /** @var Order $order */
         $order = Order::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $order);
 
@@ -127,7 +128,7 @@ class OrderController extends Controller
 
     public function addItem(Request $request, string $uuid, AddOrderItemAction $action): JsonResponse
     {
-        /** @var \App\Models\Order $order */
+        /** @var Order $order */
         $order = Order::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $order);
 
@@ -144,7 +145,7 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:250',
         ]);
 
-        /** @var \App\Models\Product $product */
+        /** @var Product $product */
         $product = Product::where('uuid', $request->input('product_uuid'))->firstOrFail();
 
         // Garante isolamento de tenant
@@ -162,7 +163,7 @@ class OrderController extends Controller
 
     public function removeItem(Request $request, string $uuid, string $itemUuid, RemoveOrderItemAction $action): JsonResponse
     {
-        /** @var \App\Models\Order $order */
+        /** @var Order $order */
         $order = Order::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $order);
 
@@ -173,7 +174,7 @@ class OrderController extends Controller
             ], 422);
         }
 
-        /** @var \App\Models\OrderItem $item */
+        /** @var OrderItem $item */
         $item = OrderItem::where('uuid', $itemUuid)->firstOrFail();
 
         // Garante isolamento
@@ -191,7 +192,7 @@ class OrderController extends Controller
 
     public function updateItemQuantity(Request $request, string $uuid, string $itemUuid, UpdateOrderItemQuantityAction $action): JsonResponse
     {
-        /** @var \App\Models\Order $order */
+        /** @var Order $order */
         $order = Order::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $order);
 
@@ -206,7 +207,7 @@ class OrderController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        /** @var \App\Models\OrderItem $item */
+        /** @var OrderItem $item */
         $item = OrderItem::where('uuid', $itemUuid)->firstOrFail();
 
         // Garante isolamento

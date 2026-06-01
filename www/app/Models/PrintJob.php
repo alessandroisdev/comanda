@@ -22,9 +22,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $attempts
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- *
- * @property-read \App\Models\Company $company
- * @property-read \App\Models\CompanyUnit $unit
+ * @property-read Company $company
+ * @property-read CompanyUnit $unit
  *
  * @method static \Illuminate\Database\Eloquent\Builder|PrintJob where(string $column, mixed $value)
  */

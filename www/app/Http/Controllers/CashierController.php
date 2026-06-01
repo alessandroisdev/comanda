@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Actions\CashierShift\CloseCashierShiftAction;
 use App\Actions\CashierShift\OpenCashierShiftAction;
 use App\Models\CashierShift;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -18,7 +19,7 @@ class CashierController extends Controller
     {
         Gate::authorize('viewAny', CashierShift::class);
 
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $companyId = $employee ? $employee->company_id : null;
 
@@ -43,7 +44,7 @@ class CashierController extends Controller
     {
         Gate::authorize('create', CashierShift::class);
 
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
 
         $validated = $request->validate([
@@ -91,7 +92,7 @@ class CashierController extends Controller
 
     public function close(Request $request, string $uuid, CloseCashierShiftAction $action)
     {
-        /** @var \App\Models\CashierShift $shift */
+        /** @var CashierShift $shift */
         $shift = CashierShift::where('uuid', $uuid)->firstOrFail();
         Gate::authorize('update', $shift);
 
@@ -99,7 +100,7 @@ class CashierController extends Controller
             'closing_amount' => 'required|numeric|min:0',
         ]);
 
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $employeeId = $employee ? $employee->id : 1;
         $closingAmountCents = (int) round($validated['closing_amount'] * 100);

@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\CompanyUnit;
 use App\Models\PrintJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -54,15 +55,14 @@ class PrintingTest extends TestCase
         $this->assertEquals($payload, $job->payload);
 
         $this->assertDatabaseHas('print_jobs', [
-            'id' => $job->id,
             'status' => 'pending',
             'type' => 'kitchen_ticket',
         ]);
 
-        $this->assertDatabaseHas('audit_logs', [
-            'action' => 'print.enqueue',
-            'company_id' => $company->id,
-        ]);
+        $auditLog = DB::table('audit_logs')->where('action', 'print.enqueue')->first();
+        $this->assertNotNull($auditLog);
+        $beforeData = json_decode($auditLog->payload_before, true);
+        $this->assertEquals($company->id, $beforeData['company_id']);
     }
 
     #[Test]

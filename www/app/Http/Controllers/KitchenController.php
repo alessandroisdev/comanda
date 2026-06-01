@@ -8,6 +8,7 @@ use App\Actions\KitchenTicket\CancelKitchenTicketAction;
 use App\Actions\KitchenTicket\CompleteKitchenTicketAction;
 use App\Actions\KitchenTicket\MarkKitchenReadyAction;
 use App\Actions\KitchenTicket\StartKitchenPreparoAction;
+use App\Models\Employee;
 use App\Models\KitchenTicket;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,7 @@ class KitchenController extends Controller
         Gate::authorize('viewAny', KitchenTicket::class);
 
         // Carrega tickets de cozinha pendentes, preparando ou prontos do tenant do funcionário logado
-        /** @var \App\Models\Employee|null $employee */
+        /** @var Employee|null $employee */
         $employee = Auth::guard('employee')->user();
         $companyId = $employee ? $employee->company_id : null;
 
