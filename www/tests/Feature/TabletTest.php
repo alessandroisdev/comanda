@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\TableStatusEnum;
+use App\Models\Category;
 use App\Models\Company;
 use App\Models\CompanyUnit;
-use App\Models\Category;
+use App\Models\Employee;
 use App\Models\Product;
 use App\Models\Table;
-use App\Models\Employee;
-use App\Enums\TableStatusEnum;
 use App\Services\SSE\SseQueueService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -26,7 +26,7 @@ class TabletTest extends TestCase
     {
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
-        
+
         $table = Table::create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -82,13 +82,13 @@ class TabletTest extends TestCase
             'status' => 'active',
         ]);
 
-        Cache::forget("sse_events:admin.orders");
+        Cache::forget('sse_events:admin.orders');
 
         $response = $this->postJson('/api/v1/tablet/order', [
             'table_uuid' => $table->public_uuid,
             'items' => [
-                ['uuid' => $product->uuid, 'quantity' => 2]
-            ]
+                ['uuid' => $product->uuid, 'quantity' => 2],
+            ],
         ]);
 
         $response->assertStatus(200);
@@ -109,12 +109,102 @@ class TabletTest extends TestCase
     }
 
     #[Test]
+    public function it_fails_tablet_order_if_table_not_found()
+    {
+        $this->withoutMiddleware();
+        $response = $this->postJson('/api/v1/tablet/order', [
+            'table_uuid' => '00000000-0000-0000-0000-000000000000',
+            'items' => [
+                ['uuid' => '00000000-0000-0000-0000-000000000000', 'quantity' => 1],
+            ],
+        ]);
+
+        $response->assertStatus(404);
+    }
+
+    #[Test]
+    public function it_fails_tablet_order_with_empty_items()
+    {
+        $this->withoutMiddleware();
+        $company = Company::factory()->create();
+        $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
+
+        $table = Table::create([
+            'company_id' => $company->id,
+            'unit_id' => $unit->id,
+            'code' => 'M-TAB-ERR1',
+            'name' => 'Mesa Erro 1',
+            'capacity' => 4,
+            'sector' => 'Salão',
+            'status' => 'occupied',
+        ]);
+
+        $response = $this->postJson('/api/v1/tablet/order', [
+            'table_uuid' => $table->public_uuid,
+            'items' => [],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Seu carrinho está vazio.',
+            ]);
+    }
+
+    #[Test]
+    public function it_fails_tablet_order_if_no_employee()
+    {
+        $this->withoutMiddleware();
+        $company = Company::factory()->create();
+        $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
+
+        $table = Table::create([
+            'company_id' => $company->id,
+            'unit_id' => $unit->id,
+            'code' => 'M-TAB-ERR2',
+            'name' => 'Mesa Erro 2',
+            'capacity' => 4,
+            'sector' => 'Salão',
+            'status' => 'occupied',
+        ]);
+
+        $category = Category::create([
+            'company_id' => $company->id,
+            'name' => 'Burgers',
+            'status' => 'active',
+            'sort_order' => 1,
+        ]);
+
+        $product = Product::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'code' => 'BURGER-99',
+            'name' => 'Error Burger',
+            'price_cents' => 3500,
+            'status' => 'active',
+        ]);
+
+        $response = $this->postJson('/api/v1/tablet/order', [
+            'table_uuid' => $table->public_uuid,
+            'items' => [
+                ['uuid' => $product->uuid, 'quantity' => 1],
+            ],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Nenhum atendente disponível no estabelecimento.',
+            ]);
+    }
+
+    #[Test]
     public function it_can_call_waiter_via_tablet_endpoint()
     {
         $this->withoutMiddleware();
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
-        
+
         $table = Table::create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -125,7 +215,7 @@ class TabletTest extends TestCase
             'status' => 'occupied',
         ]);
 
-        Cache::forget("sse_events:admin.tables");
+        Cache::forget('sse_events:admin.tables');
 
         $response = $this->postJson("/api/v1/tables/{$table->public_uuid}/call-waiter");
 
@@ -143,7 +233,7 @@ class TabletTest extends TestCase
         $this->withoutMiddleware();
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
-        
+
         $table = Table::create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -154,7 +244,7 @@ class TabletTest extends TestCase
             'status' => 'occupied',
         ]);
 
-        Cache::forget("sse_events:admin.tables");
+        Cache::forget('sse_events:admin.tables');
 
         $response = $this->postJson("/api/v1/tables/{$table->public_uuid}/request-bill");
 

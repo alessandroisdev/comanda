@@ -19,14 +19,14 @@ class MercadoPagoGateway implements GatewayInterface
         ]);
 
         $success = $dto->amount > 0;
-        $transactionId = 'mp_tx_' . bin2hex(random_bytes(8));
+        $transactionId = 'mp_tx_'.bin2hex(random_bytes(8));
 
         return new PaymentResponseDTO(
             success: $success,
             transactionId: $success ? $transactionId : null,
             status: $success ? 'pending' : 'failed',
             paymentMethod: $dto->paymentMethod,
-            qrCodeUrl: 'https://mercadopago.com/pix/qr/' . $transactionId,
+            qrCodeUrl: 'https://mercadopago.com/pix/qr/'.$transactionId,
             qrCodeBase64: 'mp_base64_image_data...',
             errorMessage: $success ? null : 'Falha ao gerar transação no Mercado Pago.'
         );
@@ -35,6 +35,7 @@ class MercadoPagoGateway implements GatewayInterface
     public function refund(string $transactionId): bool
     {
         Log::info("[Gateway MercadoPago] Reembolso solicitado: {$transactionId}");
+
         return true;
     }
 

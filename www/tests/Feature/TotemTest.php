@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\Category;
 use App\Models\Company;
 use App\Models\CompanyUnit;
-use App\Models\Category;
-use App\Models\Product;
 use App\Models\Employee;
+use App\Models\Product;
 use App\Services\SSE\SseQueueService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -54,18 +54,18 @@ class TotemTest extends TestCase
             'status' => 'active',
         ]);
 
-        Cache::forget("sse_events:admin.orders");
+        Cache::forget('sse_events:admin.orders');
 
         $response = $this->postJson('/api/v1/totem/order', [
             'option' => 'local',
             'items' => [
-                ['uuid' => $product->uuid, 'quantity' => 3]
-            ]
+                ['uuid' => $product->uuid, 'quantity' => 3],
+            ],
         ]);
 
         $response->assertStatus(200)
             ->assertJson([
-                'success' => true
+                'success' => true,
             ]);
 
         $this->assertNotNull($response->json('senha'));
@@ -83,5 +83,57 @@ class TotemTest extends TestCase
         $this->assertNotEmpty($events);
         $this->assertEquals('order.created', $events[0]['event']);
         $this->assertEquals('Totem Autoatendimento', $events[0]['data']['table_name']);
+    }
+
+    #[Test]
+    public function it_fails_totem_checkout_with_empty_items()
+    {
+        $this->withoutMiddleware();
+        $response = $this->postJson('/api/v1/totem/order', [
+            'option' => 'local',
+            'items' => [],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Carrinho vazio.',
+            ]);
+    }
+
+    #[Test]
+    public function it_fails_totem_checkout_if_no_employee()
+    {
+        $this->withoutMiddleware();
+        $company = Company::factory()->create();
+
+        $category = Category::create([
+            'company_id' => $company->id,
+            'name' => 'Bebidas',
+            'status' => 'active',
+            'sort_order' => 1,
+        ]);
+
+        $product = Product::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'code' => 'REFR-02',
+            'name' => 'Fanta',
+            'price_cents' => 600,
+            'status' => 'active',
+        ]);
+
+        $response = $this->postJson('/api/v1/totem/order', [
+            'option' => 'local',
+            'items' => [
+                ['uuid' => $product->uuid, 'quantity' => 1],
+            ],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Totem inoperante: sem funcionários registrados.',
+            ]);
     }
 }

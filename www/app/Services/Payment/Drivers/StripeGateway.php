@@ -20,14 +20,14 @@ class StripeGateway implements GatewayInterface
         ]);
 
         $success = $dto->amount > 0;
-        $transactionId = 'pi_' . bin2hex(random_bytes(12));
+        $transactionId = 'pi_'.bin2hex(random_bytes(12));
 
         return new PaymentResponseDTO(
             success: $success,
             transactionId: $success ? $transactionId : null,
             status: $success ? 'pending' : 'failed',
             paymentMethod: $dto->paymentMethod,
-            paymentUrl: 'https://checkout.stripe.com/pay/' . $transactionId,
+            paymentUrl: 'https://checkout.stripe.com/pay/'.$transactionId,
             errorMessage: $success ? null : 'Invalid Stripe charge amount.'
         );
     }
@@ -35,6 +35,7 @@ class StripeGateway implements GatewayInterface
     public function refund(string $transactionId): bool
     {
         Log::info("[Gateway Stripe] Refund para intent: {$transactionId}");
+
         return true;
     }
 

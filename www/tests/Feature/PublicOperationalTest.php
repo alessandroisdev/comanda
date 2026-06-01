@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\Category;
 use App\Models\Company;
 use App\Models\CompanyUnit;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\Table;
 use App\Services\SSE\SseQueueService;
@@ -23,7 +23,7 @@ class PublicOperationalTest extends TestCase
     public function public_menu_can_be_rendered_without_table()
     {
         $company = Company::factory()->create();
-        
+
         $response = $this->get(route('public.menu', ['company_id' => $company->id]));
 
         $response->assertStatus(200);
@@ -36,7 +36,7 @@ class PublicOperationalTest extends TestCase
     {
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
-        
+
         $table = Table::create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -59,7 +59,7 @@ class PublicOperationalTest extends TestCase
     {
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
-        
+
         $table = Table::create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -111,7 +111,7 @@ class PublicOperationalTest extends TestCase
     {
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
-        
+
         $table = Table::create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -125,7 +125,7 @@ class PublicOperationalTest extends TestCase
         $this->withoutMiddleware();
 
         // Limpar o cache de eventos SSE antes de testar
-        Cache::forget("sse_events:admin.tables");
+        Cache::forget('sse_events:admin.tables');
 
         $response = $this->postJson("/api/v1/tables/{$table->public_uuid}/call-waiter");
 
@@ -144,7 +144,7 @@ class PublicOperationalTest extends TestCase
     {
         $company = Company::factory()->create();
         $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
-        
+
         $table = Table::create([
             'company_id' => $company->id,
             'unit_id' => $unit->id,
@@ -157,7 +157,7 @@ class PublicOperationalTest extends TestCase
 
         $this->withoutMiddleware();
 
-        Cache::forget("sse_events:admin.tables");
+        Cache::forget('sse_events:admin.tables');
 
         $response = $this->postJson("/api/v1/tables/{$table->public_uuid}/request-bill");
 

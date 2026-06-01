@@ -40,7 +40,7 @@
     <!-- Schema.org Marcação Estruturada (Restaurante/Prato) -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
+      "@@context": "https://schema.org",
       "@type": "Restaurant",
       "name": "Comanda Premium",
       "image": "{{ $seo['image'] }}",
@@ -195,7 +195,7 @@
                                     <h5 class="text-white fw-bold m-0">{{ $product->name }}</h5>
                                     <p class="text-muted small my-2" style="line-height: 1.4;">{{ $product->description }}</p>
                                     <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-slate-900">
-                                        <span class="fs-5 fw-bold text-success">R$ {{ number_format($product->price / 100, 2, ',', '.') }}</span>
+                                        <span class="fs-5 fw-bold text-success">R$ {{ number_format($product->price_cents / 100, 2, ',', '.') }}</span>
                                         <button class="btn btn-action-premium btn-sm px-3 rounded-pill btn-add-cart" data-uuid="{{ $product->uuid }}">
                                             <i class="bi bi-plus-lg me-1"></i> Adicionar
                                         </button>

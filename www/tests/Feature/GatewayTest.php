@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\DTOs\Payment\PaymentRequestDTO;
-use App\Services\Payment\GatewayManager;
-use App\Services\Payment\GatewayInterface;
 use App\Services\Payment\Drivers\AsaasGateway;
 use App\Services\Payment\Drivers\MercadoPagoGateway;
 use App\Services\Payment\Drivers\PagSeguroGateway;
 use App\Services\Payment\Drivers\StripeGateway;
+use App\Services\Payment\GatewayManager;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -21,7 +20,7 @@ class GatewayTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->manager = new GatewayManager();
+        $this->manager = new GatewayManager;
     }
 
     #[Test]

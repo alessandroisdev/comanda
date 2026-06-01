@@ -15,20 +15,20 @@ class AsaasGateway implements GatewayInterface
     {
         Log::info('[Gateway Asaas] Processando cobrança...', [
             'amount' => $dto->amount,
-            'customer_cpf' => substr($dto->customerCpf, 0, 3) . '***', // Mascaramento de privacidade LGPD
+            'customer_cpf' => substr($dto->customerCpf, 0, 3).'***', // Mascaramento de privacidade LGPD
             'order_id' => $dto->orderId,
         ]);
 
         // Simulação de transação PIX ou Cartão no Asaas
         $success = $dto->amount > 0;
-        $transactionId = 'asaas_tx_' . bin2hex(random_bytes(8));
+        $transactionId = 'asaas_tx_'.bin2hex(random_bytes(8));
 
         return new PaymentResponseDTO(
             success: $success,
             transactionId: $success ? $transactionId : null,
             status: $success ? 'pending' : 'failed',
             paymentMethod: $dto->paymentMethod,
-            qrCodeUrl: 'https://asaas.com/pix/qr/' . $transactionId,
+            qrCodeUrl: 'https://asaas.com/pix/qr/'.$transactionId,
             qrCodeBase64: 'asaas_base64_image_data...',
             errorMessage: $success ? null : 'Valor de cobrança deve ser maior que zero.'
         );
@@ -37,6 +37,7 @@ class AsaasGateway implements GatewayInterface
     public function refund(string $transactionId): bool
     {
         Log::info("[Gateway Asaas] Solicitando reembolso para transação: {$transactionId}");
+
         return true;
     }
 

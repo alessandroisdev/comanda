@@ -11,12 +11,12 @@ class QrCodeService
     /**
      * Gera um QR Code permanente de alta fidelidade em formato SVG com caching no Redis.
      *
-     * @param string $url URL do deep link operacional da mesa
+     * @param  string  $url  URL do deep link operacional da mesa
      * @return string Código SVG puro renderizado e estilizado
      */
     public function generate(string $url): string
     {
-        $cacheKey = "qrcode:" . md5($url);
+        $cacheKey = 'qrcode:'.md5($url);
 
         return Cache::remember($cacheKey, 86400, function () use ($url) {
             // Desenho estético premium de QR Code corporativo em formato SVG puro com logo centralizado e gradiente

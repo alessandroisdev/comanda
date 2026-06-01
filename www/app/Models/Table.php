@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 /**
  * @property int $id
@@ -68,7 +69,7 @@ class Table extends Model
     {
         static::creating(function (Table $table) {
             if (empty($table->slug)) {
-                $table->slug = \Illuminate\Support\Str::slug($table->name . '-' . $table->code . '-' . \Illuminate\Support\Str::random(5));
+                $table->slug = Str::slug($table->name.'-'.$table->code.'-'.Str::random(5));
             }
         });
     }

@@ -353,6 +353,123 @@ paths:
                     type: string
                     format: uuid
 
+  /coupons/validate:
+    get:
+      summary: Validar Cupom de Desconto
+      description: Verifica se o cupom está ativo, dentro da validade e calcula o desconto em centavos aplicável.
+      operationId: validateCoupon
+      security: []
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: subtotal
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cupom processado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  discount_cents:
+                    type: integer
+                  code:
+                    type: string
+
+  /delivery/frete:
+    get:
+      summary: Calcular Frete de Entrega
+      description: Calcula a taxa de entrega baseada nas faixas de CEP cadastradas no delivery.
+      operationId: calculateFrete
+      security: []
+      parameters:
+        - name: cep
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Frete calculado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  frete_cents:
+                    type: integer
+
+  /delivery/checkout:
+    post:
+      summary: Checkout de Delivery
+      description: Efetua o fechamento do carrinho de delivery, aplicando cupons, salvando bases LGPD e criando cobrança digital.
+      operationId: checkoutDelivery
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - items
+                - customer_name
+                - customer_phone
+                - customer_email
+                - customer_cpf
+                - zip_code
+                - payment_method
+                - lgpd_consent
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                customer_name:
+                  type: string
+                customer_phone:
+                  type: string
+                customer_email:
+                  type: string
+                customer_cpf:
+                  type: string
+                zip_code:
+                  type: string
+                payment_method:
+                  type: string
+                lgpd_consent:
+                  type: boolean
+      responses:
+        '200':
+          description: Checkout finalizado com sucesso.
+
+  /payments/webhooks/{gateway}:
+    post:
+      summary: Webhook de Gateway de Pagamento
+      description: Recebe chamadas de webhooks financeiros assíncronos para liquidação e envio do pedido à cozinha.
+      operationId: receiveWebhook
+      security: []
+      parameters:
+        - name: gateway
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook recebido e processado.
+
 components:
   securitySchemes:
     bearerAuth:

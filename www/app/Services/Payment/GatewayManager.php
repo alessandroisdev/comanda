@@ -15,17 +15,17 @@ class GatewayManager
     /**
      * Resolve e retorna o driver de gateway solicitado.
      *
-     * @param string $driver Nome do provedor (asaas, mercadopago, pagseguro, stripe)
-     * @return GatewayInterface
+     * @param  string  $driver  Nome do provedor (asaas, mercadopago, pagseguro, stripe)
+     *
      * @throws InvalidArgumentException
      */
     public function driver(string $driver): GatewayInterface
     {
         return match (strtolower($driver)) {
-            'asaas' => new AsaasGateway(),
-            'mercadopago', 'mercado_pago' => new MercadoPagoGateway(),
-            'pagseguro', 'pag_seguro' => new PagSeguroGateway(),
-            'stripe' => new StripeGateway(),
+            'asaas' => new AsaasGateway,
+            'mercadopago', 'mercado_pago' => new MercadoPagoGateway,
+            'pagseguro', 'pag_seguro' => new PagSeguroGateway,
+            'stripe' => new StripeGateway,
             default => throw new InvalidArgumentException("Gateway driver [{$driver}] não é suportado pelo ecossistema Comanda."),
         };
     }

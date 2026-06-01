@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Actions\Payment;
 
+use App\Enums\OrderStatusEnum;
 use App\Models\DeliveryOrder;
 use App\Models\Order;
-use App\Enums\OrderStatusEnum;
 use App\Services\Audit\AuditService;
 use App\Services\Payment\GatewayManager;
 use App\Services\SSE\SseQueueService;
@@ -28,8 +28,9 @@ class ProcessWebhookAction
         $gateway = $this->gatewayManager->driver($driver);
         $response = $gateway->handleWebhook($payload);
 
-        if (!$response->success) {
+        if (! $response->success) {
             Log::warning("[Gateway Webhook] Processamento do webhook falhou para o provedor: {$driver}");
+
             return;
         }
 
@@ -40,7 +41,7 @@ class ProcessWebhookAction
             if ($deliveryOrder) {
                 if ($response->status === 'paid') {
                     $deliveryOrder->update(['status' => 'confirmed']);
-                    
+
                     /** @var Order $order */
                     $order = $deliveryOrder->order;
                     $order->update(['status' => OrderStatusEnum::PENDING]); // Pronto para cozinha/PDV

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\OrderStatusEnum;
+use App\Models\Category;
 use App\Models\Company;
 use App\Models\CompanyUnit;
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\Employee;
 use App\Models\Coupon;
-use App\Models\Order;
-use App\Models\DeliveryOrder;
-use App\Models\OrderSession;
 use App\Models\Customer;
-use App\Enums\OrderStatusEnum;
+use App\Models\DeliveryOrder;
+use App\Models\Employee;
+use App\Models\Order;
+use App\Models\OrderSession;
+use App\Models\Product;
 use App\Services\SSE\SseQueueService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -84,7 +84,7 @@ class DeliveryCheckoutTest extends TestCase
 
         $response = $this->postJson('/api/v1/delivery/checkout', [
             'items' => [
-                ['uuid' => $product->uuid, 'quantity' => 2] // R$ 100,00 subtotal
+                ['uuid' => $product->uuid, 'quantity' => 2], // R$ 100,00 subtotal
             ],
             'customer_name' => 'Jane Doe',
             'customer_phone' => '11977777777',
@@ -101,13 +101,13 @@ class DeliveryCheckoutTest extends TestCase
             'coupon_code' => 'DELIVERY10', // 10% de R$ 100 = R$ 10 de desc
             'payment_method' => 'pix',
             'gateway' => 'asaas',
-            'lgpd_consent' => true // consentimento opcional
+            'lgpd_consent' => true, // consentimento opcional
         ]);
 
         // Total esperado: 100 (subtotal) + 12 (frete) - 10 (desconto) = 102 (R$ 102,00 ou 10200 centavos)
         $response->assertStatus(200)
             ->assertJson([
-                'success' => true
+                'success' => true,
             ]);
 
         $this->assertNotNull($response->json('payment_data.transaction_id'));
@@ -183,14 +183,14 @@ class DeliveryCheckoutTest extends TestCase
             'tracking_code' => 'asaas_tx_webhook_test',
         ]);
 
-        Cache::forget("sse_events:admin.orders");
+        Cache::forget('sse_events:admin.orders');
 
         // Dispara a chamada do Webhook fingindo ser o Asaas confirmando o pagamento da transação
         $response = $this->postJson('/api/v1/payments/webhooks/asaas', [
             'event' => 'PAYMENT_CONFIRMED',
             'payment' => [
                 'id' => 'asaas_tx_webhook_test',
-            ]
+            ],
         ]);
 
         $response->assertStatus(200)
@@ -209,5 +209,246 @@ class DeliveryCheckoutTest extends TestCase
         $this->assertNotEmpty($events);
         $this->assertEquals('order.confirmed', $events[0]['event']);
         $this->assertEquals('ORD-DEL-WEB', $events[0]['data']['order_number']);
+    }
+
+    #[Test]
+    public function it_fails_delivery_checkout_if_items_empty()
+    {
+        $this->withoutMiddleware();
+        $response = $this->postJson('/api/v1/delivery/checkout', [
+            'items' => [],
+            'customer_name' => 'John Doe',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Carrinho vazio.',
+            ]);
+    }
+
+    #[Test]
+    public function it_fails_delivery_checkout_if_employee_missing()
+    {
+        $this->withoutMiddleware();
+        $company = Company::factory()->create();
+
+        $category = Category::create([
+            'company_id' => $company->id,
+            'name' => 'Sucos',
+            'status' => 'active',
+            'sort_order' => 1,
+        ]);
+
+        $product = Product::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'code' => 'SUCO-01',
+            'name' => 'Suco de Laranja',
+            'price_cents' => 800,
+            'status' => 'active',
+        ]);
+
+        $response = $this->postJson('/api/v1/delivery/checkout', [
+            'items' => [
+                ['uuid' => $product->uuid, 'quantity' => 1],
+            ],
+            'customer_name' => 'Jane Doe',
+            'customer_phone' => '11977777777',
+            'customer_email' => 'jane@example.com',
+            'customer_cpf' => '123.456.789-00',
+            'street' => 'Rua Augusta',
+            'number' => '1500',
+            'neighborhood' => 'Consolação',
+            'city' => 'São Paulo',
+            'state' => 'SP',
+            'zip_code' => '01305-100',
+            'delivery_fee' => 10.00,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Delivery inoperante: sem funcionários.',
+            ]);
+    }
+
+    #[Test]
+    public function it_fails_delivery_checkout_with_invalid_coupon()
+    {
+        $this->withoutMiddleware();
+        $company = Company::factory()->create();
+        $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
+        $employee = Employee::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id]);
+
+        $category = Category::create([
+            'company_id' => $company->id,
+            'name' => 'Massas',
+            'status' => 'active',
+            'sort_order' => 1,
+        ]);
+
+        $product = Product::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'code' => 'MASS-01',
+            'name' => 'Lasanha',
+            'price_cents' => 4000,
+            'status' => 'active',
+        ]);
+
+        $response = $this->postJson('/api/v1/delivery/checkout', [
+            'items' => [
+                ['uuid' => $product->uuid, 'quantity' => 1],
+            ],
+            'customer_name' => 'Jane Doe',
+            'customer_phone' => '11977777777',
+            'customer_email' => 'jane@example.com',
+            'customer_cpf' => '123.456.789-00',
+            'street' => 'Rua Augusta',
+            'number' => '1500',
+            'neighborhood' => 'Consolação',
+            'city' => 'São Paulo',
+            'state' => 'SP',
+            'zip_code' => '01305-100',
+            'delivery_fee' => 10.00,
+            'coupon_code' => 'INVALIDCOUPON',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true, // Checkout prossegue, cupom apenas não é aplicado
+            ]);
+    }
+
+    #[Test]
+    public function it_can_calculate_frete_with_different_cep()
+    {
+        $response = $this->getJson('/api/v1/delivery/frete?cep=22021-001');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'frete_cents' => 1000,
+            ]);
+    }
+
+    #[Test]
+    public function it_fails_if_coupon_code_does_not_exist()
+    {
+        $response = $this->getJson('/api/v1/coupons/validate?code=NONEXISTENT');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Cupom não encontrado ou inativo.',
+            ]);
+    }
+
+    #[Test]
+    public function it_fails_webhook_with_invalid_event()
+    {
+        $this->withoutMiddleware();
+        $response = $this->postJson('/api/v1/payments/webhooks/asaas', [
+            'event' => 'PAYMENT_REFUNDED',
+            'payment' => [
+                'id' => 'asaas_tx_invalid_event_test',
+            ],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true]);
+    }
+
+    #[Test]
+    public function it_fails_webhook_with_unknown_gateway()
+    {
+        $this->withoutMiddleware();
+        $response = $this->postJson('/api/v1/payments/webhooks/unknown_gateway', [
+            'event' => 'PAYMENT_CONFIRMED',
+        ]);
+
+        $response->assertStatus(500);
+    }
+
+    #[Test]
+    public function it_fails_tablet_view_with_invalid_uuid()
+    {
+        $response = $this->get('/cardapio/m/00000000-0000-0000-0000-000000000000');
+        $response->assertStatus(404);
+    }
+
+    #[Test]
+    public function it_can_process_delivery_checkout_without_optional_marketing_consent()
+    {
+        $this->withoutMiddleware();
+        $company = Company::factory()->create();
+        $unit = CompanyUnit::factory()->create(['company_id' => $company->id]);
+        $employee = Employee::factory()->create(['company_id' => $company->id, 'unit_id' => $unit->id]);
+
+        $category = Category::create([
+            'company_id' => $company->id,
+            'name' => 'Bebidas',
+            'status' => 'active',
+            'sort_order' => 1,
+        ]);
+
+        $product = Product::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'code' => 'COCA-99',
+            'name' => 'Coca 2L',
+            'price_cents' => 1200,
+            'status' => 'active',
+        ]);
+
+        $response = $this->postJson('/api/v1/delivery/checkout', [
+            'items' => [
+                ['uuid' => $product->uuid, 'quantity' => 1],
+            ],
+            'customer_name' => 'John Doe Without Consent',
+            'customer_phone' => '11988888888',
+            'customer_email' => 'noconsent@example.com',
+            'customer_cpf' => '987.654.321-00',
+            'street' => 'Av. Paulista',
+            'number' => '2000',
+            'neighborhood' => 'Bela Vista',
+            'city' => 'São Paulo',
+            'state' => 'SP',
+            'zip_code' => '01310-200',
+            'delivery_fee' => 10.00,
+            'lgpd_consent' => false,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('customers', [
+            'document' => '987.654.321-00',
+            'email' => 'noconsent@example.com',
+        ]);
+
+        // Valida que o log de base legal de execução de contrato existe
+        $this->assertDatabaseHas('privacy_audit_logs', [
+            'action' => 'privacy.legal_basis',
+        ]);
+
+        // E o consentimento de marketing NÃO existe para este cliente no banco de dados de logs
+        $this->assertDatabaseMissing('privacy_audit_logs', [
+            'action' => 'privacy.consent_granted',
+            'entity_uuid' => Customer::where('document', '987.654.321-00')->first()->uuid,
+        ]);
+    }
+
+    #[Test]
+    public function it_fails_frete_with_empty_cep()
+    {
+        $response = $this->getJson('/api/v1/delivery/frete?cep=');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => false,
+                'message' => 'CEP inválido.',
+            ]);
     }
 }

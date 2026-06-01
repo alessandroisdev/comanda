@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Models\Table;
-
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -118,6 +117,8 @@ Route::prefix('api/v1')->group(function () {
 });
 
 // --- ROTAS PÚBLICAS E CANAIS DIGITAIS (FASE 4) ---
+use App\Actions\Table\CallWaiterAction;
+use App\Actions\Table\RequestBillAction;
 use App\Http\Controllers\Public\CardapioController;
 use App\Http\Controllers\Public\MenuCategoryController;
 use App\Http\Controllers\Public\MenuProductController;
@@ -127,7 +128,12 @@ Route::get('/cardapio', [CardapioController::class, 'index'])->name('public.menu
 Route::get('/mesa/{slug}', [CardapioController::class, 'index'])->name('public.menu.table');
 Route::get('/qrcode/{public_uuid}', [CardapioController::class, 'qrcode'])->name('public.menu.qrcode');
 
-// APIs públicas para PWA/Tablet
+// Tablet, Totem e Delivery views
+Route::get('/cardapio/m/{public_uuid}', [CardapioController::class, 'tablet'])->name('public.menu.tablet');
+Route::get('/totem', [CardapioController::class, 'totem'])->name('public.menu.totem');
+Route::get('/delivery', [CardapioController::class, 'delivery'])->name('public.menu.delivery');
+
+// APIs públicas para PWA/Tablet/Totem/Delivery
 Route::prefix('api/v1')->group(function () {
     Route::get('menu/categories', [MenuCategoryController::class, 'index']);
     Route::get('menu/products', [MenuProductController::class, 'index']);
@@ -137,13 +143,8 @@ Route::prefix('api/v1')->group(function () {
     Route::post('tables/{tableUuid}/call-waiter', function (string $tableUuid) {
         /** @var Table $table */
         $table = Table::where('public_uuid', $tableUuid)->firstOrFail();
-        
-        // Publicar evento SSE no canal admin
-        App\Services\SSE\SseQueueService::publish('admin.tables', 'waiter.called', [
-            'table_uuid' => $table->uuid,
-            'table_code' => $table->code,
-            'timestamp' => now()->toIso8601String(),
-        ]);
+
+        app(CallWaiterAction::class)->execute($table);
 
         return response()->json(['success' => true, 'message' => 'Garçom chamado.']);
     });
@@ -151,16 +152,17 @@ Route::prefix('api/v1')->group(function () {
     Route::post('tables/{tableUuid}/request-bill', function (string $tableUuid) {
         /** @var Table $table */
         $table = Table::where('public_uuid', $tableUuid)->firstOrFail();
-        
-        // Publicar evento SSE no canal admin
-        App\Services\SSE\SseQueueService::publish('admin.tables', 'bill.requested', [
-            'table_uuid' => $table->uuid,
-            'table_code' => $table->code,
-            'timestamp' => now()->toIso8601String(),
-        ]);
+
+        app(RequestBillAction::class)->execute($table);
 
         return response()->json(['success' => true, 'message' => 'Conta solicitada.']);
     });
 
+    // APIs da Fase 4
+    Route::post('tablet/order', [CardapioController::class, 'tabletOrder']);
+    Route::post('totem/order', [CardapioController::class, 'checkoutTotem']);
+    Route::get('coupons/validate', [CardapioController::class, 'validateCoupon']);
+    Route::get('delivery/frete', [CardapioController::class, 'calculateFrete']);
+    Route::post('delivery/checkout', [CardapioController::class, 'checkoutDelivery']);
+    Route::post('payments/webhooks/{gateway}', [CardapioController::class, 'webhook']);
 });
-

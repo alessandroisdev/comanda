@@ -19,14 +19,14 @@ class PagSeguroGateway implements GatewayInterface
         ]);
 
         $success = $dto->amount > 0;
-        $transactionId = 'ps_tx_' . bin2hex(random_bytes(8));
+        $transactionId = 'ps_tx_'.bin2hex(random_bytes(8));
 
         return new PaymentResponseDTO(
             success: $success,
             transactionId: $success ? $transactionId : null,
             status: $success ? 'pending' : 'failed',
             paymentMethod: $dto->paymentMethod,
-            paymentUrl: 'https://pagseguro.uol.com.br/checkout/' . $transactionId,
+            paymentUrl: 'https://pagseguro.uol.com.br/checkout/'.$transactionId,
             errorMessage: $success ? null : 'Erro de validação de valor no PagSeguro.'
         );
     }
@@ -34,6 +34,7 @@ class PagSeguroGateway implements GatewayInterface
     public function refund(string $transactionId): bool
     {
         Log::info("[Gateway PagSeguro] Estornando transação: {$transactionId}");
+
         return true;
     }
 

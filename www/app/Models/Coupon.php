@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $expires_at
  * @property int|null $usage_limit
  * @property int $used_count
- * @property boolean $is_active
+ * @property bool $is_active
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -75,7 +75,7 @@ class Coupon extends Model
      */
     public function calculateDiscount(int $subtotalCents): int
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return 0;
         }
 

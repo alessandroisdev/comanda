@@ -19,11 +19,11 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
             $table->foreignId('delivery_zone_id')->nullable()->constrained('delivery_zones')->onDelete('set null');
-            
+
             // Dados pessoais do destinatário (LGPD - Rastreável)
             $table->string('recipient_name');
             $table->string('recipient_phone');
-            
+
             // Endereço de entrega
             $table->string('street');
             $table->string('number');
@@ -32,13 +32,13 @@ return new class extends Migration
             $table->string('city');
             $table->string('state');
             $table->string('zip_code');
-            
+
             // Valores e prazos
             $table->decimal('delivery_fee', 10, 2);
             $table->timestamp('estimated_delivery_time')->nullable();
             $table->string('status')->default('pending'); // pending, assigned, dispatched, delivered, cancelled
             $table->string('tracking_code')->nullable();
-            
+
             $table->timestamps();
         });
     }
@@ -51,4 +51,3 @@ return new class extends Migration
         Schema::dropIfExists('delivery_orders');
     }
 };
-
