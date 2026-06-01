@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class HealthCheckControllerTest extends TestCase
 {
@@ -15,7 +15,7 @@ class HealthCheckControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'status' => 'alive'
+                'status' => 'alive',
             ]);
     }
 
@@ -27,7 +27,7 @@ class HealthCheckControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'status' => 'ready'
+                'status' => 'ready',
             ]);
     }
 
@@ -45,8 +45,8 @@ class HealthCheckControllerTest extends TestCase
                     'database',
                     'redis',
                     'license',
-                    'storage'
-                ]
+                    'storage',
+                ],
             ]);
     }
 }

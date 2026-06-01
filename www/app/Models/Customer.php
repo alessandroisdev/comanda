@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @property string $uuid
+ */
 class Customer extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes;

@@ -2,23 +2,24 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
+use App\Enums\LicenseStatusEnum;
 use App\Services\Licensing\LicenseManager;
 use App\Services\Licensing\LicenseValidator;
 use App\ValueObjects\LicenseKey;
-use App\Enums\LicenseStatusEnum;
 use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class LicenseManagerTest extends TestCase
 {
     private LicenseManager $manager;
+
     private LicenseValidator $validator;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->validator = new LicenseValidator();
+        $this->validator = new LicenseValidator;
         $this->manager = new LicenseManager($this->validator);
         Cache::flush();
     }
@@ -40,7 +41,7 @@ class LicenseManagerTest extends TestCase
     public function it_fails_activation_if_key_data_is_corrupt()
     {
         $key = new LicenseKey(base64_encode('corrupt-non-json-data-that-is-long-enough-for-validation-criteria-to-pass-12345678'));
-        
+
         $activated = $this->manager->activate($key);
         $this->assertFalse($activated);
     }

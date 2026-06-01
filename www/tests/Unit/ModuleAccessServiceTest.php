@@ -2,15 +2,16 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use App\Services\Licensing\ModuleAccessService;
-use App\Services\Licensing\LicenseManager;
 use App\Enums\LicenseStatusEnum;
+use App\Services\Licensing\LicenseManager;
+use App\Services\Licensing\ModuleAccessService;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class ModuleAccessServiceTest extends TestCase
 {
     private ModuleAccessService $service;
+
     private $licenseManagerMock;
 
     protected function setUp(): void

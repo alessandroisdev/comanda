@@ -84,10 +84,6 @@ class LicenseValidator
         // openssl_verify retorna 1 se a assinatura for válida, 0 se incorreta, -1 em erro.
         $result = openssl_verify($data, $signature, $pubKeyResource, OPENSSL_ALGO_SHA256);
 
-        if (is_resource($pubKeyResource) || $pubKeyResource instanceof \OpenSSLAsymmetricKey) {
-            openssl_free_key($pubKeyResource);
-        }
-
         return $result === 1;
     }
 

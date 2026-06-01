@@ -1,0 +1,17 @@
+parameters:
+    paths:
+        - app/
+        - config/
+        - database/
+        - routes/
+        - tests/
+
+    level: 5
+
+    excludePaths:
+        - bootstrap/cache/*
+        - storage/*
+        - vendor/*
+        - routes/console.php
+
+    treatPhpDocTypesAsCertain: false

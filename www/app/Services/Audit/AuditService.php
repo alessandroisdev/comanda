@@ -74,7 +74,7 @@ class AuditService
                 $user = Auth::guard($guard)->user();
 
                 return [
-                    'id' => $user->id,
+                    'id' => $user->getAuthIdentifier(),
                     'type' => get_class($user),
                 ];
             }

@@ -1,3 +1,6 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
+
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

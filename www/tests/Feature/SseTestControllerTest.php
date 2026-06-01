@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class SseTestControllerTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_serves_sse_stream_with_proper_headers()
     {
         $response = $this->get('/sse/test');

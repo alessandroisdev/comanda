@@ -3,16 +3,23 @@ info:
   title: Comanda API
   description: Especificação inicial da API para o ecossistema Comanda - Fase 1 (Fundação).
   version: 0.1.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 servers:
   - url: http://localhost:8000/api/v1
     description: Servidor de Desenvolvimento Principal (www)
   - url: http://localhost:8080/api/v1
     description: Servidor de Gerenciamento de Licenças (manager)
+security:
+  - bearerAuth: []
 paths:
   /health:
     get:
       summary: Health Check Geral
       description: Retorna o status de saúde física de todos os serviços (banco de dados, Redis, armazenamento e licença).
+      operationId: checkHealth
+      security: []
       responses:
         '200':
           description: Serviços operando de forma saudável.
@@ -43,6 +50,8 @@ paths:
                       license:
                         type: string
                         example: active
+        '400':
+          description: Requisição malformada ou parâmetros inválidos.
         '503':
           description: Falha crítica em um ou mais serviços de infraestrutura.
 
@@ -50,6 +59,8 @@ paths:
     post:
       summary: Autenticação de Operadores e Clientes
       description: Endpoint unificado de autenticação aceitando credenciais e determinando guard correspondente.
+      operationId: login
+      security: []
       requestBody:
         required: true
         content:
@@ -107,6 +118,7 @@ paths:
     get:
       summary: Status de Licença Ativa
       description: Retorna o status da licença criptografada instalada na aplicação principal.
+      operationId: checkLicenseStatus
       responses:
         '200':
           description: Dados de licenciamento verificados.
@@ -140,3 +152,10 @@ paths:
                         example: ["admin", "pdv", "kitchen", "waiter"]
         '403':
           description: Acesso negado por falta ou invalidez de licença comercial.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

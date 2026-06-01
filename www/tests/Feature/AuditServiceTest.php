@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Services\Audit\AuditService;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class AuditServiceTest extends TestCase
 {
@@ -17,7 +17,7 @@ class AuditServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new AuditService();
+        $this->service = new AuditService;
     }
 
     #[Test]
@@ -37,7 +37,7 @@ class AuditServiceTest extends TestCase
 
         $record = DB::table('audit_logs')->where('action', $action)->first();
         $this->assertNotNull($record);
-        $this->assertEquals(json_encode($before), $record->payload_before);
-        $this->assertEquals(json_encode($after), $record->payload_after);
+        $this->assertEquals($before, json_decode($record->payload_before, true));
+        $this->assertEquals($after, json_decode($record->payload_after, true));
     }
 }
