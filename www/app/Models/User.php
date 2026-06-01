@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\UserStatusEnum;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -25,7 +26,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, HasUuids;
 
     protected $fillable = [
         'uuid',
@@ -52,18 +53,8 @@ class User extends Authenticatable
     /**
      * Boot para geração do UUID automático na criação do usuário.
      */
-    protected static function booted(): void
+    public function uniqueIds(): array
     {
-        static::creating(function (User $user) {
-            if (empty($user->uuid)) {
-                $user->uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                    mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF),
-                    mt_rand(0, 0xFFFF),
-                    mt_rand(0, 0x0FFF) | 0x4000,
-                    mt_rand(0, 0x3FFF) | 0x8000,
-                    mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF)
-                );
-            }
-        });
+        return ['uuid'];
     }
 }

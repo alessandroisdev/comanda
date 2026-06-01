@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\CustomerStatusEnum;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,7 +32,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class Customer extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, HasUuids;
 
     protected $fillable = [
         'uuid',
@@ -64,19 +65,9 @@ class Customer extends Authenticatable
     /**
      * Geração automática de UUID na criação do cliente.
      */
-    protected static function booted(): void
+    public function uniqueIds(): array
     {
-        static::creating(function (Customer $customer) {
-            if (empty($customer->uuid)) {
-                $customer->uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                    mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF),
-                    mt_rand(0, 0xFFFF),
-                    mt_rand(0, 0x0FFF) | 0x4000,
-                    mt_rand(0, 0x3FFF) | 0x8000,
-                    mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF)
-                );
-            }
-        });
+        return ['uuid'];
     }
 
     /**

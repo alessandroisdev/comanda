@@ -8,6 +8,7 @@ use App\Enums\EmployeeRoleEnum;
 use App\Enums\EmployeeStatusEnum;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -39,7 +40,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class Employee extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, HasUuids;
 
     protected $fillable = [
         'uuid',
@@ -76,19 +77,9 @@ class Employee extends Authenticatable
     /**
      * Geração automática de UUID na criação do funcionário.
      */
-    protected static function booted(): void
+    public function uniqueIds(): array
     {
-        static::creating(function (Employee $employee) {
-            if (empty($employee->uuid)) {
-                $employee->uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                    mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF),
-                    mt_rand(0, 0xFFFF),
-                    mt_rand(0, 0x0FFF) | 0x4000,
-                    mt_rand(0, 0x3FFF) | 0x8000,
-                    mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF)
-                );
-            }
-        });
+        return ['uuid'];
     }
 
     /**

@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -22,7 +23,7 @@ use Illuminate\Support\Str;
  */
 class Permission extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     protected $fillable = [
         'uuid',
@@ -33,13 +34,9 @@ class Permission extends Model
     /**
      * Geração automática de UUID na criação.
      */
-    protected static function booted(): void
+    public function uniqueIds(): array
     {
-        static::creating(function (Permission $permission) {
-            if (empty($permission->uuid)) {
-                $permission->uuid = (string) Str::uuid();
-            }
-        });
+        return ['uuid'];
     }
 
     /**

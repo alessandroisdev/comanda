@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\UnitStatusEnum;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,7 +36,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class CompanyUnit extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasUuids;
 
     protected $fillable = [
         'uuid',
@@ -66,19 +67,9 @@ class CompanyUnit extends Model
     /**
      * Geração automática de UUID na criação da unidade.
      */
-    protected static function booted(): void
+    public function uniqueIds(): array
     {
-        static::creating(function (CompanyUnit $unit) {
-            if (empty($unit->uuid)) {
-                $unit->uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                    mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF),
-                    mt_rand(0, 0xFFFF),
-                    mt_rand(0, 0x0FFF) | 0x4000,
-                    mt_rand(0, 0x3FFF) | 0x8000,
-                    mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF)
-                );
-            }
-        });
+        return ['uuid'];
     }
 
     /**

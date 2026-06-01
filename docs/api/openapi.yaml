@@ -155,6 +155,7 @@ paths:
 
   /companies/{company_uuid}:
     delete:
+      operationId: deleteCompany
       summary: Excluir Empresa (Soft Delete)
       description: Executa a deleção lógica da empresa e registra a ação de forma imutável nos logs de auditoria.
       parameters:
@@ -174,6 +175,7 @@ paths:
 
   /units/{unit_uuid}:
     delete:
+      operationId: deleteUnit
       summary: Excluir Unidade Física (Soft Delete)
       description: Executa a deleção lógica da unidade/filial física vinculada à empresa proprietária.
       parameters:
@@ -193,6 +195,7 @@ paths:
 
   /users/{user_uuid}:
     delete:
+      operationId: deleteUser
       summary: Excluir Usuário Administrativo (Soft Delete)
       description: Executa a deleção lógica do operador de painel (users). Impede que o próprio usuário se autoexclua.
       parameters:
@@ -212,6 +215,7 @@ paths:
 
   /employees/{employee_uuid}:
     delete:
+      operationId: deleteEmployee
       summary: Excluir Funcionário (Soft Delete)
       description: Executa a deleção lógica do funcionário de loja e registra nos logs de auditoria.
       parameters:
@@ -231,6 +235,7 @@ paths:
 
   /customers/{customer_uuid}:
     delete:
+      operationId: deleteCustomer
       summary: Excluir Cliente (Soft Delete)
       description: Executa a deleção lógica do cliente/consumidor final do ecossistema.
       parameters:
@@ -250,6 +255,7 @@ paths:
 
   /categories/{category_uuid}:
     delete:
+      operationId: deleteCategory
       summary: Excluir Categoria (Soft Delete)
       description: Executa a deleção lógica da categoria de cardápio.
       parameters:
@@ -269,6 +275,7 @@ paths:
 
   /products/{product_uuid}:
     delete:
+      operationId: deleteProduct
       summary: Excluir Produto (Soft Delete)
       description: Executa a deleção lógica do produto do catálogo de vendas.
       parameters:

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -24,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Consent extends Model
 {
+    use HasUuids;
+
     protected $fillable = [
         'uuid',
         'company_id',
@@ -46,19 +49,9 @@ class Consent extends Model
         ];
     }
 
-    protected static function booted(): void
+    public function uniqueIds(): array
     {
-        static::creating(function (Consent $model) {
-            if (empty($model->uuid)) {
-                $model->uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                    mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF),
-                    mt_rand(0, 0xFFFF),
-                    mt_rand(0, 0x0FFF) | 0x4000,
-                    mt_rand(0, 0x3FFF) | 0x8000,
-                    mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF)
-                );
-            }
-        });
+        return ['uuid'];
     }
 
     public function company(): BelongsTo
