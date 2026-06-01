@@ -1,0 +1,98 @@
+name: comanda
+
+services:
+  app:
+    build:
+      context: .docker
+      dockerfile: app/Dockerfile
+    container_name: comanda-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./www:/var/www
+      - .docker/scripts/permissions.sh:/usr/local/bin/permissions.sh
+      - .docker/scripts/wait-for-mysql.sh:/usr/local/bin/wait-for-mysql.sh
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+    networks:
+      - comanda-network
+    depends_on:
+      - mysql
+      - redis
+
+  manager-app:
+    build:
+      context: .docker
+      dockerfile: app/Dockerfile
+    container_name: comanda-manager-app
+    restart: unless-stopped
+    working_dir: /var/www/manager
+    volumes:
+      - ./manager:/var/www/manager
+      - .docker/scripts/permissions.sh:/usr/local/bin/permissions.sh
+      - .docker/scripts/wait-for-mysql.sh:/usr/local/bin/wait-for-mysql.sh
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+    networks:
+      - comanda-network
+    depends_on:
+      - mysql
+      - redis
+
+  nginx:
+    image: nginx:alpine
+    container_name: comanda-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+      - "8080:8080"
+    volumes:
+      - ./www:/var/www
+      - ./manager:/var/www/manager
+      - .docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - comanda-network
+    depends_on:
+      - app
+      - manager-app
+
+  mysql:
+    image: mysql:8.0
+    container_name: comanda-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=comanda
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=root
+    volumes:
+      - comanda-mysql-data:/var/lib/mysql
+      - .docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - comanda-network
+
+  redis:
+    image: redis:alpine
+    container_name: comanda-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - comanda-redis-data:/data
+      - .docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - comanda-network
+
+networks:
+  comanda-network:
+    driver: bridge
+
+volumes:
+  comanda-mysql-data:
+    driver: local
+  comanda-redis-data:
+    driver: local

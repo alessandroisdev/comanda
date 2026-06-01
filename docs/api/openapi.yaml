@@ -1,0 +1,142 @@
+openapi: 3.0.3
+info:
+  title: Comanda API
+  description: Especificação inicial da API para o ecossistema Comanda - Fase 1 (Fundação).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Servidor de Desenvolvimento Principal (www)
+  - url: http://localhost:8080/api/v1
+    description: Servidor de Gerenciamento de Licenças (manager)
+paths:
+  /health:
+    get:
+      summary: Health Check Geral
+      description: Retorna o status de saúde física de todos os serviços (banco de dados, Redis, armazenamento e licença).
+      responses:
+        '200':
+          description: Serviços operando de forma saudável.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  status:
+                    type: string
+                    example: healthy
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2026-06-01T14:35:00Z"
+                  services:
+                    type: object
+                    properties:
+                      database:
+                        type: string
+                        example: up
+                      redis:
+                        type: string
+                        example: up
+                      license:
+                        type: string
+                        example: active
+        '503':
+          description: Falha crítica em um ou mais serviços de infraestrutura.
+
+  /auth/login:
+    post:
+      summary: Autenticação de Operadores e Clientes
+      description: Endpoint unificado de autenticação aceitando credenciais e determinando guard correspondente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - type
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@comanda.com.br
+                password:
+                  type: string
+                  format: password
+                  example: password123
+                type:
+                  type: string
+                  enum: [admin, employee, customer]
+                  example: employee
+      responses:
+        '200':
+          description: Autenticação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: "1|laravel_sanctum_token_data..."
+                  user:
+                    type: object
+                    properties:
+                      uuid:
+                        type: string
+                        format: uuid
+                        example: "f3b392a8-129b-43d9-a9a3-a5c7c2512f45"
+                      name:
+                        type: string
+                        example: "João Silva"
+                      email:
+                        type: string
+                        example: "joao.silva@comanda.com.br"
+        '401':
+          description: Credenciais incorretas ou inválidas.
+
+  /licensing/status:
+    get:
+      summary: Status de Licença Ativa
+      description: Retorna o status da licença criptografada instalada na aplicação principal.
+      responses:
+        '200':
+          description: Dados de licenciamento verificados.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  license:
+                    type: object
+                    properties:
+                      license_uuid:
+                        type: string
+                        format: uuid
+                      installation_uuid:
+                        type: string
+                        format: uuid
+                      expires_at:
+                        type: string
+                        format: date-time
+                      status:
+                        type: string
+                        example: active
+                      modules:
+                        type: array
+                        items:
+                          type: string
+                        example: ["admin", "pdv", "kitchen", "waiter"]
+        '403':
+          description: Acesso negado por falta ou invalidez de licença comercial.
