@@ -1,0 +1,26 @@
+{
+  "name": "Comanda - Canais Digitais",
+  "short_name": "Comanda",
+  "description": "Plataforma premium e integrada de autoatendimento para restaurantes, mesas, totens e delivery.",
+  "start_url": "/admin/tables",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "scope": "/",
+  "categories": ["food", "productivity", "shopping"],
+  "icons": [
+    {
+      "src": "/js/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/js/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
