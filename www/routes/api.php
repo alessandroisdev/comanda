@@ -2,10 +2,18 @@
 
 use App\Actions\Table\CallWaiterAction;
 use App\Actions\Table\RequestBillAction;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Public\CardapioController;
 use App\Http\Controllers\Public\MenuCategoryController;
 use App\Http\Controllers\Public\MenuProductController;
+use App\Http\Controllers\TableController;
+use App\Http\Controllers\UnitController;
+use App\Http\Controllers\UserController;
 use App\Models\Table;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +49,18 @@ Route::prefix('v1')->group(function () {
     Route::get('delivery/frete', [CardapioController::class, 'calculateFrete'])->middleware('license.module:delivery');
     Route::post('delivery/checkout', [CardapioController::class, 'checkoutDelivery'])->middleware('license.module:delivery');
     Route::post('payments/webhooks/{gateway}', [CardapioController::class, 'webhook']);
+
+    // Rotas API para Deleção via AJAX nos DataTables
+    Route::delete('companies/{company}', [CompanyController::class, 'destroy']);
+    Route::delete('units/{unit}', [UnitController::class, 'destroy']);
+    Route::delete('users/{user}', [UserController::class, 'destroy']);
+    Route::delete('employees/{employee}', [EmployeeController::class, 'destroy']);
+    Route::delete('customers/{customer}', [CustomerController::class, 'destroy']);
+    Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
+    Route::delete('products/{product}', [ProductController::class, 'destroy']);
+
+    // API da Fase 3
+    Route::delete('tables/{table}', [TableController::class, 'destroy']);
 });
 
 // Endpoints de Saúde Avançados

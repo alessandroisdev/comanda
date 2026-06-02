@@ -116,20 +116,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('cashier/{shift}/close', [CashierController::class, 'close'])->name('cashier.close');
 });
 
-// Rotas API para Deleção via AJAX nos DataTables
-Route::prefix('api/v1')->group(function () {
-    Route::delete('companies/{company}', [CompanyController::class, 'destroy']);
-    Route::delete('units/{unit}', [UnitController::class, 'destroy']);
-    Route::delete('users/{user}', [UserController::class, 'destroy']);
-    Route::delete('employees/{employee}', [EmployeeController::class, 'destroy']);
-    Route::delete('customers/{customer}', [CustomerController::class, 'destroy']);
-    Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
-    Route::delete('products/{product}', [ProductController::class, 'destroy']);
-
-    // API da Fase 3
-    Route::delete('tables/{table}', [TableController::class, 'destroy']);
-});
-
 // Cardápio Digital & Deep Links
 Route::get('/cardapio', [CardapioController::class, 'index'])->name('public.menu');
 Route::get('/mesa/{slug}', [CardapioController::class, 'index'])->name('public.menu.table');
