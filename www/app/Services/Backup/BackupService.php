@@ -41,8 +41,8 @@ class BackupService
             @mkdir($this->tempDir, 0755, true);
 
             $timestamp = $startedAt->format('Y_m_d_His');
-            $dbFile = $this->tempDir . '/db_backup.sql';
-            $storageZipFile = $this->tempDir . '/storage_backup.zip';
+            $dbFile = $this->tempDir.'/db_backup.sql';
+            $storageZipFile = $this->tempDir.'/storage_backup.zip';
 
             // 2. Dump do Banco de Dados
             $this->dumpDatabase($dbFile);
@@ -67,7 +67,7 @@ class BackupService
 
             // 5. Criptografar o arquivo se solicitado
             if ($encrypt) {
-                $encryptedFile = $finalZipFile . '.enc';
+                $encryptedFile = $finalZipFile.'.enc';
                 $this->encryptFile($finalZipFile, $encryptedFile);
                 @unlink($finalZipFile); // remove zip cru
                 $outputFile = $encryptedFile;
@@ -78,7 +78,7 @@ class BackupService
             $size = filesize($outputFile);
             $checksum = hash_file('sha256', $outputFile);
             $filename = basename($outputFile);
-            $relativePath = 'backups/' . $filename;
+            $relativePath = 'backups/'.$filename;
 
             // 7. Persistir metadados no banco
             $backup = Backup::create([
@@ -129,7 +129,7 @@ class BackupService
     private function cleanTempDir(): void
     {
         if (is_dir($this->tempDir)) {
-            $files = glob($this->tempDir . '/*');
+            $files = glob($this->tempDir.'/*');
             foreach ($files as $file) {
                 if (is_file($file)) {
                     @unlink($file);
@@ -143,6 +143,7 @@ class BackupService
     {
         if (config('database.default') === 'sqlite') {
             file_put_contents($outputPath, '-- SQLite memory dump');
+
             return;
         }
 
@@ -219,7 +220,7 @@ class BackupService
         }
 
         // O arquivo criptografado contém: [IV (16 bytes)][DADOS CRIPTOGRAFADOS]
-        file_put_contents($outputPath, $iv . $encrypted);
+        file_put_contents($outputPath, $iv.$encrypted);
     }
 
     private function applyRetention(): void
@@ -232,7 +233,7 @@ class BackupService
 
         /** @var Backup $oldBackup */
         foreach ($oldBackups as $oldBackup) {
-            $physicalPath = storage_path('app/' . $oldBackup->path);
+            $physicalPath = storage_path('app/'.$oldBackup->path);
             if (file_exists($physicalPath)) {
                 @unlink($physicalPath);
             }

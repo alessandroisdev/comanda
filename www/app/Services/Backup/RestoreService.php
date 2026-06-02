@@ -35,7 +35,7 @@ class RestoreService
             'started_at' => $startedAt,
         ]);
 
-        $filePath = storage_path('app/' . $backup->path);
+        $filePath = storage_path('app/'.$backup->path);
 
         try {
             // 1. Verificar integridade física por Checksum SHA-256
@@ -56,7 +56,7 @@ class RestoreService
 
             // 3. Se criptografado, descriptografa para um ZIP temporário
             if ($backup->is_encrypted) {
-                $zipPath = $this->tempDir . '/temp_decrypted.zip';
+                $zipPath = $this->tempDir.'/temp_decrypted.zip';
                 $this->decryptFile($filePath, $zipPath);
             }
 
@@ -68,8 +68,8 @@ class RestoreService
             $zip->extractTo($this->tempDir);
             $zip->close();
 
-            $dbFile = $this->tempDir . '/db_backup.sql';
-            $storageZipFile = $this->tempDir . '/storage_backup.zip';
+            $dbFile = $this->tempDir.'/db_backup.sql';
+            $storageZipFile = $this->tempDir.'/storage_backup.zip';
 
             if (! file_exists($dbFile) || ! file_exists($storageZipFile)) {
                 throw new Exception('Estrutura interna do backup corrompida ou incompleta.');
@@ -113,7 +113,7 @@ class RestoreService
     private function cleanTempDir(): void
     {
         if (is_dir($this->tempDir)) {
-            $files = glob($this->tempDir . '/*');
+            $files = glob($this->tempDir.'/*');
             foreach ($files as $file) {
                 if (is_file($file)) {
                     @unlink($file);

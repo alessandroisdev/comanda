@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Services\Logging\ApplicationLogService;
-use App\Services\Logging\SecurityLogService;
-use App\Services\Logging\BusinessLogService;
 use App\Services\Logging\AuditLogService;
+use App\Services\Logging\BusinessLogService;
+use App\Services\Logging\SecurityLogService;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
@@ -46,7 +46,7 @@ class LoggingTest extends TestCase
             'password' => 'supersecret123',
             'card_number' => '1234-5678-9012-3456',
             'cvv' => '123',
-            'safe_param' => 'visible_value'
+            'safe_param' => 'visible_value',
         ]);
 
         $path = storage_path('logs/security.json.log');
@@ -67,7 +67,7 @@ class LoggingTest extends TestCase
         $businessLog = app(BusinessLogService::class);
         $businessLog->event('business.sale', 'order_completed', [
             'order_id' => 99,
-            'amount_cents' => 15000
+            'amount_cents' => 15000,
         ]);
 
         $path = storage_path('logs/business.json.log');
@@ -86,7 +86,7 @@ class LoggingTest extends TestCase
     {
         $auditLog = app(AuditLogService::class);
         $auditLog->log('audit.access', 'user_profile_viewed', [
-            'viewed_user_id' => 1
+            'viewed_user_id' => 1,
         ]);
 
         $path = storage_path('logs/audit.json.log');

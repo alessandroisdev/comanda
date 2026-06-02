@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Module;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -38,8 +39,8 @@ class ModulesCatalogTest extends TestCase
             'version_min' => '1.0.0',
         ]);
 
-        $this->expectException(\Illuminate\Database\UniqueConstraintViolationException::class);
-        
+        $this->expectException(UniqueConstraintViolationException::class);
+
         Module::create([
             'name' => 'Modulo Teste 2',
             'code' => 'key_unica', // Duplicada

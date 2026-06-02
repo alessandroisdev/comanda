@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services\Monitoring;
 
-use App\Models\Order;
-use App\Models\Table;
-use App\Models\DeliveryOrder;
-use App\Models\KitchenTicket;
+use App\Enums\KitchenTicketStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\TableStatusEnum;
-use App\Enums\KitchenTicketStatusEnum;
+use App\Models\DeliveryOrder;
+use App\Models\KitchenTicket;
+use App\Models\Order;
+use App\Models\Table;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 class BusinessMetricsService
 {
@@ -23,6 +24,7 @@ class BusinessMetricsService
         $orderQuery = Order::query()->where('status', '!=', OrderStatusEnum::CANCELLED);
         $tableQuery = Table::query();
         $deliveryQuery = DeliveryOrder::query()->whereIn('status', ['assigned', 'dispatched']);
+        /** @var Builder $kitchenQuery */
         $kitchenQuery = KitchenTicket::query()->whereIn('status', [
             KitchenTicketStatusEnum::PENDING,
             KitchenTicketStatusEnum::PREPARING,

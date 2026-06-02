@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Services\Monitoring\MetricsService;
 use App\Services\Licensing\LicenseManager;
+use App\Services\Monitoring\MetricsService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     private MetricsService $metricsService;
+
     private LicenseManager $licenseManager;
 
     public function __construct(MetricsService $metricsService, LicenseManager $licenseManager)
@@ -44,6 +44,7 @@ class DashboardController extends Controller
     public function metrics(): JsonResponse
     {
         $metrics = $this->metricsService->getFullMetrics();
+
         return response()->json($metrics);
     }
 }

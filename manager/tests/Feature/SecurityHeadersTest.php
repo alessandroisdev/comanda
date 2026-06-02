@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\SecurityHeadersMiddleware;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
@@ -12,7 +13,7 @@ class SecurityHeadersTest extends TestCase
         parent::setUp();
         Route::get('/_test_security_headers_mgr', function () {
             return response('OK_MGR');
-        })->middleware(\App\Http\Middleware\SecurityHeadersMiddleware::class);
+        })->middleware(SecurityHeadersMiddleware::class);
     }
 
     public function test_manager_contains_hsts_header()

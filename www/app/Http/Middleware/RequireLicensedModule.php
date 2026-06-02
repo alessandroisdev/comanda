@@ -25,7 +25,7 @@ class RequireLicensedModule
      */
     public function handle(Request $request, Closure $next, string $moduleKey): Response
     {
-        if (app()->environment('testing') && ! config('licensing.strict_testing', false)) {
+        if ((app()->environment('testing') || app()->runningUnitTests()) && ! config('licensing.strict_testing', false)) {
             return $next($request);
         }
 

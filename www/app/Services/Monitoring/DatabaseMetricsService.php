@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Monitoring;
 
-use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseMetricsService
 {

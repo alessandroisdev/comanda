@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Services\Monitoring\MetricsService;
-use App\Services\Monitoring\HealthMetricsService;
-use App\Services\Monitoring\DatabaseMetricsService;
-use App\Services\Monitoring\QueueMetricsService;
 use App\Services\Monitoring\BusinessMetricsService;
+use App\Services\Monitoring\DatabaseMetricsService;
+use App\Services\Monitoring\HealthMetricsService;
+use App\Services\Monitoring\MetricsService;
+use App\Services\Monitoring\QueueMetricsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

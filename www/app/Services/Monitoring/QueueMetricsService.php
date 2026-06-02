@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Monitoring;
 
-use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Schema;
 
 class QueueMetricsService
 {

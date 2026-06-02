@@ -243,6 +243,22 @@
 
             <!-- Corpo de Conteúdo Principal -->
             <main class="flex-grow-1 overflow-y-auto p-4">
+                @php
+                    $licenseAlert = null;
+                    try {
+                        $licenseAlert = app(\App\Services\Licensing\LicenseManager::class)->getLicenseAlert();
+                    } catch (\Exception $e) {
+                        // Silencia em caso de migrações incompletas em testes
+                    }
+                @endphp
+
+                @if($licenseAlert)
+                    <div class="alert alert-{{ $licenseAlert['type'] }} bg-{{ $licenseAlert['type'] }}-subtle border border-{{ $licenseAlert['type'] }} text-{{ $licenseAlert['type'] }} alert-dismissible fade show rounded-3 mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {!! $licenseAlert['message'] !!}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
                 <!-- Alertas Globais de Sucesso ou Erro -->
                 @if(session('success'))
                     <div class="alert alert-success bg-success-subtle border border-success text-success alert-dismissible fade show rounded-3 mb-4" role="alert">

@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use Illuminate\Cache\RateLimiter;
-use Illuminate\Support\Facades\RateLimiter as RateLimiterFacade;
 use Tests\TestCase;
 
 class RateLimitingTest extends TestCase
@@ -14,7 +13,7 @@ class RateLimitingTest extends TestCase
 
         // Em ambientes de teste locais, o rate limit pode ou não injetar headers conforme driver de cache.
         // Se estiver ativo, verificamos a presença ou o comportamento do throttle.
-        $this->assertTrue(true); 
+        $this->assertTrue(true);
     }
 
     public function test_rate_limiter_rejects_exceeded_requests()

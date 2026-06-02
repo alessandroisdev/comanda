@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\SecurityHeadersMiddleware;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
@@ -13,7 +14,7 @@ class SecurityHeadersTest extends TestCase
         // Garante uma rota simples para teste
         Route::get('/_test_security_headers', function () {
             return response('OK');
-        })->middleware(\App\Http\Middleware\SecurityHeadersMiddleware::class);
+        })->middleware(SecurityHeadersMiddleware::class);
     }
 
     public function test_it_contains_hsts_header()
@@ -61,7 +62,7 @@ class SecurityHeadersTest extends TestCase
     public function test_it_generates_and_returns_correlation_id_header()
     {
         $response = $this->get('/_test_security_headers');
-        $response->assertHeaderHas('X-Correlation-ID');
+        $this->assertTrue($response->headers->has('X-Correlation-ID'));
         $this->assertNotEmpty($response->headers->get('X-Correlation-ID'));
     }
 
@@ -69,7 +70,7 @@ class SecurityHeadersTest extends TestCase
     {
         $testUuid = '12345678-abcd-1234-abcd-1234567890ab';
         $response = $this->withHeaders([
-            'X-Correlation-ID' => $testUuid
+            'X-Correlation-ID' => $testUuid,
         ])->get('/_test_security_headers');
 
         $response->assertHeader('X-Correlation-ID', $testUuid);

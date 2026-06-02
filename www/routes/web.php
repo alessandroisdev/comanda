@@ -4,6 +4,7 @@ use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\KitchenController;
@@ -17,13 +18,30 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
+Route::get('/admin/metrics', [DashboardController::class, 'metrics'])->name('admin.metrics');
+
+Route::get('/health', [HealthCheckController::class, 'full'])->name('health');
+Route::get('/liveness', [HealthCheckController::class, 'live'])->name('liveness');
+Route::get('/readiness', [HealthCheckController::class, 'ready'])->name('readiness');
+
+Route::get('/manifest.json', function () {
+    $path = public_path('manifest.json');
+    if (! file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path, ['Content-Type' => 'application/json']);
 });
 
-Route::get('/health', [HealthCheckController::class, 'check'])->name('health');
-Route::get('/liveness', [HealthCheckController::class, 'liveness'])->name('liveness');
-Route::get('/readiness', [HealthCheckController::class, 'readiness'])->name('readiness');
+Route::get('/sw.js', function () {
+    $path = public_path('sw.js');
+    if (! file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path, ['Content-Type' => 'application/javascript']);
+});
 
 // Importação das rotas de Realtime Server-Sent Events (SSE)
 require base_path('routes/sse.php');

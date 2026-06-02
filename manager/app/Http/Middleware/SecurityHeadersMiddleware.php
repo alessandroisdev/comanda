@@ -13,8 +13,7 @@ class SecurityHeadersMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -29,13 +28,13 @@ class SecurityHeadersMiddleware
             $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 
             $csp = "default-src 'self'; "
-                . "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-                . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-                . "font-src 'self' data: https://fonts.gstatic.com; "
-                . "img-src 'self' data: blob:; "
-                . "connect-src 'self' ws: wss:; "
-                . "frame-ancestors 'none'; "
-                . "object-src 'none';";
+                ."script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+                ."style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+                ."font-src 'self' data: https://fonts.gstatic.com; "
+                ."img-src 'self' data: blob:; "
+                ."connect-src 'self' ws: wss:; "
+                ."frame-ancestors 'none'; "
+                ."object-src 'none';";
 
             $response->headers->set('Content-Security-Policy', $csp);
         }

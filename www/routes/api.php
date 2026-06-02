@@ -2,6 +2,7 @@
 
 use App\Actions\Table\CallWaiterAction;
 use App\Actions\Table\RequestBillAction;
+use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\Public\CardapioController;
 use App\Http\Controllers\Public\MenuCategoryController;
 use App\Http\Controllers\Public\MenuProductController;
@@ -40,4 +41,11 @@ Route::prefix('v1')->group(function () {
     Route::get('delivery/frete', [CardapioController::class, 'calculateFrete'])->middleware('license.module:delivery');
     Route::post('delivery/checkout', [CardapioController::class, 'checkoutDelivery'])->middleware('license.module:delivery');
     Route::post('payments/webhooks/{gateway}', [CardapioController::class, 'webhook']);
+});
+
+// Endpoints de Saúde Avançados
+Route::prefix('health')->group(function () {
+    Route::get('live', [HealthCheckController::class, 'live']);
+    Route::get('ready', [HealthCheckController::class, 'ready']);
+    Route::get('full', [HealthCheckController::class, 'full']);
 });

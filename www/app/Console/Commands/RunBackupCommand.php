@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Services\Backup\BackupService;
-use Illuminate\Console\Command;
 use Exception;
+use Illuminate\Console\Command;
 
 class RunBackupCommand extends Command
 {
@@ -35,13 +35,13 @@ class RunBackupCommand extends Command
         try {
             $backup = $backupService->executeBackup($encrypt);
             $this->info('Backup concluído com sucesso!');
-            $this->line('Arquivo: ' . $backup->filename);
-            $this->line('Tamanho: ' . round($backup->size_bytes / 1024 / 1024, 2) . ' MB');
-            $this->line('Checksum (SHA-256): ' . $backup->checksum);
+            $this->line('Arquivo: '.$backup->filename);
+            $this->line('Tamanho: '.round($backup->size_bytes / 1024 / 1024, 2).' MB');
+            $this->line('Checksum (SHA-256): '.$backup->checksum);
 
             return 0;
         } catch (Exception $e) {
-            $this->error('Erro ao realizar backup: ' . $e->getMessage());
+            $this->error('Erro ao realizar backup: '.$e->getMessage());
 
             return 1;
         }

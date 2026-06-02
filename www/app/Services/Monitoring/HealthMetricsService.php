@@ -22,10 +22,11 @@ class HealthMetricsService
     {
         if (function_exists('sys_getloadavg')) {
             $load = sys_getloadavg();
-            if (is_array($load) && isset($load[0])) {
+            if (is_array($load)) {
                 return round($load[0] * 10.0, 2);
             }
         }
+
         return 4.2; // Fallback simbólico se a função não estiver disponível
     }
 

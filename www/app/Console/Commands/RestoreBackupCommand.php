@@ -6,8 +6,8 @@ namespace App\Console\Commands;
 
 use App\Models\Backup;
 use App\Services\Backup\RestoreService;
-use Illuminate\Console\Command;
 use Exception;
+use Illuminate\Console\Command;
 
 class RestoreBackupCommand extends Command
 {
@@ -53,7 +53,7 @@ class RestoreBackupCommand extends Command
 
             return 0;
         } catch (Exception $e) {
-            $this->error('Erro ao realizar a restauração: ' . $e->getMessage());
+            $this->error('Erro ao realizar a restauração: '.$e->getMessage());
 
             return 1;
         }

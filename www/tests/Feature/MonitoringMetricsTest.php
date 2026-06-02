@@ -2,14 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Enums\DocumentTypeEnum;
 use App\Enums\KitchenTicketStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\TableStatusEnum;
 use App\Models\Company;
 use App\Models\CompanyUnit;
+use App\Models\Customer;
 use App\Models\DeliveryOrder;
+use App\Models\DeliveryZone;
+use App\Models\Employee;
 use App\Models\KitchenTicket;
 use App\Models\Order;
+use App\Models\OrderSession;
 use App\Models\Table;
 use App\Services\Monitoring\BusinessMetricsService;
 use App\Services\Monitoring\DatabaseMetricsService;
@@ -21,6 +26,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class MonitoringMetricsTest extends TestCase
@@ -28,19 +34,88 @@ class MonitoringMetricsTest extends TestCase
     use RefreshDatabase;
 
     private Company $company1;
+
     private Company $company2;
+
     private CompanyUnit $unit1;
+
     private CompanyUnit $unit2;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->company1 = Company::create(['name' => 'Restaurante 1', 'document' => '12345678000101', 'email' => 'r1@test.com']);
-        $this->company2 = Company::create(['name' => 'Restaurante 2', 'document' => '12345678000102', 'email' => 'r2@test.com']);
+        $this->company1 = Company::create([
+            'trade_name' => 'Restaurante 1',
+            'legal_name' => 'Restaurante 1 Ltda',
+            'document_type' => DocumentTypeEnum::CNPJ,
+            'document_number' => '12345678000101',
+            'email' => 'r1@test.com',
+            'phone' => '11999999999',
+            'timezone' => 'America/Sao_Paulo',
+            'currency' => 'BRL',
+            'language' => 'pt_BR',
+        ]);
+        $this->company2 = Company::create([
+            'trade_name' => 'Restaurante 2',
+            'legal_name' => 'Restaurante 2 Ltda',
+            'document_type' => DocumentTypeEnum::CNPJ,
+            'document_number' => '12345678000102',
+            'email' => 'r2@test.com',
+            'phone' => '11999999998',
+            'timezone' => 'America/Sao_Paulo',
+            'currency' => 'BRL',
+            'language' => 'pt_BR',
+        ]);
 
-        $this->unit1 = CompanyUnit::create(['company_id' => $this->company1->id, 'name' => 'Unidade Centro', 'email' => 'centro@test.com']);
-        $this->unit2 = CompanyUnit::create(['company_id' => $this->company2->id, 'name' => 'Unidade Sul', 'email' => 'sul@test.com']);
+        $this->unit1 = CompanyUnit::create([
+            'company_id' => $this->company1->id,
+            'name' => 'Unidade Centro',
+            'email' => 'centro@test.com',
+            'zipcode' => '01000-000',
+            'street' => 'Rua Centro',
+            'number' => '100',
+            'district' => 'Centro',
+            'city' => 'Sao Paulo',
+            'state' => 'SP',
+            'country' => 'Brasil',
+        ]);
+        $this->unit2 = CompanyUnit::create([
+            'company_id' => $this->company2->id,
+            'name' => 'Unidade Sul',
+            'email' => 'sul@test.com',
+            'zipcode' => '02000-000',
+            'street' => 'Rua Sul',
+            'number' => '200',
+            'district' => 'Zona Sul',
+            'city' => 'Sao Paulo',
+            'state' => 'SP',
+            'country' => 'Brasil',
+        ]);
+    }
+
+    private function createOrder(array $attributes = []): Order
+    {
+        $companyId = $attributes['company_id'] ?? $this->company1->id;
+        $unitId = $attributes['unit_id'] ?? $this->unit1->id;
+
+        $employee = Employee::factory()->create(['company_id' => $companyId]);
+
+        $session = OrderSession::factory()->create([
+            'company_id' => $companyId,
+            'unit_id' => $unitId,
+            'opened_by_employee_id' => $employee->id,
+        ]);
+
+        return Order::create(array_merge([
+            'company_id' => $companyId,
+            'unit_id' => $unitId,
+            'session_id' => $session->id,
+            'employee_id' => $employee->id,
+            'order_number' => 'ORD-'.rand(10000, 99999),
+            'total_cents' => 1000,
+            'status' => OrderStatusEnum::PENDING,
+        ], $attributes));
     }
 
     public function test_business_metrics_empty_defaults()
@@ -58,10 +133,10 @@ class MonitoringMetricsTest extends TestCase
 
     public function test_business_metrics_orders_last_hour()
     {
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 5000, 'status' => OrderStatusEnum::PENDING]);
-        
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 5000, 'status' => OrderStatusEnum::PENDING]);
+
         Carbon::setTestNow(Carbon::now()->addMinutes(30));
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 6000, 'status' => OrderStatusEnum::PREPARING]);
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 6000, 'status' => OrderStatusEnum::PREPARING]);
 
         Carbon::setTestNow(Carbon::now()->addMinutes(45)); // mais de 1 hora da primeira ordem
 
@@ -74,9 +149,9 @@ class MonitoringMetricsTest extends TestCase
 
     public function test_business_metrics_average_ticket_calculation()
     {
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 4000, 'status' => OrderStatusEnum::PENDING]);
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 8000, 'status' => OrderStatusEnum::DELIVERED]);
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 9000, 'status' => OrderStatusEnum::CANCELLED]); // Cancelado deve ser ignorado
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 4000, 'status' => OrderStatusEnum::PENDING]);
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 8000, 'status' => OrderStatusEnum::DELIVERED]);
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 9000, 'status' => OrderStatusEnum::CANCELLED]); // Cancelado deve ser ignorado
 
         $service = app(BusinessMetricsService::class);
         $metrics = $service->getBusinessMetrics();
@@ -86,13 +161,13 @@ class MonitoringMetricsTest extends TestCase
 
     public function test_business_metrics_sales_today_calculation()
     {
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 3500, 'status' => OrderStatusEnum::PENDING]);
-        
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 3500, 'status' => OrderStatusEnum::PENDING]);
+
         // Simular ontem
         $yesterday = Carbon::now()->subDay();
         Carbon::setTestNow($yesterday);
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 9900, 'status' => OrderStatusEnum::PENDING]);
-        
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 9900, 'status' => OrderStatusEnum::PENDING]);
+
         Carbon::setTestNow(); // Reset time para hoje
 
         $service = app(BusinessMetricsService::class);
@@ -103,8 +178,8 @@ class MonitoringMetricsTest extends TestCase
 
     public function test_business_metrics_occupied_tables_count()
     {
-        Table::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'number' => '10', 'status' => TableStatusEnum::OCCUPIED]);
-        Table::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'number' => '11', 'status' => TableStatusEnum::AVAILABLE]);
+        Table::factory()->create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'code' => 'T10', 'name' => 'Mesa 10', 'status' => TableStatusEnum::OCCUPIED]);
+        Table::factory()->create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'code' => 'T11', 'name' => 'Mesa 11', 'status' => TableStatusEnum::AVAILABLE]);
 
         $service = app(BusinessMetricsService::class);
         $metrics = $service->getBusinessMetrics();
@@ -114,9 +189,71 @@ class MonitoringMetricsTest extends TestCase
 
     public function test_business_metrics_deliveries_in_progress_count()
     {
-        DeliveryOrder::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'status' => 'assigned', 'customer_id' => 1, 'delivery_zone_id' => 1, 'delivery_fee_id' => 1, 'address_street' => 'Rua A', 'address_number' => '100', 'address_neighborhood' => 'Centro', 'address_city' => 'Cidade', 'address_state' => 'SP', 'address_zipcode' => '01000-000']);
-        DeliveryOrder::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'status' => 'dispatched', 'customer_id' => 1, 'delivery_zone_id' => 1, 'delivery_fee_id' => 1, 'address_street' => 'Rua B', 'address_number' => '200', 'address_neighborhood' => 'Centro', 'address_city' => 'Cidade', 'address_state' => 'SP', 'address_zipcode' => '01000-000']);
-        DeliveryOrder::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'status' => 'delivered', 'customer_id' => 1, 'delivery_zone_id' => 1, 'delivery_fee_id' => 1, 'address_street' => 'Rua C', 'address_number' => '300', 'address_neighborhood' => 'Centro', 'address_city' => 'Cidade', 'address_state' => 'SP', 'address_zipcode' => '01000-000']); // entregue não está em progresso
+        $customer = Customer::factory()->create(['company_id' => $this->company1->id]);
+        $zone = DeliveryZone::create([
+            'company_id' => $this->company1->id,
+            'unit_id' => $this->unit1->id,
+            'name' => 'Zona Centro',
+            'type' => 'raio',
+            'zone_data' => ['km' => 5],
+        ]);
+
+        $order1 = $this->createOrder();
+        DeliveryOrder::create([
+            'company_id' => $this->company1->id,
+            'unit_id' => $this->unit1->id,
+            'order_id' => $order1->id,
+            'customer_id' => $customer->id,
+            'delivery_zone_id' => $zone->id,
+            'recipient_name' => 'John Doe',
+            'recipient_phone' => '11999999999',
+            'street' => 'Rua A',
+            'number' => '100',
+            'neighborhood' => 'Centro',
+            'city' => 'Cidade',
+            'state' => 'SP',
+            'zip_code' => '01000-000',
+            'delivery_fee' => 10.00,
+            'status' => 'assigned',
+        ]);
+
+        $order2 = $this->createOrder();
+        DeliveryOrder::create([
+            'company_id' => $this->company1->id,
+            'unit_id' => $this->unit1->id,
+            'order_id' => $order2->id,
+            'customer_id' => $customer->id,
+            'delivery_zone_id' => $zone->id,
+            'recipient_name' => 'Jane Doe',
+            'recipient_phone' => '11999999999',
+            'street' => 'Rua B',
+            'number' => '200',
+            'neighborhood' => 'Centro',
+            'city' => 'Cidade',
+            'state' => 'SP',
+            'zip_code' => '01000-000',
+            'delivery_fee' => 10.00,
+            'status' => 'dispatched',
+        ]);
+
+        $order3 = $this->createOrder();
+        DeliveryOrder::create([
+            'company_id' => $this->company1->id,
+            'unit_id' => $this->unit1->id,
+            'order_id' => $order3->id,
+            'customer_id' => $customer->id,
+            'delivery_zone_id' => $zone->id,
+            'recipient_name' => 'Jack Doe',
+            'recipient_phone' => '11999999999',
+            'street' => 'Rua C',
+            'number' => '300',
+            'neighborhood' => 'Centro',
+            'city' => 'Cidade',
+            'state' => 'SP',
+            'zip_code' => '01000-000',
+            'delivery_fee' => 10.00,
+            'status' => 'delivered',
+        ]);
 
         $service = app(BusinessMetricsService::class);
         $metrics = $service->getBusinessMetrics();
@@ -126,11 +263,11 @@ class MonitoringMetricsTest extends TestCase
 
     public function test_business_metrics_orders_in_production_count()
     {
-        $order1 = Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 3000, 'status' => OrderStatusEnum::PENDING]);
-        $order2 = Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 4000, 'status' => OrderStatusEnum::PENDING]);
+        $order1 = $this->createOrder(['total_cents' => 3000, 'status' => OrderStatusEnum::PENDING]);
+        $order2 = $this->createOrder(['total_cents' => 4000, 'status' => OrderStatusEnum::PENDING]);
 
-        KitchenTicket::create(['order_id' => $order1->id, 'status' => KitchenTicketStatusEnum::PENDING]);
-        KitchenTicket::create(['order_id' => $order2->id, 'status' => KitchenTicketStatusEnum::PREPARING]);
+        KitchenTicket::create(['order_id' => $order1->id, 'status' => KitchenTicketStatusEnum::PENDING, 'sent_at' => now()]);
+        KitchenTicket::create(['order_id' => $order2->id, 'status' => KitchenTicketStatusEnum::PREPARING, 'sent_at' => now()]);
 
         $service = app(BusinessMetricsService::class);
         $metrics = $service->getBusinessMetrics();
@@ -140,8 +277,8 @@ class MonitoringMetricsTest extends TestCase
 
     public function test_business_metrics_filters_by_company_id()
     {
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 5000, 'status' => OrderStatusEnum::PENDING]);
-        Order::create(['company_id' => $this->company2->id, 'unit_id' => $this->unit2->id, 'total_cents' => 7000, 'status' => OrderStatusEnum::PENDING]);
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 5000, 'status' => OrderStatusEnum::PENDING]);
+        $this->createOrder(['company_id' => $this->company2->id, 'unit_id' => $this->unit2->id, 'total_cents' => 7000, 'status' => OrderStatusEnum::PENDING]);
 
         $service = app(BusinessMetricsService::class);
 
@@ -160,8 +297,8 @@ class MonitoringMetricsTest extends TestCase
 
     public function test_business_metrics_filters_by_unit_id()
     {
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 5000, 'status' => OrderStatusEnum::PENDING]);
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit2->id, 'total_cents' => 3000, 'status' => OrderStatusEnum::PENDING]); // Unidade 2
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 5000, 'status' => OrderStatusEnum::PENDING]);
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit2->id, 'total_cents' => 3000, 'status' => OrderStatusEnum::PENDING]); // Unidade 2
 
         $service = app(BusinessMetricsService::class);
 
@@ -174,8 +311,8 @@ class MonitoringMetricsTest extends TestCase
 
     public function test_business_metrics_filters_by_company_and_unit()
     {
-        Order::create(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 5000, 'status' => OrderStatusEnum::PENDING]);
-        
+        $this->createOrder(['company_id' => $this->company1->id, 'unit_id' => $this->unit1->id, 'total_cents' => 5000, 'status' => OrderStatusEnum::PENDING]);
+
         $service = app(BusinessMetricsService::class);
 
         $metricsFiltered = $service->getBusinessMetrics($this->company1->id, $this->unit1->id);
@@ -241,16 +378,17 @@ class MonitoringMetricsTest extends TestCase
     public function test_queue_metrics_counts_correctly()
     {
         Queue::shouldReceive('size')->andReturn(4);
-        DB::shouldReceive('table')->andReturnSelf();
-        DB::shouldReceive('count')->andReturn(2);
+
+        DB::table('failed_jobs')->insert([
+            ['uuid' => (string) Str::uuid(), 'connection' => 'sync', 'queue' => 'default', 'payload' => '{}', 'exception' => 'err', 'failed_at' => now()],
+            ['uuid' => (string) Str::uuid(), 'connection' => 'sync', 'queue' => 'default', 'payload' => '{}', 'exception' => 'err', 'failed_at' => now()],
+        ]);
 
         $service = app(QueueMetricsService::class);
         $metrics = $service->getQueueMetrics();
 
         $this->assertEquals(4, $metrics['pending_jobs']);
         $this->assertEquals(2, $metrics['failed_jobs']);
-
-        DB::shouldReceive(); // reset mocks
     }
 
     public function test_health_metrics_cpu_is_numeric()

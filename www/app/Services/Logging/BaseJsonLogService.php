@@ -17,7 +17,7 @@ abstract class BaseJsonLogService
      */
     public function write(string $level, string $action, string $message, array $extraContext = []): void
     {
-        $logPath = storage_path('logs/' . $this->getLogFilename());
+        $logPath = storage_path('logs/'.$this->getLogFilename());
 
         // Rastreabilidade ponta a ponta via Correlation ID e Request ID
         $correlationId = app()->has('correlation_id') ? app('correlation_id') : (string) Str::uuid();
@@ -54,7 +54,7 @@ abstract class BaseJsonLogService
             'context' => $this->sanitizeContext($extraContext),
         ];
 
-        $logLine = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+        $logLine = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n";
 
         // Assegurar diretório do log
         $dir = dirname($logPath);
