@@ -39,14 +39,15 @@ class GenerateLicenseKeysCommand extends Command
             $this->comment('Chave Privada salva em: storage/app/keys/license_private.key (Mantenha em segredo absoluto!)');
             $this->comment('Chave Pública salva em:  storage/app/keys/license_public.key');
             $this->line('');
-            
+
             $this->info('👉 Copie a Chave Pública para o diretório do Cliente para habilitar a validação offline:');
             $this->line('   No seu terminal principal, execute:');
             $this->line('   cp manager/storage/app/keys/license_public.key www/storage/app/keys/license_public.key');
-            
+
             return 0;
         } catch (\Exception $e) {
-            $this->error('❌ Erro: ' . $e->getMessage());
+            $this->error('❌ Erro: '.$e->getMessage());
+
             return 1;
         }
     }

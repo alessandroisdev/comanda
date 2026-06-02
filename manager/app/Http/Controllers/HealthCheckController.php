@@ -37,6 +37,7 @@ class HealthCheckController extends Controller
     {
         try {
             DB::connection()->getPdo();
+
             return true;
         } catch (Exception $e) {
             return false;
@@ -50,6 +51,7 @@ class HealthCheckController extends Controller
     {
         try {
             Redis::connection()->ping();
+
             return true;
         } catch (Exception $e) {
             return false;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -19,8 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $type
  * @property string $status
  * @property string|null $key_data
- * @property \Carbon\Carbon|null $issued_at
- * @property \Carbon\Carbon|null $expires_at
+ * @property Carbon|null $issued_at
+ * @property Carbon|null $expires_at
  */
 class License extends Model
 {

@@ -9,6 +9,7 @@ use Exception;
 class KeyGeneratorService
 {
     private string $privateKeyPath;
+
     private string $publicKeyPath;
 
     public function __construct()
@@ -74,6 +75,7 @@ class KeyGeneratorService
         if (file_exists($this->privateKeyPath)) {
             return file_get_contents($this->privateKeyPath);
         }
+
         return null;
     }
 
@@ -82,6 +84,7 @@ class KeyGeneratorService
         if (file_exists($this->publicKeyPath)) {
             return file_get_contents($this->publicKeyPath);
         }
+
         return null;
     }
 }

@@ -17,6 +17,7 @@ use App\Models\Product;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -102,12 +103,18 @@ class ProductTest extends TestCase
 
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'product.create',
-            'context' => json_encode([
-                'product_uuid' => $product->uuid,
-                'company_id' => $company->id,
-                'category_id' => $category->id,
-            ]),
         ]);
+
+        $log = DB::table('audit_logs')
+            ->where('action', 'product.create')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $this->assertNotNull($log);
+        $context = json_decode($log->context, true);
+        $this->assertEquals($product->uuid, $context['product_uuid']);
+        $this->assertEquals($company->id, $context['company_id']);
+        $this->assertEquals($category->id, $context['category_id']);
     }
 
     #[Test]

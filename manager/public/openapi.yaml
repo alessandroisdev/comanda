@@ -6,6 +6,8 @@ info:
 servers:
   - url: http://localhost:8080/api
     description: Servidor Local do Comanda Manager
+security:
+  - bearerAuth: []
 paths:
   /licenses/generate:
     post:
@@ -211,3 +213,10 @@ paths:
       responses:
         '200':
           description: Catálogo de módulos do Comanda.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

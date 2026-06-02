@@ -1,14 +1,25 @@
 <?php
 
-use App\Models\Table;
+use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\KitchenController;
+use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderSessionController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Public\CardapioController;
+use App\Http\Controllers\TableController;
+use App\Http\Controllers\UnitController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
-
-// Endpoints de Health e Integridade do Sistema
-use App\Http\Controllers\HealthCheckController;
 
 Route::get('/health', [HealthCheckController::class, 'check'])->name('health');
 Route::get('/liveness', [HealthCheckController::class, 'liveness'])->name('liveness');
@@ -16,21 +27,6 @@ Route::get('/readiness', [HealthCheckController::class, 'readiness'])->name('rea
 
 // Importação das rotas de Realtime Server-Sent Events (SSE)
 require base_path('routes/sse.php');
-
-// Controllers Administrativos da Fase 2 e 3
-use App\Http\Controllers\CashierController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\KitchenController;
-use App\Http\Controllers\ModuleController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OrderSessionController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\TableController;
-use App\Http\Controllers\UnitController;
-use App\Http\Controllers\UserController;
 
 // Rotas Administrativas em Blade
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -116,53 +112,12 @@ Route::prefix('api/v1')->group(function () {
     Route::delete('tables/{table}', [TableController::class, 'destroy']);
 });
 
-// --- ROTAS PÚBLICAS E CANAIS DIGITAIS (FASE 4) ---
-use App\Actions\Table\CallWaiterAction;
-use App\Actions\Table\RequestBillAction;
-use App\Http\Controllers\Public\CardapioController;
-use App\Http\Controllers\Public\MenuCategoryController;
-use App\Http\Controllers\Public\MenuProductController;
-
 // Cardápio Digital & Deep Links
 Route::get('/cardapio', [CardapioController::class, 'index'])->name('public.menu');
 Route::get('/mesa/{slug}', [CardapioController::class, 'index'])->name('public.menu.table');
 Route::get('/qrcode/{public_uuid}', [CardapioController::class, 'qrcode'])->name('public.menu.qrcode');
 
 // Tablet, Totem e Delivery views
-Route::get('/cardapio/m/{public_uuid}', [CardapioController::class, 'tablet'])->name('public.menu.tablet');
-Route::get('/totem', [CardapioController::class, 'totem'])->name('public.menu.totem');
-Route::get('/delivery', [CardapioController::class, 'delivery'])->name('public.menu.delivery');
-
-// APIs públicas para PWA/Tablet/Totem/Delivery
-Route::prefix('api/v1')->group(function () {
-    Route::get('menu/categories', [MenuCategoryController::class, 'index']);
-    Route::get('menu/products', [MenuProductController::class, 'index']);
-    Route::get('menu/products/{uuid}', [MenuProductController::class, 'show']);
-
-    // Chamados e Reações de Mesa reativas via SSE
-    Route::post('tables/{tableUuid}/call-waiter', function (string $tableUuid) {
-        /** @var Table $table */
-        $table = Table::where('public_uuid', $tableUuid)->firstOrFail();
-
-        app(CallWaiterAction::class)->execute($table);
-
-        return response()->json(['success' => true, 'message' => 'Garçom chamado.']);
-    });
-
-    Route::post('tables/{tableUuid}/request-bill', function (string $tableUuid) {
-        /** @var Table $table */
-        $table = Table::where('public_uuid', $tableUuid)->firstOrFail();
-
-        app(RequestBillAction::class)->execute($table);
-
-        return response()->json(['success' => true, 'message' => 'Conta solicitada.']);
-    });
-
-    // APIs da Fase 4
-    Route::post('tablet/order', [CardapioController::class, 'tabletOrder']);
-    Route::post('totem/order', [CardapioController::class, 'checkoutTotem']);
-    Route::get('coupons/validate', [CardapioController::class, 'validateCoupon']);
-    Route::get('delivery/frete', [CardapioController::class, 'calculateFrete']);
-    Route::post('delivery/checkout', [CardapioController::class, 'checkoutDelivery']);
-    Route::post('payments/webhooks/{gateway}', [CardapioController::class, 'webhook']);
-});
+Route::get('/cardapio/m/{public_uuid}', [CardapioController::class, 'tablet'])->name('public.menu.tablet')->middleware('license.module:tablet_table');
+Route::get('/totem', [CardapioController::class, 'totem'])->name('public.menu.totem')->middleware('license.module:kiosk');
+Route::get('/delivery', [CardapioController::class, 'delivery'])->name('public.menu.delivery')->middleware('license.module:delivery');

@@ -8,18 +8,23 @@ use App\Models\License;
 use App\Services\Licensing\KeyGeneratorService;
 use App\Services\Licensing\LicenseIssuerService;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class LicensingTest extends TestCase
 {
+    use RefreshDatabase;
+
     private KeyGeneratorService $keyGenerator;
+
     private LicenseIssuerService $licenseIssuer;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->keyGenerator = new KeyGeneratorService();
+        $this->keyGenerator = new KeyGeneratorService;
         $this->licenseIssuer = new LicenseIssuerService($this->keyGenerator);
     }
 
@@ -39,7 +44,7 @@ class LicensingTest extends TestCase
 
         /** @var License $license */
         $license = License::create([
-            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'uuid' => (string) Str::uuid(),
             'client_name' => 'Alessandro Test',
             'client_email' => 'test@client.com',
             'client_document' => '12345678901',
@@ -51,7 +56,7 @@ class LicensingTest extends TestCase
         ]);
 
         $modules = ['pdv', 'delivery', 'kitchen'];
-        $installationUuid = (string) \Illuminate\Support\Str::uuid();
+        $installationUuid = (string) Str::uuid();
 
         $activationKey = $this->licenseIssuer->issue($license, $modules, $installationUuid);
 
@@ -71,7 +76,7 @@ class LicensingTest extends TestCase
 
         $publicKey = $this->keyGenerator->getPublicKey();
         $pubKeyResource = openssl_pkey_get_public($publicKey);
-        
+
         $result = openssl_verify($canonicalJson, $signature, $pubKeyResource, OPENSSL_ALGO_SHA256);
         $this->assertEquals(1, $result);
     }

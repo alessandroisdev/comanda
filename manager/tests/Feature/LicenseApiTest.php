@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\License;
-use App\Models\LicenseInstallation;
 use App\Models\Module;
 use App\Services\Licensing\KeyGeneratorService;
 use Carbon\Carbon;
+use Database\Seeders\ModuleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class LicenseApiTest extends TestCase
@@ -19,9 +20,10 @@ class LicenseApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware();
 
         // Popula os módulos necessários
-        $this->seed(\Database\Seeders\ModuleSeeder::class);
+        $this->seed(ModuleSeeder::class);
 
         // Garante que o par de chaves RSA exista para os testes
         app(KeyGeneratorService::class)->generate(true);
@@ -41,7 +43,7 @@ class LicenseApiTest extends TestCase
 
         $response->assertStatus(201);
         $response->assertJsonStructure([
-            'id', 'uuid', 'client_name', 'client_email', 'status', 'expires_at'
+            'id', 'uuid', 'client_name', 'client_email', 'status', 'expires_at',
         ]);
 
         $this->assertDatabaseHas('licenses', [
@@ -54,7 +56,7 @@ class LicenseApiTest extends TestCase
     {
         /** @var License $license */
         $license = License::create([
-            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'uuid' => (string) Str::uuid(),
             'client_name' => 'Jane Doe',
             'client_email' => 'jane@doe.com',
             'client_document' => '98765432100',
@@ -67,7 +69,7 @@ class LicenseApiTest extends TestCase
 
         $license->modules()->sync(Module::whereIn('code', ['pdv', 'tables'])->pluck('id'));
 
-        $installationUuid = (string) \Illuminate\Support\Str::uuid();
+        $installationUuid = (string) Str::uuid();
 
         $response = $this->postJson('/api/licenses/activate', [
             'license_uuid' => $license->uuid,
@@ -80,7 +82,7 @@ class LicenseApiTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'success', 'license_uuid', 'activation_key', 'status', 'expires_at'
+            'success', 'license_uuid', 'activation_key', 'status', 'expires_at',
         ]);
 
         $this->assertDatabaseHas('license_installations', [
@@ -99,7 +101,7 @@ class LicenseApiTest extends TestCase
     {
         /** @var License $license */
         $license = License::create([
-            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'uuid' => (string) Str::uuid(),
             'client_name' => 'Jane Doe',
             'client_email' => 'jane@doe.com',
             'client_document' => '98765432100',
@@ -121,7 +123,7 @@ class LicenseApiTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('licenses', [
             'id' => $license->id,
             'expires_at' => $newExpiresAt->format('Y-m-d H:i:s'),
@@ -132,7 +134,7 @@ class LicenseApiTest extends TestCase
     {
         /** @var License $license */
         $license = License::create([
-            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'uuid' => (string) Str::uuid(),
             'client_name' => 'Jane Doe',
             'client_email' => 'jane@doe.com',
             'client_document' => '98765432100',
@@ -155,7 +157,7 @@ class LicenseApiTest extends TestCase
     {
         /** @var License $license */
         $license = License::create([
-            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'uuid' => (string) Str::uuid(),
             'client_name' => 'Jane Doe',
             'client_email' => 'jane@doe.com',
             'client_document' => '98765432100',

@@ -12,6 +12,7 @@ use App\DTOs\User\UpdateUserDTO;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use PHPUnit\Framework\Attributes\Test;
@@ -69,8 +70,17 @@ class UserTest extends TestCase
 
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'user.create',
-            'context' => json_encode(['user_uuid' => $user->uuid, 'email' => $user->email]),
         ]);
+
+        $log = DB::table('audit_logs')
+            ->where('action', 'user.create')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $this->assertNotNull($log);
+        $context = json_decode($log->context, true);
+        $this->assertEquals($user->uuid, $context['user_uuid']);
+        $this->assertEquals($user->email, $context['email']);
     }
 
     #[Test]

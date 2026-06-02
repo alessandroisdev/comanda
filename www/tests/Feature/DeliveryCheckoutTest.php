@@ -29,6 +29,7 @@ class DeliveryCheckoutTest extends TestCase
     #[Test]
     public function it_can_open_delivery_view()
     {
+        $this->withoutExceptionHandling();
         $company = Company::factory()->create();
 
         $response = $this->get(route('public.menu.delivery', ['company_id' => $company->id]));

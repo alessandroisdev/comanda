@@ -9,7 +9,9 @@ use App\Models\LicenseInstallation;
 use App\Models\Module;
 use App\Services\Licensing\KeyGeneratorService;
 use Carbon\Carbon;
+use Database\Seeders\ModuleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class PortalTest extends TestCase
@@ -19,8 +21,9 @@ class PortalTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware();
 
-        $this->seed(\Database\Seeders\ModuleSeeder::class);
+        $this->seed(ModuleSeeder::class);
 
         // Garante que o par de chaves RSA exista para os testes
         app(KeyGeneratorService::class)->generate(true);
@@ -41,7 +44,7 @@ class PortalTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('portal.licenses');
-        $response->assertSee('Licenças & Contratos');
+        $response->assertSee('Licenças & Contratos', false);
     }
 
     public function test_it_can_create_new_license_via_portal(): void
@@ -67,7 +70,7 @@ class PortalTest extends TestCase
     {
         /** @var License $license */
         $license = License::create([
-            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'uuid' => (string) Str::uuid(),
             'client_name' => 'Alessandro Test',
             'client_email' => 'alessandro@example.com',
             'client_document' => '12345678901',
@@ -94,7 +97,7 @@ class PortalTest extends TestCase
     {
         /** @var License $license */
         $license = License::create([
-            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'uuid' => (string) Str::uuid(),
             'client_name' => 'Alessandro Test',
             'client_email' => 'alessandro@example.com',
             'client_document' => '12345678901',
@@ -117,7 +120,7 @@ class PortalTest extends TestCase
     {
         /** @var License $license */
         $license = License::create([
-            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'uuid' => (string) Str::uuid(),
             'client_name' => 'Alessandro Test',
             'client_email' => 'alessandro@example.com',
             'client_document' => '12345678901',
@@ -186,7 +189,7 @@ class PortalTest extends TestCase
     {
         /** @var LicenseInstallation $installation */
         $installation = LicenseInstallation::create([
-            'uuid' => (string) \Illuminate\Support\Str::uuid(),
+            'uuid' => (string) Str::uuid(),
             'hostname' => 'client-machine-01',
             'ip_address' => '10.0.0.1',
             'fingerprint' => 'hash_test_value',

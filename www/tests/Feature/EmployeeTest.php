@@ -17,6 +17,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use PHPUnit\Framework\Attributes\Test;
@@ -92,13 +93,19 @@ class EmployeeTest extends TestCase
 
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'employee.create',
-            'context' => json_encode([
-                'employee_uuid' => $employee->uuid,
-                'company_id' => $company->id,
-                'unit_id' => null,
-                'role' => 'cashier',
-            ]),
         ]);
+
+        $log = DB::table('audit_logs')
+            ->where('action', 'employee.create')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $this->assertNotNull($log);
+        $context = json_decode($log->context, true);
+        $this->assertEquals($employee->uuid, $context['employee_uuid']);
+        $this->assertEquals($company->id, $context['company_id']);
+        $this->assertNull($context['unit_id']);
+        $this->assertEquals('cashier', $context['role']);
     }
 
     #[Test]

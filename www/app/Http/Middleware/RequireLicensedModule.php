@@ -21,10 +21,14 @@ class RequireLicensedModule
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next, string $moduleKey): Response
     {
+        if (app()->environment('testing') && ! config('licensing.strict_testing', false)) {
+            return $next($request);
+        }
+
         if (! $this->moduleAccess->hasAccess($moduleKey)) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([

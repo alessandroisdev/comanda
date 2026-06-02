@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -16,8 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $ip_address
  * @property string $fingerprint
  * @property string $status
- * @property \Carbon\Carbon $activated_at
- * @property \Carbon\Carbon|null $revoked_at
+ * @property Carbon $activated_at
+ * @property Carbon|null $revoked_at
  */
 class LicenseActivation extends Model
 {
