@@ -54,7 +54,7 @@ class BusinessMetricsService
             ->count();
 
         // 2. Ticket Médio (em centavos)
-        $avgTicketCents = (int) round((clone $orderQuery)->avg('total_cents') ?? 0);
+        $avgTicketCents = (int) round((float) ((clone $orderQuery)->avg('total_cents') ?? 0));
 
         // 3. Vendas totais de hoje (em centavos)
         $salesTodayCents = (clone $orderQuery)

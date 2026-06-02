@@ -61,7 +61,7 @@ class CardapioController extends Controller
             return Category::where('company_id', $companyId)
                 ->where('status', 'active')
                 ->with(['products' => function ($q) {
-                    $q->where('status', 'active')->orderBy('sort_order');
+                    $q->where('status', 'active')->orderBy('name');
                 }])
                 ->orderBy('sort_order')
                 ->get();
@@ -98,7 +98,7 @@ class CardapioController extends Controller
         $categories = Category::where('company_id', $companyId)
             ->where('status', 'active')
             ->with(['products' => function ($q) {
-                $q->where('status', 'active')->orderBy('sort_order');
+                $q->where('status', 'active')->orderBy('name');
             }])
             ->orderBy('sort_order')
             ->get();
@@ -115,7 +115,7 @@ class CardapioController extends Controller
         $categories = Category::where('company_id', $companyId)
             ->where('status', 'active')
             ->with(['products' => function ($q) {
-                $q->where('status', 'active')->orderBy('sort_order');
+                $q->where('status', 'active')->orderBy('name');
             }])
             ->orderBy('sort_order')
             ->get();
@@ -132,7 +132,7 @@ class CardapioController extends Controller
         $categories = Category::where('company_id', $companyId)
             ->where('status', 'active')
             ->with(['products' => function ($q) {
-                $q->where('status', 'active')->orderBy('sort_order');
+                $q->where('status', 'active')->orderBy('name');
             }])
             ->orderBy('sort_order')
             ->get();
@@ -388,8 +388,14 @@ class CardapioController extends Controller
             $street, $number, $complement, $neighborhood, $city, $state, $zipCode,
             $deliveryFeeVal, $couponCode, $paymentMethod, $gatewayName, $lgpdConsent
         ) {
-            $companyId = 1;
+            $companyId = request()->json('company_id') ?? request()->get('company_id') ?? 1;
             $employee = Employee::where('company_id', $companyId)->first();
+            if (! $employee) {
+                $employee = Employee::first();
+                if ($employee) {
+                    $companyId = $employee->company_id;
+                }
+            }
             if (! $employee) {
                 return ['success' => false, 'message' => 'Delivery inoperante: sem funcionários.'];
             }

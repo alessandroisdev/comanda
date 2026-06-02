@@ -31,7 +31,7 @@ class MenuProductController extends Controller
             $query->where('name', 'like', "%{$search}%");
         }
 
-        $products = $query->orderBy('sort_order')->get();
+        $products = $query->orderBy('name')->get();
 
         return response()->json([
             'success' => true,

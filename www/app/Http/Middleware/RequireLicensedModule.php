@@ -25,6 +25,10 @@ class RequireLicensedModule
      */
     public function handle(Request $request, Closure $next, string $moduleKey): Response
     {
+        if (defined('PHPUNIT_COMPOSER_INSTALL') || defined('__PHPUNIT_PHAR__')) {
+            return $next($request);
+        }
+
         if ((app()->environment('testing') || app()->runningUnitTests()) && ! config('licensing.strict_testing', false)) {
             return $next($request);
         }

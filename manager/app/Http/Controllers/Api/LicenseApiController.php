@@ -105,7 +105,7 @@ class LicenseApiController extends Controller
             $licenseUuid, $installationUuid, $hostname, $domain, $ipAddress, $fingerprint
         ) {
             /** @var License $license */
-            $license = License::where('uuid', $licenseUuid)->firstOrFail();
+            $license = License::where('uuid', $licenseUuid)->lockForUpdate()->firstOrFail();
 
             if (in_array($license->status, ['suspended', 'cancelled', 'blocked'])) {
                 return ['success' => false, 'message' => "Licença não elegível para ativação: status {$license->status}."];
@@ -204,7 +204,7 @@ class LicenseApiController extends Controller
 
         $result = DB::transaction(function () use ($licenseUuid, $expiresAt, $newModules) {
             /** @var License $license */
-            $license = License::where('uuid', $licenseUuid)->firstOrFail();
+            $license = License::where('uuid', $licenseUuid)->lockForUpdate()->firstOrFail();
 
             $license->update([
                 'expires_at' => $expiresAt,
@@ -264,7 +264,7 @@ class LicenseApiController extends Controller
 
         $result = DB::transaction(function () use ($licenseUuid) {
             /** @var License $license */
-            $license = License::where('uuid', $licenseUuid)->firstOrFail();
+            $license = License::where('uuid', $licenseUuid)->lockForUpdate()->firstOrFail();
 
             $license->update(['status' => 'suspended']);
 
@@ -308,7 +308,7 @@ class LicenseApiController extends Controller
 
         $result = DB::transaction(function () use ($licenseUuid) {
             /** @var License $license */
-            $license = License::where('uuid', $licenseUuid)->firstOrFail();
+            $license = License::where('uuid', $licenseUuid)->lockForUpdate()->firstOrFail();
 
             $license->update(['status' => 'cancelled']);
 
