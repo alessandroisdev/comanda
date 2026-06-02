@@ -29,12 +29,6 @@ class RestoreService
     public function executeRestore(Backup $backup): void
     {
         $startedAt = Carbon::now();
-        $execution = BackupExecution::create([
-            'type' => 'restore',
-            'status' => 'running',
-            'started_at' => $startedAt,
-        ]);
-
         $filePath = storage_path('app/'.$backup->path);
 
         try {
@@ -84,9 +78,11 @@ class RestoreService
             // 7. Limpar diretório temporário
             $this->cleanTempDir();
 
-            // 8. Atualizar execução
-            $execution->update([
+            // 8. Criar e salvar execução no banco restaurado
+            BackupExecution::create([
+                'type' => 'restore',
                 'status' => 'success',
+                'started_at' => $startedAt,
                 'finished_at' => Carbon::now(),
             ]);
 
@@ -95,11 +91,17 @@ class RestoreService
             ]);
 
         } catch (Exception $e) {
-            $execution->update([
-                'status' => 'failed',
-                'finished_at' => Carbon::now(),
-                'error_message' => $e->getMessage(),
-            ]);
+            try {
+                BackupExecution::create([
+                    'type' => 'restore',
+                    'status' => 'failed',
+                    'started_at' => $startedAt,
+                    'finished_at' => Carbon::now(),
+                    'error_message' => $e->getMessage(),
+                ]);
+            } catch (Exception $dbEx) {
+                // Silencia se o banco estiver inacessível
+            }
 
             $this->auditLog->log('backup.restore_failed', "Falha ao restaurar backup {$backup->filename}: {$e->getMessage()}", [
                 'error' => $e->getMessage(),
@@ -157,7 +159,7 @@ class RestoreService
         $database = config('database.connections.mysql.database', 'comanda');
 
         $cmd = sprintf(
-            'mysql --ssl=0 -h %s -u %s -p%s %s < %s 2>&1',
+            'mariadb --ssl=0 -h %s -u %s -p%s %s < %s 2>&1',
             escapeshellarg($host),
             escapeshellarg($user),
             escapeshellarg($password),

@@ -152,9 +152,9 @@ class BackupService
         $password = config('database.connections.mysql.password', 'root');
         $database = config('database.connections.mysql.database', 'comanda');
 
-        // Comando mysqldump nativo mapeado no container
+        // Comando mariadb-dump nativo mapeado no container
         $cmd = sprintf(
-            'mysqldump --ssl=0 -h %s -u %s -p%s %s > %s',
+            'mariadb-dump --ssl=0 -h %s -u %s -p%s %s > %s',
             escapeshellarg($host),
             escapeshellarg($user),
             escapeshellarg($password),
