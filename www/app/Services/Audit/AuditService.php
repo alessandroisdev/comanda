@@ -2,6 +2,7 @@
 
 namespace App\Services\Audit;
 
+use App\Services\Logging\LogSanitizer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +20,11 @@ class AuditService
      */
     public function log(string $action, ?array $before = null, ?array $after = null, array $context = []): void
     {
+        // Sanitizar PII para conformidade LGPD plena
+        $before = LogSanitizer::sanitize($before);
+        $after = LogSanitizer::sanitize($after);
+        $context = LogSanitizer::sanitize($context);
+
         // Obter ator autenticado em qualquer um dos guards
         $actor = $this->resolveActiveActor();
 

@@ -57,15 +57,26 @@ class CardapioController extends Controller
         $companyId = ($table instanceof Table) ? $table->company_id : $request->get('company_id', 1);
         $cacheKey = "menu_public:{$companyId}";
 
-        $categories = Cache::remember($cacheKey, 600, function () use ($companyId) {
-            return Category::where('company_id', $companyId)
+        try {
+            $categories = Cache::remember($cacheKey, 600, function () use ($companyId) {
+                return Category::where('company_id', $companyId)
+                    ->where('status', 'active')
+                    ->with(['products' => function ($q) {
+                        $q->where('status', 'active')->orderBy('name');
+                    }])
+                    ->orderBy('sort_order')
+                    ->get();
+            });
+        } catch (\Throwable $e) {
+            // Fallback silencioso direto do banco de dados caso o Redis esteja offline
+            $categories = Category::where('company_id', $companyId)
                 ->where('status', 'active')
                 ->with(['products' => function ($q) {
                     $q->where('status', 'active')->orderBy('name');
                 }])
                 ->orderBy('sort_order')
                 ->get();
-        });
+        }
 
         $seo = [
             'title' => ($table instanceof Table) ? "Mesa {$table->name} — Cardápio Digital" : 'Cardápio Digital Oficial',
@@ -210,6 +221,12 @@ class CardapioController extends Controller
             return response()->json(['success' => false, 'message' => 'Seu carrinho está vazio.']);
         }
 
+        foreach ($items as $itemData) {
+            if (! isset($itemData['quantity']) || (int) $itemData['quantity'] <= 0) {
+                return response()->json(['success' => false, 'message' => 'A quantidade de cada item deve ser maior que zero.']);
+            }
+        }
+
         $result = DB::transaction(function () use ($table, $items) {
             // Cria ou localiza uma sessão de comanda ativa para a mesa
             $session = OrderSession::where('company_id', $table->company_id)
@@ -291,6 +308,12 @@ class CardapioController extends Controller
 
         if (empty($items)) {
             return response()->json(['success' => false, 'message' => 'Carrinho vazio.']);
+        }
+
+        foreach ($items as $itemData) {
+            if (! isset($itemData['quantity']) || (int) $itemData['quantity'] <= 0) {
+                return response()->json(['success' => false, 'message' => 'A quantidade de cada item deve ser maior que zero.']);
+            }
         }
 
         $result = DB::transaction(function () use ($items) {
@@ -383,15 +406,21 @@ class CardapioController extends Controller
             return response()->json(['success' => false, 'message' => 'Carrinho vazio.']);
         }
 
+        foreach ($items as $itemData) {
+            if (! isset($itemData['quantity']) || (int) $itemData['quantity'] <= 0) {
+                return response()->json(['success' => false, 'message' => 'A quantidade de cada item deve ser maior que zero.']);
+            }
+        }
+
         $result = DB::transaction(function () use (
             $items, $custName, $custPhone, $custEmail, $custCpf,
             $street, $number, $complement, $neighborhood, $city, $state, $zipCode,
             $deliveryFeeVal, $couponCode, $paymentMethod, $gatewayName, $lgpdConsent
         ) {
             $companyId = request()->json('company_id') ?? request()->get('company_id') ?? 1;
-            $employee = Employee::where('company_id', $companyId)->first();
+            $employee = Employee::query()->where('company_id', $companyId)->first();
             if (! $employee) {
-                $employee = Employee::first();
+                $employee = Employee::query()->first();
                 if ($employee) {
                     $companyId = $employee->company_id;
                 }

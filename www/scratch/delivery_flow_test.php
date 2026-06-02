@@ -2,27 +2,22 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-$kernel->bootstrap();
-
+use App\Actions\Payment\ProcessWebhookAction;
 use App\Models\Company;
 use App\Models\CompanyUnit;
-use App\Models\Product;
 use App\Models\Coupon;
-use App\Models\Customer;
-use App\Models\Order;
 use App\Models\DeliveryOrder;
-use App\Models\OrderItem;
-use App\Models\OrderSession;
 use App\Models\KitchenTicket;
-use App\Enums\OrderStatusEnum;
-use App\Actions\Payment\ProcessWebhookAction;
-use App\Services\Payment\GatewayManager;
+use App\Models\Order;
+use App\Models\Product;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
+$kernel->bootstrap();
 
 $outputBuffer = "=== AUDITORIA DE DELIVERY E FLUXO FINANCEIRO (ETAPA P6) ===\n\n";
 
@@ -31,12 +26,12 @@ $company = Company::first();
 $unit = CompanyUnit::where('company_id', $company->id)->first();
 $product = Product::where('company_id', $company->id)->first();
 
-if (!$company || !$unit || !$product) {
+if (! $company || ! $unit || ! $product) {
     $outputBuffer .= "Dados do sistema incompletos para auditoria. Abortando.\n";
     exit(1);
 }
 
-$outputBuffer .= "Produto para teste: {$product->name} (Preço: R$ " . number_format($product->price_cents/100, 2, ',', '.') . ")\n\n";
+$outputBuffer .= "Produto para teste: {$product->name} (Preço: R$ ".number_format($product->price_cents / 100, 2, ',', '.').")\n\n";
 
 // 2. Validação de Frete
 $outputBuffer .= "1. Testando cálculo de frete (ViaCEP integrado)...\n";
@@ -88,10 +83,9 @@ $couponMin = Coupon::create([
 // Testar cada um contra um subtotal de R$ 50,00 (5000 cents)
 $subtotalTest = 5000;
 $outputBuffer .= "  - Subtotal base de teste: R$ 50,00\n";
-$outputBuffer .= "  - Cupom DESC10 (10%): Desconto calculado: R$ " . number_format($couponValid->calculateDiscount($subtotalTest)/100, 2, ',', '.') . " (Esperado: R$ 5,00)\n";
-$outputBuffer .= "  - Cupom EXPIRADO (R$ 5,00): Desconto calculado: R$ " . number_format($couponExpired->calculateDiscount($subtotalTest)/100, 2, ',', '.') . " (Esperado: R$ 0,00)\n";
-$outputBuffer .= "  - Cupom MINIMO (R$ 10,00 min R$ 100,00): Desconto calculado: R$ " . number_format($couponMin->calculateDiscount($subtotalTest)/100, 2, ',', '.') . " (Esperado: R$ 0,00)\n";
-
+$outputBuffer .= '  - Cupom DESC10 (10%): Desconto calculado: R$ '.number_format($couponValid->calculateDiscount($subtotalTest) / 100, 2, ',', '.')." (Esperado: R$ 5,00)\n";
+$outputBuffer .= '  - Cupom EXPIRADO (R$ 5,00): Desconto calculado: R$ '.number_format($couponExpired->calculateDiscount($subtotalTest) / 100, 2, ',', '.')." (Esperado: R$ 0,00)\n";
+$outputBuffer .= '  - Cupom MINIMO (R$ 10,00 min R$ 100,00): Desconto calculado: R$ '.number_format($couponMin->calculateDiscount($subtotalTest) / 100, 2, ',', '.')." (Esperado: R$ 0,00)\n";
 
 // 4. Teste de Vulnerabilidade Financeira: Quantidades Negativas
 $outputBuffer .= "\n3. Testando Vulnerabilidade Financeira de Quantidade Negativa...\n";
@@ -115,9 +109,9 @@ $badCheckoutData = [
     'items' => [
         [
             'uuid' => $product->uuid,
-            'quantity' => -2 // Quantidade negativa!
-        ]
-    ]
+            'quantity' => -2, // Quantidade negativa!
+        ],
+    ],
 ];
 
 $checkoutRequest = Request::create('/api/v1/delivery/checkout', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($badCheckoutData));
@@ -127,16 +121,15 @@ try {
     if (isset($resData['success']) && $resData['success'] === true) {
         $outputBuffer .= "  - ⚠️ ALERTA DE SEGURANÇA: Checkout com quantidade negativa foi processado com sucesso!\n";
         $orderCreated = Order::where('uuid', $resData['order_uuid'])->first();
-        $outputBuffer .= "    * Total do Pedido Criado: R$ " . number_format($orderCreated->total_cents/100, 2, ',', '.') . "\n";
-        $outputBuffer .= "    * Subtotal: R$ " . number_format($orderCreated->subtotal_cents/100, 2, ',', '.') . "\n";
+        $outputBuffer .= '    * Total do Pedido Criado: R$ '.number_format($orderCreated->total_cents / 100, 2, ',', '.')."\n";
+        $outputBuffer .= '    * Subtotal: R$ '.number_format($orderCreated->subtotal_cents / 100, 2, ',', '.')."\n";
         $outputBuffer .= "    * Detalhes: A falta de validação sanitária no carrinho permitiu subtotal negativo/zerado.\n";
     } else {
-        $outputBuffer .= "  - Sucesso: O checkout de quantidade negativa foi bloqueado (Mensagem: " . ($resData['message'] ?? 'Nenhuma') . ")\n";
+        $outputBuffer .= '  - Sucesso: O checkout de quantidade negativa foi bloqueado (Mensagem: '.($resData['message'] ?? 'Nenhuma').")\n";
     }
-} catch (\Throwable $e) {
-    $outputBuffer .= "  - Bloqueado com exceção: " . $e->getMessage() . "\n";
+} catch (Throwable $e) {
+    $outputBuffer .= '  - Bloqueado com exceção: '.$e->getMessage()."\n";
 }
-
 
 // 5. Fluxo de Checkout Legítimo e Webhook
 $outputBuffer .= "\n4. Executando Checkout Legítimo e Integração de Webhook...\n";
@@ -161,9 +154,9 @@ $goodCheckoutData = [
     'items' => [
         [
             'uuid' => $product->uuid,
-            'quantity' => 2 // Quantidade positiva
-        ]
-    ]
+            'quantity' => 2, // Quantidade positiva
+        ],
+    ],
 ];
 
 $goodRequest = Request::create('/api/v1/delivery/checkout', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($goodCheckoutData));
@@ -174,16 +167,16 @@ if ($goodResData['success'] === true) {
     $orderUuid = $goodResData['order_uuid'];
     $txId = $goodResData['payment_data']['transaction_id'];
     $outputBuffer .= "  - Checkout criado com sucesso! Order UUID: {$orderUuid} | Transaction ID: {$txId}\n";
-    
+
     $orderDb = Order::where('uuid', $orderUuid)->first();
     $deliveryDb = DeliveryOrder::where('order_id', $orderDb->id)->first();
-    
+
     $outputBuffer .= "    * Status inicial do Pedido: {$orderDb->status->value} (Esperado: draft)\n";
     $outputBuffer .= "    * Status inicial do Delivery: {$deliveryDb->status} (Esperado: pending)\n";
-    $outputBuffer .= "    * Subtotal calculado: R$ " . number_format($orderDb->subtotal_cents/100, 2, ',', '.') . "\n";
-    $outputBuffer .= "    * Desconto calculado (10%): R$ " . number_format($orderDb->discount_cents/100, 2, ',', '.') . "\n";
-    $outputBuffer .= "    * Frete cobrado: R$ " . number_format($deliveryDb->delivery_fee, 2, ',', '.') . "\n";
-    $outputBuffer .= "    * Total final do pedido: R$ " . number_format($orderDb->total_cents/100, 2, ',', '.') . "\n";
+    $outputBuffer .= '    * Subtotal calculado: R$ '.number_format($orderDb->subtotal_cents / 100, 2, ',', '.')."\n";
+    $outputBuffer .= '    * Desconto calculado (10%): R$ '.number_format($orderDb->discount_cents / 100, 2, ',', '.')."\n";
+    $outputBuffer .= '    * Frete cobrado: R$ '.number_format($deliveryDb->delivery_fee, 2, ',', '.')."\n";
+    $outputBuffer .= '    * Total final do pedido: R$ '.number_format($orderDb->total_cents / 100, 2, ',', '.')."\n";
 
     // 6. Testar Webhook de Confirmação (ProcessWebhookAction)
     $outputBuffer .= "\n5. Disparando Webhook de Confirmação do Asaas...\n";
@@ -191,12 +184,12 @@ if ($goodResData['success'] === true) {
         'event' => 'PAYMENT_CONFIRMED',
         'payment' => [
             'id' => $txId,
-        ]
+        ],
     ];
-    
+
     $webhookAction = app(ProcessWebhookAction::class);
     $webhookAction->execute('asaas', $webhookPayload);
-    
+
     $orderDb->refresh();
     $deliveryDb->refresh();
     $outputBuffer .= "    * Status pós-webhook do Pedido: {$orderDb->status->value} (Esperado: pending)\n";
@@ -204,15 +197,15 @@ if ($goodResData['success'] === true) {
 
     // Verificar se foi gerado o Ticket de Cozinha
     $ticketExists = KitchenTicket::where('order_id', $orderDb->id)->exists();
-    $outputBuffer .= "    * Ticket de Cozinha gerado: " . ($ticketExists ? 'SIM' : 'NÃO') . " (Esperado: SIM)\n";
+    $outputBuffer .= '    * Ticket de Cozinha gerado: '.($ticketExists ? 'SIM' : 'NÃO')." (Esperado: SIM)\n";
 
     // 7. Testar Webhook Duplicado (Idempotência)
     $outputBuffer .= "\n6. Disparando Webhook DUPLICADO com mesma transação (Auditoria de Idempotência)...\n";
     $logsBefore = DB::table('audit_logs')->where('action', 'payment.webhook_confirmed')->count();
-    
+
     // Dispara novamente
     $webhookAction->execute('asaas', $webhookPayload);
-    
+
     $logsAfter = DB::table('audit_logs')->where('action', 'payment.webhook_confirmed')->count();
     $outputBuffer .= "    * Chamadas webhook registradas no log: Antes={$logsBefore}, Depois={$logsAfter}\n";
     if ($logsAfter > $logsBefore) {
@@ -221,8 +214,8 @@ if ($goodResData['success'] === true) {
         $outputBuffer .= "    * Sucesso: Processamento de webhook duplicado bloqueado / idempotente.\n";
     }
 } else {
-    $outputBuffer .= "  - Falha ao realizar checkout legítimo: " . $goodResData['message'] . "\n";
+    $outputBuffer .= '  - Falha ao realizar checkout legítimo: '.$goodResData['message']."\n";
 }
 
-file_put_contents(__DIR__ . '/delivery_flow_result.txt', $outputBuffer);
+file_put_contents(__DIR__.'/delivery_flow_result.txt', $outputBuffer);
 echo "Auditoria de Delivery concluída e salva em scratch/delivery_flow_result.txt\n";

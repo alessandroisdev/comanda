@@ -31,9 +31,14 @@ class LicenseManager
             return $this->loadFromFile();
         }
 
-        return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
+        try {
+            return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
+                return $this->loadFromFile();
+            });
+        } catch (\Throwable $e) {
+            // Fallback para leitura do arquivo em caso de cache offline (Redis fora)
             return $this->loadFromFile();
-        });
+        }
     }
 
     public function getStatus(): LicenseStatusEnum
@@ -117,7 +122,11 @@ class LicenseManager
      */
     public function clearCache(): void
     {
-        Cache::forget(self::CACHE_KEY);
+        try {
+            Cache::forget(self::CACHE_KEY);
+        } catch (\Throwable $e) {
+            // Silencia para resiliência offline
+        }
     }
 
     /**
@@ -202,6 +211,13 @@ class LicenseManager
             return [
                 'type' => 'danger',
                 'message' => 'Licença comercial suspensa pela administração comercial. O acesso aos módulos está restrito.',
+            ];
+        }
+
+        if ($status === LicenseStatusEnum::CANCELLED) {
+            return [
+                'type' => 'danger',
+                'message' => 'Licença comercial cancelada pela administração comercial. O acesso aos módulos está restrito.',
             ];
         }
 

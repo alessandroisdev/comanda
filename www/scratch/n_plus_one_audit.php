@@ -1,16 +1,15 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
-use Illuminate\Support\Facades\DB;
-use App\Models\Order;
-use App\Models\KitchenTicket;
-use App\Models\Product;
 use App\Models\Category;
-use App\Models\Table;
+use App\Models\KitchenTicket;
+use App\Models\Order;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Facades\DB;
 
 $output = "=== AUDITORIA DE N+1 REAL (ETAPA P2) ===\n\n";
 
@@ -34,8 +33,8 @@ foreach ($categories as $cat) {
 }
 $queries = DB::getQueryLog();
 $output .= "Cardápio Público:\n";
-$output .= "  Categorias carregadas: " . $categories->count() . "\n";
-$output .= "  Total queries disparadas: " . count($queries) . "\n";
+$output .= '  Categorias carregadas: '.$categories->count()."\n";
+$output .= '  Total queries disparadas: '.count($queries)."\n";
 $output .= "  Estratégia: Eager Loading (com with(['products']))\n\n";
 
 // 2. Profiling de Pedidos (Simular carregamento com eager loading real do index)
@@ -49,8 +48,8 @@ foreach ($orders as $order) {
 }
 $queries = DB::getQueryLog();
 $output .= "Pedidos e itens (Index com Eager Loading):\n";
-$output .= "  Pedidos iterados: " . $orders->count() . "\n";
-$output .= "  Total queries disparadas: " . count($queries) . "\n";
+$output .= '  Pedidos iterados: '.$orders->count()."\n";
+$output .= '  Total queries disparadas: '.count($queries)."\n";
 $output .= "  Resultado: Sem N+1.\n\n";
 
 // 3. Profiling da Cozinha
@@ -68,9 +67,9 @@ foreach ($tickets as $t) {
 }
 $queries = DB::getQueryLog();
 $output .= "Fila da Cozinha (KDS):\n";
-$output .= "  Tickets na fila: " . $tickets->count() . "\n";
-$output .= "  Total queries disparadas: " . count($queries) . "\n";
+$output .= '  Tickets na fila: '.$tickets->count()."\n";
+$output .= '  Total queries disparadas: '.count($queries)."\n";
 $output .= "  Estratégia: Nested Eager Loading (with(['order.items.product', 'order.session.table']))\n\n";
 
-file_put_contents(__DIR__ . '/n_plus_one_result.txt', $output);
+file_put_contents(__DIR__.'/n_plus_one_result.txt', $output);
 echo "Profiling N+1 concluído e salvo em scratch/n_plus_one_result.txt\n";

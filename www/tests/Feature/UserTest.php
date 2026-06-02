@@ -11,6 +11,7 @@ use App\DTOs\User\CreateUserDTO;
 use App\DTOs\User\UpdateUserDTO;
 use App\Models\Employee;
 use App\Models\User;
+use App\Services\Logging\LogSanitizer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -80,7 +81,7 @@ class UserTest extends TestCase
         $this->assertNotNull($log);
         $context = json_decode($log->context, true);
         $this->assertEquals($user->uuid, $context['user_uuid']);
-        $this->assertEquals($user->email, $context['email']);
+        $this->assertEquals(LogSanitizer::sanitize(['email' => $user->email])['email'], $context['email']);
     }
 
     #[Test]

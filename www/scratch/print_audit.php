@@ -2,28 +2,29 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
 use App\Actions\PrintJob\EnqueuePrintJobAction;
-use App\Models\PrintJob;
+use App\Enums\PrintJobStatusEnum;
 use App\Models\Company;
 use App\Models\CompanyUnit;
-use App\Enums\PrintJobStatusEnum;
+use App\Models\PrintJob;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 
 $outputBuffer = "=== AUDITORIA DE IMPRESSÃO (ETAPA P5) ===\n\n";
 
 // 1. Carregar ou criar Company / Unit
 $company = Company::first();
-if (!$company) {
+if (! $company) {
     $outputBuffer .= "Empresa não encontrada. Abortando.\n";
     exit(1);
 }
 $unit = CompanyUnit::where('company_id', $company->id)->first();
-if (!$unit) {
+if (! $unit) {
     $outputBuffer .= "Unidade da empresa não encontrada. Abortando.\n";
     exit(1);
 }
@@ -48,7 +49,7 @@ for ($i = 1; $i <= 5; $i++) {
         'items' => [
             ['product_name' => "Produto Audit {$i}", 'quantity' => $i],
         ],
-        'total' => 'R$ ' . number_format($i * 15.5, 2, ',', '.'),
+        'total' => 'R$ '.number_format($i * 15.5, 2, ',', '.'),
     ];
 
     $job = $enqueueAction->execute([
@@ -57,7 +58,7 @@ for ($i = 1; $i <= 5; $i++) {
         'type' => 'receipt',
         'payload' => $payload,
     ]);
-    
+
     $jobsCreated[] = $job;
     $outputBuffer .= "  - Job enfileirado: UUID {$job->uuid} | Destino: {$source} | Status: {$job->status->value}\n";
 }
@@ -72,17 +73,17 @@ $outputBuffer .= "2. Simulando o processamento dos jobs pelo spooler...\n";
 foreach ($jobsCreated as $index => $job) {
     $jobId = $job->id;
     $jobRef = PrintJob::find($jobId);
-    
-    $outputBuffer .= "Processing Job: UUID {$jobRef->uuid} (PED-AUDIT-00" . ($index + 1) . ")\n";
-    
+
+    $outputBuffer .= "Processing Job: UUID {$jobRef->uuid} (PED-AUDIT-00".($index + 1).")\n";
+
     // Transição para processing
     $jobRef->update(['status' => PrintJobStatusEnum::PROCESSING]);
-    $outputBuffer .= "  - Status atualizado para: " . PrintJobStatusEnum::PROCESSING->value . "\n";
-    
+    $outputBuffer .= '  - Status atualizado para: '.PrintJobStatusEnum::PROCESSING->value."\n";
+
     if ($index < 3) {
         // Sucesso
         $jobRef->update(['status' => PrintJobStatusEnum::PRINTED]);
-        $outputBuffer .= "  - Impresso com SUCESSO. Status final: " . PrintJobStatusEnum::PRINTED->value . "\n";
+        $outputBuffer .= '  - Impresso com SUCESSO. Status final: '.PrintJobStatusEnum::PRINTED->value."\n";
     } elseif ($index === 3) {
         // Falha Permanente: simula 3 tentativas com falha de conexão e marca como FAILED
         $outputBuffer .= "  - Simulando FALHA PERMANENTE de conexão...\n";
@@ -91,12 +92,12 @@ foreach ($jobsCreated as $index => $job) {
             $attempts++;
             $jobRef->update([
                 'attempts' => $attempts,
-                'status' => PrintJobStatusEnum::PROCESSING
+                'status' => PrintJobStatusEnum::PROCESSING,
             ]);
             $outputBuffer .= "    * Tentativa {$attempts}: Falha de rede detectada.\n";
         }
         $jobRef->update(['status' => PrintJobStatusEnum::FAILED]);
-        $outputBuffer .= "  - Tentativas esgotadas (3/3). Status final: " . PrintJobStatusEnum::FAILED->value . "\n";
+        $outputBuffer .= '  - Tentativas esgotadas (3/3). Status final: '.PrintJobStatusEnum::FAILED->value."\n";
     } else {
         // Falha Recuperável: simula 2 falhas, e sucesso na 3ª tentativa
         $outputBuffer .= "  - Simulando FALHA RECUPERÁVEL (rede oscilando)...\n";
@@ -105,19 +106,19 @@ foreach ($jobsCreated as $index => $job) {
             $attempts++;
             $jobRef->update([
                 'attempts' => $attempts,
-                'status' => PrintJobStatusEnum::PROCESSING
+                'status' => PrintJobStatusEnum::PROCESSING,
             ]);
             $outputBuffer .= "    * Tentativa {$attempts}: Falha temporária.\n";
         }
-        
+
         // 3ª tentativa com sucesso
         $attempts++;
         $jobRef->update([
             'attempts' => $attempts,
-            'status' => PrintJobStatusEnum::PRINTED
+            'status' => PrintJobStatusEnum::PRINTED,
         ]);
         $outputBuffer .= "    * Tentativa {$attempts}: Conexão restabelecida. Impresso com SUCESSO.\n";
-        $outputBuffer .= "  - Status final: " . PrintJobStatusEnum::PRINTED->value . "\n";
+        $outputBuffer .= '  - Status final: '.PrintJobStatusEnum::PRINTED->value."\n";
     }
 }
 
@@ -146,5 +147,5 @@ if ($printedCount === 4 && $failedCount === 1 && $duplicateUuids === 0) {
     $outputBuffer .= "❌ FALHA: Discrepância na auditoria de impressão.\n";
 }
 
-file_put_contents(__DIR__ . '/print_audit_result.txt', $outputBuffer);
+file_put_contents(__DIR__.'/print_audit_result.txt', $outputBuffer);
 echo "Auditoria de Impressão concluída e salva em scratch/print_audit_result.txt\n";

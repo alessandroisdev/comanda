@@ -10,6 +10,7 @@ enum LicenseStatusEnum: string
     case SUSPENDED = 'suspended';
     case REVOKED = 'revoked';
     case INVALID = 'invalid';
+    case CANCELLED = 'cancelled';
 
     /**
      * Retorna a descrição traduzível do status.

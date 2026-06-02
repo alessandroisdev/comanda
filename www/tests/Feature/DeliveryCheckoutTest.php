@@ -202,15 +202,16 @@ class DeliveryCheckoutTest extends TestCase
         $deliveryOrder->refresh();
         $this->assertEquals('confirmed', $deliveryOrder->status);
 
-        // Valida que o order mudou para PENDING (enviado à produção)
+        // Valida que o order mudou para SENT_TO_KITCHEN (enviado à produção)
         $order->refresh();
-        $this->assertEquals(OrderStatusEnum::PENDING, $order->status);
+        $this->assertEquals(OrderStatusEnum::SENT_TO_KITCHEN, $order->status);
 
         // Valida o SSE reativo publicado para a produção da cozinha
         $events = SseQueueService::pull('admin.orders');
         $this->assertNotEmpty($events);
-        $this->assertEquals('order.confirmed', $events[0]['event']);
-        $this->assertEquals('ORD-DEL-WEB', $events[0]['data']['order_number']);
+        $eventTypes = array_map(fn ($e) => $e['event'], $events);
+        $this->assertContains('orders.sent_to_kitchen', $eventTypes);
+        $this->assertContains('order.confirmed', $eventTypes);
     }
 
     #[Test]

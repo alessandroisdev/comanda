@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\SSE;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class SseQueueService
 {
@@ -14,16 +16,31 @@ class SseQueueService
     public static function publish(string $channel, string $event, array $data): void
     {
         $key = "sse_events:{$channel}";
-
-        // Usamos um lock simples ou operação atômica de array no Cache
         $events = Cache::get($key, []);
         $events[] = [
             'event' => $event,
             'data' => $data,
             'timestamp' => time(),
         ];
+        Cache::put($key, $events, 60);
 
-        Cache::put($key, $events, 60); // Expira em 60 segundos
+        if (! app()->runningUnitTests()) {
+            try {
+                // Faz o POST para o servidor Node.js dedicado
+                $url = 'http://sse-server:8082/publish';
+
+                Http::timeout(1)
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->post($url, [
+                        'channel' => $channel,
+                        'event' => $event,
+                        'data' => $data,
+                    ]);
+            } catch (\Throwable $e) {
+                // Fallback silencioso para garantir resiliência
+                Log::warning("[SSE Server] Falha ao publicar evento no canal '{$channel}': ".$e->getMessage());
+            }
+        }
     }
 
     /**

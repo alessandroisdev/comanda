@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Payment;
 
-use App\Enums\OrderStatusEnum;
+use App\Actions\Order\SendOrderToKitchenAction;
 use App\Models\DeliveryOrder;
 use App\Models\Order;
 use App\Services\Audit\AuditService;
@@ -17,7 +17,8 @@ class ProcessWebhookAction
 {
     public function __construct(
         private readonly GatewayManager $gatewayManager,
-        private readonly AuditService $auditService
+        private readonly AuditService $auditService,
+        private readonly SendOrderToKitchenAction $sendOrderToKitchenAction
     ) {}
 
     /**
@@ -35,16 +36,27 @@ class ProcessWebhookAction
         }
 
         DB::transaction(function () use ($response, $driver) {
-            // Localiza a ordem de delivery associada à transação
-            $deliveryOrder = DeliveryOrder::where('tracking_code', $response->transactionId)->first();
+            // Localiza a ordem de delivery associada à transação com lock para concorrência
+            $deliveryOrder = DeliveryOrder::where('tracking_code', $response->transactionId)
+                ->lockForUpdate()
+                ->first();
 
             if ($deliveryOrder) {
+                // Checagem de Idempotência
+                if (in_array($deliveryOrder->status, ['confirmed', 'paid'])) {
+                    Log::info("[Gateway Webhook] Webhook ignorado por idempotência. Ordem {$deliveryOrder->uuid} já está paga/confirmada.");
+
+                    return;
+                }
+
                 if ($response->status === 'paid') {
                     $deliveryOrder->update(['status' => 'confirmed']);
 
                     /** @var Order $order */
                     $order = $deliveryOrder->order;
-                    $order->update(['status' => OrderStatusEnum::PENDING]); // Pronto para cozinha/PDV
+
+                    // Envia o pedido diretamente para a cozinha (cria ticket e altera status para sent_to_kitchen)
+                    $this->sendOrderToKitchenAction->execute($order);
 
                     // Auditoria física do recebimento em total conformidade LGPD
                     $this->auditService->log('payment.webhook_confirmed', [

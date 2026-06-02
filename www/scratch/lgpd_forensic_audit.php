@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
+use App\Services\Backup\BackupService;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -15,7 +17,7 @@ $outputBuffer = "=== AUDITORIA LGPD FORENSE E SEGURANÇA DE DADOS (ETAPA P8) ===
 // 1. Varredura nos Logs do Sistema
 $outputBuffer .= "1. Varrendo arquivos de logs em storage/logs/...\n";
 $logDir = storage_path('logs');
-$logFiles = glob($logDir . '/*.log');
+$logFiles = glob($logDir.'/*.log');
 
 $regexPatterns = [
     'CPF' => '/\b\d{3}\.\d{3}\.\d{3}-\d{2}\b/', // Ex: 123.456.789-01
@@ -28,7 +30,7 @@ foreach ($logFiles as $file) {
     $filename = basename($file);
     $outputBuffer .= "  Arquivo: {$filename}\n";
     $content = file_get_contents($file);
-    
+
     foreach ($regexPatterns as $name => $pattern) {
         $matches = [];
         preg_match_all($pattern, $content, $matches);
@@ -46,7 +48,7 @@ foreach ($logFiles as $file) {
 // 2. Auditoria no Banco de Dados
 $outputBuffer .= "\n2. Verificando dados pessoais sensíveis no Banco de Dados (Cartões e Chaves)...\n";
 $hasCardTable = Schema::hasTable('cards') || Schema::hasTable('credit_cards');
-$outputBuffer .= "  - Tabela de cartões/crédito direto no banco: " . ($hasCardTable ? "⚠️ AVISO: Existe tabela de cartões." : "✅ OK (Inexistente)") . "\n";
+$outputBuffer .= '  - Tabela de cartões/crédito direto no banco: '.($hasCardTable ? '⚠️ AVISO: Existe tabela de cartões.' : '✅ OK (Inexistente)')."\n";
 
 // Checar se há chaves em tabelas como empresas ou configurações
 $companiesCount = DB::table('companies')->count();
@@ -55,7 +57,7 @@ if ($companiesCount > 0) {
     $companies = DB::table('companies')->get();
     foreach ($companies as $comp) {
         $json = $comp->settings_json;
-        if (str_contains((string)$json, 'private_key') || str_contains((string)$json, 'passwd')) {
+        if (str_contains((string) $json, 'private_key') || str_contains((string) $json, 'passwd')) {
             $outputBuffer .= "    ⚠️ AVISO: Dados potencialmente sensíveis encontrados em settings_json para Company ID {$comp->id}.\n";
         } else {
             $outputBuffer .= "    ✅ OK (settings_json limpo)\n";
@@ -66,15 +68,15 @@ if ($companiesCount > 0) {
 // 3. Varredura nos Backups
 $outputBuffer .= "\n3. Auditando criptografia dos Backups (storage/app/backups/)...\n";
 $backupDir = storage_path('app/backups');
-$backups = glob($backupDir . '/*');
+$backups = glob($backupDir.'/*');
 
 if (empty($backups)) {
     $outputBuffer .= "  - Nenhum arquivo de backup encontrado. Gerando um de teste...\n";
     try {
-        $backupService = app(App\Services\Backup\BackupService::class);
+        $backupService = app(BackupService::class);
         $backupService->executeBackup(true); // Gerar criptografado
-        $backups = glob($backupDir . '/*');
-    } catch (\Exception $e) {
+        $backups = glob($backupDir.'/*');
+    } catch (Exception $e) {
         $outputBuffer .= "    * Falha ao gerar backup de teste: {$e->getMessage()}\n";
     }
 }
@@ -82,13 +84,13 @@ if (empty($backups)) {
 foreach ($backups as $bfile) {
     $bname = basename($bfile);
     $outputBuffer .= "  Backup: {$bname}\n";
-    
+
     if (str_ends_with($bname, '.enc')) {
         // Tentar ler e verificar se está criptografado (não contém strings SQL ou ZIP comuns)
         $fh = fopen($bfile, 'rb');
         $header = fread($fh, 100);
         fclose($fh);
-        
+
         $isClearText = str_contains($header, 'CREATE TABLE') || str_contains($header, 'PK') || str_contains($header, 'INSERT INTO');
         if ($isClearText) {
             $outputBuffer .= "    ⚠️ ALERTA: Arquivo .enc possui cabeçalho legível em texto claro!\n";
@@ -100,5 +102,5 @@ foreach ($backups as $bfile) {
     }
 }
 
-file_put_contents(__DIR__ . '/lgpd_forensic_result.txt', $outputBuffer);
+file_put_contents(__DIR__.'/lgpd_forensic_result.txt', $outputBuffer);
 echo "Auditoria LGPD Forense concluída e salva em scratch/lgpd_forensic_result.txt\n";

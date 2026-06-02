@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-$kernel->bootstrap();
-
-use App\Services\Licensing\LicenseValidator;
 use App\Services\Licensing\LicenseManager;
-use App\Enums\LicenseStatusEnum;
-use Carbon\Carbon;
+use App\Services\Licensing\LicenseValidator;
+use Illuminate\Contracts\Console\Kernel;
+
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
+$kernel->bootstrap();
 
 $outputBuffer = "=== AUDITORIA DE CONTROLE DE LICENCIAMENTO (ETAPA P7) ===\n\n";
 
@@ -19,12 +18,12 @@ $manager = app(LicenseManager::class);
 
 $licensePath = storage_path('app/license.json');
 $keysDir = storage_path('app/keys');
-$pubKeyPath = $keysDir . '/license_public.key';
+$pubKeyPath = $keysDir.'/license_public.key';
 
 // 1. Fazer backup da licença e chaves originais
 $origLicense = file_exists($licensePath) ? file_get_contents($licensePath) : null;
 $origPubKey = file_exists($pubKeyPath) ? file_get_contents($pubKeyPath) : null;
-$origPrivKey = file_exists($keysDir . '/license_private.key') ? file_get_contents($keysDir . '/license_private.key') : null;
+$origPrivKey = file_exists($keysDir.'/license_private.key') ? file_get_contents($keysDir.'/license_private.key') : null;
 
 $outputBuffer .= "Realizado backup temporário das credenciais de licença existentes.\n\n";
 
@@ -39,25 +38,26 @@ $publicKeyDetails = openssl_pkey_get_details($res);
 $testPublicKey = $publicKeyDetails['key'];
 
 // Gravar chaves de teste no diretório
-if (!is_dir($keysDir)) {
+if (! is_dir($keysDir)) {
     mkdir($keysDir, 0755, true);
 }
 file_put_contents($pubKeyPath, $testPublicKey);
-file_put_contents($keysDir . '/license_private.key', $testPrivateKey);
+file_put_contents($keysDir.'/license_private.key', $testPrivateKey);
 
 $localUuid = $validator->getLocalInstallationUuid();
 $outputBuffer .= "UUID de Instalação Local: {$localUuid}\n\n";
 
 // Helper para assinar e salvar licença
-$signAndSave = function(array $data) use ($testPrivateKey, $licensePath) {
+$signAndSave = function (array $data) use ($testPrivateKey, $licensePath) {
     unset($data['signature']);
     ksort($data);
     $canonical = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    
+
     openssl_sign($canonical, $signature, $testPrivateKey, OPENSSL_ALGO_SHA256);
     $data['signature'] = base64_encode($signature);
-    
+
     file_put_contents($licensePath, json_encode($data, JSON_PRETTY_PRINT));
+
     return $data;
 };
 
@@ -73,7 +73,7 @@ $signAndSave([
 $manager->clearCache();
 $status = $manager->getStatus();
 $outputBuffer .= "  - Status retornado: {$status->value} (Esperado: active)\n";
-$outputBuffer .= "  - Expirando em breve? " . ($manager->isExpiringSoon() ? 'SIM' : 'NÃO') . " (Esperado: NÃO)\n\n";
+$outputBuffer .= '  - Expirando em breve? '.($manager->isExpiringSoon() ? 'SIM' : 'NÃO')." (Esperado: NÃO)\n\n";
 
 // Cenário 2: Licença Vencida no Grace Period (3 dias atrás)
 $outputBuffer .= "Cenário 2: Licença Vencida dentro do Grace Period (Tolerância)\n";
@@ -87,7 +87,7 @@ $signAndSave([
 $manager->clearCache();
 $status = $manager->getStatus();
 $outputBuffer .= "  - Status retornado: {$status->value} (Esperado: active - operando sob grace period)\n";
-$outputBuffer .= "  - Carência ativa? " . ($manager->isOperatingInGracePeriod() ? 'SIM' : 'NÃO') . " (Esperado: SIM)\n\n";
+$outputBuffer .= '  - Carência ativa? '.($manager->isOperatingInGracePeriod() ? 'SIM' : 'NÃO')." (Esperado: SIM)\n\n";
 
 // Cenário 3: Licença Expirada (10 dias atrás - fora do Grace Period)
 $outputBuffer .= "Cenário 3: Licença Expirada fora do Grace Period\n";
@@ -172,28 +172,27 @@ $manager->clearCache();
 $status = $manager->getStatus();
 $outputBuffer .= "  - Status retornado: {$status->value} (Esperado: invalid)\n\n";
 
-
 // 3. Restaurar credenciais originais
 if ($origLicense) {
     file_put_contents($licensePath, $origLicense);
-} else if (file_exists($licensePath)) {
+} elseif (file_exists($licensePath)) {
     unlink($licensePath);
 }
 
 if ($origPubKey) {
     file_put_contents($pubKeyPath, $origPubKey);
-} else if (file_exists($pubKeyPath)) {
+} elseif (file_exists($pubKeyPath)) {
     unlink($pubKeyPath);
 }
 
 if ($origPrivKey) {
-    file_put_contents($keysDir . '/license_private.key', $origPrivKey);
-} else if (file_exists($keysDir . '/license_private.key')) {
-    unlink($keysDir . '/license_private.key');
+    file_put_contents($keysDir.'/license_private.key', $origPrivKey);
+} elseif (file_exists($keysDir.'/license_private.key')) {
+    unlink($keysDir.'/license_private.key');
 }
 
 $manager->clearCache();
 $outputBuffer .= "Restaurado backup original das chaves e licença do sistema.\n";
 
-file_put_contents(__DIR__ . '/licensing_audit_result.txt', $outputBuffer);
+file_put_contents(__DIR__.'/licensing_audit_result.txt', $outputBuffer);
 echo "Auditoria de Licenciamento concluída e salva em scratch/licensing_audit_result.txt\n";

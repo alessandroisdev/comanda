@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Employee;
 use App\Models\User;
+use App\Services\Logging\LogSanitizerProcessor;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -34,5 +35,26 @@ class AppServiceProvider extends ServiceProvider
 
             return false;
         });
+
+        // Registrar o processador global de logs no Monolog
+        if ($this->app->resolved('log')) {
+            $this->registerLogProcessor(resolve('log'));
+        } else {
+            $this->app->afterResolving('log', function ($log) {
+                $this->registerLogProcessor($log);
+            });
+        }
+    }
+
+    private function registerLogProcessor(mixed $logManager): void
+    {
+        try {
+            $logger = $logManager->driver();
+            if (method_exists($logger, 'getMonolog')) {
+                $logger->getMonolog()->pushProcessor(new LogSanitizerProcessor);
+            }
+        } catch (\Throwable $e) {
+            // Silencia para evitar falhas em setups parciais
+        }
     }
 }

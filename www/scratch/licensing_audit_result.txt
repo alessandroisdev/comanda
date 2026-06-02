@@ -19,7 +19,7 @@ Cenário 4: Licença Suspensa comercialmente
   - Status retornado: suspended (Esperado: suspended)
 
 Cenário 5: Licença Cancelada comercialmente
-  - Status retornado: active (Esperado: cancelled)
+  - Status retornado: cancelled (Esperado: cancelled)
 
 Cenário 6: Licença Adulterada (Modificação pós-assinatura)
   - Status retornado: invalid (Esperado: invalid)
