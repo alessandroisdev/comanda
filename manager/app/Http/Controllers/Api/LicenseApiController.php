@@ -153,7 +153,7 @@ class LicenseApiController extends Controller
 
             // 3. Dispara a assinatura criptográfica RSA e gera a chave de ativação base64
             $modulesKeys = $license->modules()->pluck('code')->toArray();
-            $activationKey = $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid);
+            $activationKey = $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid, null);
 
             // Log de auditoria
             LicenseAuditLog::create([
@@ -224,7 +224,7 @@ class LicenseApiController extends Controller
             $installationUuid = $activation ? $activation->installation_uuid : (string) Str::uuid();
 
             // Re-assina a licença com os dados atualizados
-            $activationKey = $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid);
+            $activationKey = $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid, null);
 
             // Log de auditoria
             LicenseAuditLog::create([
@@ -273,7 +273,7 @@ class LicenseApiController extends Controller
             $installationUuid = $activation ? $activation->installation_uuid : (string) Str::uuid();
 
             // Re-assina informando o novo status suspenso
-            $activationKey = $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid);
+            $activationKey = $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid, null);
 
             // Log de auditoria
             LicenseAuditLog::create([
@@ -323,7 +323,7 @@ class LicenseApiController extends Controller
             $installationUuid = $activation ? $activation->installation_uuid : (string) Str::uuid();
 
             // Re-assina informando o novo status cancelado
-            $activationKey = $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid);
+            $activationKey = $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid, null);
 
             // Log de auditoria
             LicenseAuditLog::create([

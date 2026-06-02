@@ -21,7 +21,7 @@ class LicenseIssuerService
     /**
      * Emite e assina criptograficamente uma licença no Manager.
      */
-    public function issue(License $license, array $modulesKeys, string $installationUuid): string
+    public function issue(License $license, array $modulesKeys, string $installationUuid, ?string $auditAction = 'issue'): string
     {
         $privateKeyStr = $this->keyGenerator->getPrivateKey();
 
@@ -77,20 +77,22 @@ class LicenseIssuerService
             'expires_at' => $license->expires_at ?? Carbon::now()->addYear(),
         ]);
 
-        // Registrar log de auditoria comercial imutável
-        LicenseAuditLog::create([
-            'license_id' => $license->id,
-            'installation_uuid' => $installationUuid,
-            'action' => 'issue',
-            'details' => [
-                'type' => $license->type,
-                'plan_name' => $license->plan_name,
-                'modules' => $modulesKeys,
-                'expires_at' => $license->expires_at ? $license->expires_at->toIso8601String() : null,
-            ],
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-        ]);
+        // Registrar log de auditoria comercial imutável se solicitado
+        if ($auditAction !== null) {
+            LicenseAuditLog::create([
+                'license_id' => $license->id,
+                'installation_uuid' => $installationUuid,
+                'action' => $auditAction,
+                'details' => [
+                    'type' => $license->type,
+                    'plan_name' => $license->plan_name,
+                    'modules' => $modulesKeys,
+                    'expires_at' => $license->expires_at ? $license->expires_at->toIso8601String() : null,
+                ],
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        }
 
         return $activationKey;
     }

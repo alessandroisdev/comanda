@@ -3,9 +3,12 @@ info:
   title: Comanda Manager Comercial API
   description: API de ativação, validação, auditoria e controle comercial do ecossistema Comanda.
   version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 servers:
-  - url: http://localhost:8080/api
-    description: Servidor Local do Comanda Manager
+  - url: https://api.comanda.dev/api
+    description: Servidor de Produção do Comanda Manager
 security:
   - bearerAuth: []
 paths:
@@ -13,6 +16,7 @@ paths:
     post:
       summary: Emissão de Licença Comercial
       description: Registra uma nova licença no banco do Manager associando os módulos contratados.
+      operationId: generateLicense
       requestBody:
         required: true
         content:
@@ -64,11 +68,16 @@ paths:
                   status: { type: string }
                   issued_at: { type: string }
                   expires_at: { type: string }
+        '400':
+          description: Requisição inválida ou dados malformatados.
+        '401':
+          description: Não autorizado.
 
   /licenses/activate:
     post:
       summary: Ativação de Licença por Instalação
       description: Vincula a licença comercial a uma instalação física local gerando o payload assinado RSA-2048.
+      operationId: activateLicense
       requestBody:
         required: true
         content:
@@ -80,11 +89,11 @@ paths:
                 license_uuid:
                   type: string
                   format: uuid
-                  example: "e3456789-abcd-1234-efgh-987654321012"
+                  example: "e3456789-abcd-1234-ef01-987654321012"
                 installation_uuid:
                   type: string
                   format: uuid
-                  example: "87654321-efgh-4321-abcd-123456789012"
+                  example: "87654321-ef01-4321-abcd-123456789012"
                 hostname:
                   type: string
                   example: "comanda-local-server"
@@ -110,11 +119,16 @@ paths:
                   activation_key: { type: string, description: "Payload JSON completo assinado criptograficamente em Base64" }
                   status: { type: string }
                   expires_at: { type: string }
+        '400':
+          description: Requisição inválida ou dados malformatados.
+        '401':
+          description: Não autorizado.
 
   /licenses/renew:
     post:
       summary: Renovação de Licença
       description: Estende a validade e altera opcionalmente os módulos licenciados de forma contratual.
+      operationId: renewLicense
       requestBody:
         required: true
         content:
@@ -126,7 +140,7 @@ paths:
                 license_uuid:
                   type: string
                   format: uuid
-                  example: "e3456789-abcd-1234-efgh-987654321012"
+                  example: "e3456789-abcd-1234-ef01-987654321012"
                 expires_at:
                   type: string
                   format: date-time
@@ -139,11 +153,16 @@ paths:
       responses:
         '200':
           description: Licença renovada e reemitida com sucesso.
+        '400':
+          description: Requisição inválida ou dados malformatados.
+        '401':
+          description: Não autorizado.
 
   /licenses/suspend:
     post:
       summary: Suspensão de Licença
       description: Suspende uma licença comercial ativa forçando bloqueio no titular.
+      operationId: suspendLicense
       requestBody:
         required: true
         content:
@@ -155,14 +174,20 @@ paths:
                 license_uuid:
                   type: string
                   format: uuid
+                  example: "e3456789-abcd-1234-ef01-987654321012"
       responses:
         '200':
           description: Licença suspensa.
+        '400':
+          description: Requisição inválida ou dados malformatados.
+        '401':
+          description: Não autorizado.
 
   /licenses/cancel:
     post:
       summary: Cancelamento de Licença
       description: Cancela o contrato comercial e desativa as ativações de forma definitiva.
+      operationId: cancelLicense
       requestBody:
         required: true
         content:
@@ -174,13 +199,19 @@ paths:
                 license_uuid:
                   type: string
                   format: uuid
+                  example: "e3456789-abcd-1234-ef01-987654321012"
       responses:
         '200':
           description: Licença cancelada.
+        '400':
+          description: Requisição inválida ou dados malformatados.
+        '401':
+          description: Não autorizado.
 
   /licenses/{uuid}:
     get:
       summary: Detalhes da Licença
+      operationId: getLicenseByUuid
       parameters:
         - name: uuid
           in: path
@@ -188,13 +219,21 @@ paths:
           schema:
             type: string
             format: uuid
+            example: "e3456789-abcd-1234-ef01-987654321012"
       responses:
         '200':
           description: Dados retornados com sucesso.
+        '400':
+          description: Requisição inválida ou dados malformatados.
+        '401':
+          description: Não autorizado.
+        '404':
+          description: Licença não encontrada.
 
   /installations/{uuid}:
     get:
       summary: Detalhes da Instalação
+      operationId: getInstallationByUuid
       parameters:
         - name: uuid
           in: path
@@ -202,17 +241,27 @@ paths:
           schema:
             type: string
             format: uuid
+            example: "87654321-ef01-4321-abcd-123456789012"
       responses:
         '200':
           description: Instalação retornada com sucesso.
+        '400':
+          description: Requisição inválida ou dados malformatados.
+        '401':
+          description: Não autorizado.
+        '404':
+          description: Instalação não encontrada.
 
   /modules:
     get:
       summary: Catálogo de Módulos
       description: Retorna os 16 módulos comerciais ativos cadastrados no Manager.
+      operationId: listModules
       responses:
         '200':
           description: Catálogo de módulos do Comanda.
+        '401':
+          description: Não autorizado.
 
 components:
   securitySchemes:

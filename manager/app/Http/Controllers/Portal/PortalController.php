@@ -120,7 +120,7 @@ class PortalController extends Controller
             $installationUuid = $activation ? $activation->installation_uuid : (string) Str::uuid();
 
             // Re-assina a licença
-            $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid);
+            $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid, null);
 
             // Log de auditoria
             LicenseAuditLog::create([
@@ -147,7 +147,7 @@ class PortalController extends Controller
             $activation = $license->activations()->where('status', 'active')->first();
             $installationUuid = $activation ? $activation->installation_uuid : (string) Str::uuid();
 
-            $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid);
+            $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid, null);
 
             // Log de auditoria
             LicenseAuditLog::create([
@@ -179,7 +179,7 @@ class PortalController extends Controller
             $activation = $license->activations()->first();
             $installationUuid = $activation ? $activation->installation_uuid : (string) Str::uuid();
 
-            $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid);
+            $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid, null);
 
             // Log de auditoria
             LicenseAuditLog::create([
