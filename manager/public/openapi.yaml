@@ -1,0 +1,213 @@
+openapi: 3.0.3
+info:
+  title: Comanda Manager Comercial API
+  description: API de ativação, validação, auditoria e controle comercial do ecossistema Comanda.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor Local do Comanda Manager
+paths:
+  /licenses/generate:
+    post:
+      summary: Emissão de Licença Comercial
+      description: Registra uma nova licença no banco do Manager associando os módulos contratados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [client_name, client_email, client_document, plan_name, type, modules]
+              properties:
+                client_name:
+                  type: string
+                  example: "Alessandro dev"
+                client_email:
+                  type: string
+                  example: "alessandro@example.com"
+                client_document:
+                  type: string
+                  example: "12.345.678/0001-99"
+                plan_name:
+                  type: string
+                  example: "Enterprise Plan"
+                type:
+                  type: string
+                  enum: [trial, subscription, perpetual, developer, internal]
+                  example: "subscription"
+                modules:
+                  type: array
+                  items:
+                    type: string
+                  example: ["pdv", "delivery", "tables"]
+                expires_at:
+                  type: string
+                  format: date-time
+                  example: "2027-06-01T20:30:00Z"
+      responses:
+        '201':
+          description: Licença emitida com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: integer }
+                  uuid: { type: string, format: uuid }
+                  client_name: { type: string }
+                  client_email: { type: string }
+                  client_document: { type: string }
+                  plan_name: { type: string }
+                  type: { type: string }
+                  status: { type: string }
+                  issued_at: { type: string }
+                  expires_at: { type: string }
+
+  /licenses/activate:
+    post:
+      summary: Ativação de Licença por Instalação
+      description: Vincula a licença comercial a uma instalação física local gerando o payload assinado RSA-2048.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [license_uuid, installation_uuid, hostname, ip_address, fingerprint]
+              properties:
+                license_uuid:
+                  type: string
+                  format: uuid
+                  example: "e3456789-abcd-1234-efgh-987654321012"
+                installation_uuid:
+                  type: string
+                  format: uuid
+                  example: "87654321-efgh-4321-abcd-123456789012"
+                hostname:
+                  type: string
+                  example: "comanda-local-server"
+                domain:
+                  type: string
+                  example: "restaurante.com.br"
+                ip_address:
+                  type: string
+                  example: "192.168.1.100"
+                fingerprint:
+                  type: string
+                  example: "hw_fingerprint_sha256_hash_value"
+      responses:
+        '200':
+          description: Licença ativada e assinada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  license_uuid: { type: string, format: uuid }
+                  activation_key: { type: string, description: "Payload JSON completo assinado criptograficamente em Base64" }
+                  status: { type: string }
+                  expires_at: { type: string }
+
+  /licenses/renew:
+    post:
+      summary: Renovação de Licença
+      description: Estende a validade e altera opcionalmente os módulos licenciados de forma contratual.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [license_uuid, expires_at]
+              properties:
+                license_uuid:
+                  type: string
+                  format: uuid
+                  example: "e3456789-abcd-1234-efgh-987654321012"
+                expires_at:
+                  type: string
+                  format: date-time
+                  example: "2028-06-01T20:30:00Z"
+                modules:
+                  type: array
+                  items:
+                    type: string
+                  example: ["pdv", "delivery", "tables", "kiosk"]
+      responses:
+        '200':
+          description: Licença renovada e reemitida com sucesso.
+
+  /licenses/suspend:
+    post:
+      summary: Suspensão de Licença
+      description: Suspende uma licença comercial ativa forçando bloqueio no titular.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [license_uuid]
+              properties:
+                license_uuid:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Licença suspensa.
+
+  /licenses/cancel:
+    post:
+      summary: Cancelamento de Licença
+      description: Cancela o contrato comercial e desativa as ativações de forma definitiva.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [license_uuid]
+              properties:
+                license_uuid:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Licença cancelada.
+
+  /licenses/{uuid}:
+    get:
+      summary: Detalhes da Licença
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Dados retornados com sucesso.
+
+  /installations/{uuid}:
+    get:
+      summary: Detalhes da Instalação
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Instalação retornada com sucesso.
+
+  /modules:
+    get:
+      summary: Catálogo de Módulos
+      description: Retorna os 16 módulos comerciais ativos cadastrados no Manager.
+      responses:
+        '200':
+          description: Catálogo de módulos do Comanda.
