@@ -12,138 +12,140 @@
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
 
     <!-- Link do Manifesto PWA -->
-    <link rel="manifest" href="/manifest.json">
-
-
-    <style>
+    <link rel="manifest" href="/manifest.json">    <style>
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: #020617; /* Slate 950 */
-            color: #f8fafc; /* Slate 50 */
+            font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+            background-color: #09090b; /* Zinc 950 */
+            color: #f4f4f5; /* Zinc 100 */
             overflow-x: hidden;
         }
 
-        /* Scrollbar Personalizada Premium */
+        /* Scrollbar Personalizada Premium Fina */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #020617;
+            background: #09090b;
         }
         ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 4px;
+            background: #27272a; /* Zinc 800 */
+            border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
+            background: #3f3f46; /* Zinc 700 */
         }
 
         /* Glassmorphism Sidebar */
         .admin-sidebar {
-            width: 280px;
-            background: rgba(15, 23, 42, 0.85); /* Slate 900 */
-            backdrop-filter: blur(16px);
-            border-right: 1px solid rgba(51, 65, 85, 0.5);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 270px;
+            background: rgba(18, 18, 20, 0.85); /* Zinc 900 equivalent translucent */
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(63, 63, 70, 0.3);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 1000;
         }
 
         .brand-logo {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             font-weight: 800;
-            letter-spacing: -0.025em;
+            letter-spacing: -0.05em;
+            color: #ffffff;
+            font-size: 1.35rem;
         }
 
         /* Sidebar Nav Item Styling */
         .nav-link-custom {
             display: flex;
             align-items: center;
-            padding: 12px 18px;
-            color: #94a3b8; /* Slate 400 */
-            border-radius: 10px;
+            padding: 10px 16px;
+            color: #a1a1aa; /* Zinc 400 */
+            border-radius: 8px;
             font-weight: 500;
-            font-size: 0.95rem;
-            transition: all 0.2s ease-in-out;
+            font-size: 0.9rem;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             text-decoration: none;
             margin-bottom: 4px;
+            border-left: 3px solid transparent;
         }
         .nav-link-custom:hover {
-            color: #f8fafc;
-            background: rgba(30, 41, 59, 0.6);
-            transform: translateX(4px);
+            color: #f4f4f5; /* Zinc 100 */
+            background: rgba(39, 39, 42, 0.4);
+            transform: translateX(2px);
         }
         .nav-link-custom i {
-            font-size: 1.2rem;
-            margin-right: 12px;
+            font-size: 1.1rem;
+            margin-right: 10px;
             transition: transform 0.2s;
         }
         .nav-link-custom:hover i {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
         .nav-link-custom.active {
             color: #ffffff;
-            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+            background: rgba(39, 39, 42, 0.6);
+            border-left: 3px solid #06b6d4; /* Accent Cyan */
+            box-shadow: none;
         }
         .nav-link-custom.active i {
-            color: #ffffff;
+            color: #06b6d4;
         }
 
         /* Header de Ações */
         .admin-header {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(18, 18, 20, 0.6);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+            border-bottom: 1px solid rgba(63, 63, 70, 0.2);
             height: 70px;
         }
 
         /* Cards Administrativos Premium */
         .card-premium {
-            background: #0f172a; /* Slate 900 */
-            border: 1px solid #1e293b;
-            border-radius: 16px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s, border-color 0.2s;
+            background: #18181b; /* Zinc 900 */
+            border: 1px solid rgba(63, 63, 70, 0.4);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.2s;
         }
         .card-premium:hover {
-            border-color: #334155;
+            border-color: rgba(82, 82, 91, 0.6);
         }
 
         .btn-premium-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            background: #0ea5e9; /* Sky 500 */
             border: none;
             color: #fff;
             font-weight: 600;
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
-            transition: all 0.2s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .btn-premium-primary:hover {
+            background: #0284c7; /* Sky 600 */
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
+            box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3);
+        }
+        .btn-premium-primary:active {
+            transform: translateY(0) scale(0.98);
         }
 
         .badge-premium-active {
-            background: rgba(16, 185, 129, 0.15);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 5px 12px;
-            border-radius: 30px;
-            font-size: 0.8rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 600;
         }
 
         .badge-premium-inactive {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 5px 12px;
-            border-radius: 30px;
-            font-size: 0.8rem;
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 600;
         }
     </style>
@@ -154,8 +156,8 @@
     <div class="d-flex h-100 flex-row overflow-hidden">
         <!-- Sidebar Esquerda -->
         <aside class="admin-sidebar d-flex flex-column p-4 flex-shrink-0">
-            <div class="d-flex align-items-center mb-4 pb-2 border-bottom border-slate-800">
-                <span class="fs-3 brand-logo"><i class="bi bi-rocket-takeoff-fill"></i> COMANDA</span>
+            <div class="d-flex align-items-center mb-4 pb-2 border-bottom border-zinc-800" style="border-bottom-color: rgba(63, 63, 70, 0.3) !important;">
+                <span class="brand-logo">COMANDA<span style="color: #06b6d4;">.</span></span>
             </div>
 
             <!-- Navegação -->

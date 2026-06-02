@@ -8,37 +8,47 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body {
-            background-color: #f4f6f9;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f9fafb; /* Off-white premium */
+            font-family: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+            color: #0f172a;
         }
         .navbar-brand {
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            color: #0f172a !important;
         }
         .sidebar {
-            background-color: #1e293b;
+            background-color: #ffffff;
             min-height: 100vh;
-            color: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            color: #0f172a;
         }
         .sidebar .nav-link {
-            color: #cbd5e1;
+            color: #475569;
             font-weight: 500;
-            padding: 0.8rem 1.5rem;
+            padding: 0.6rem 1.2rem;
             border-radius: 0.375rem;
             margin: 0.2rem 1rem;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            border-left: 3px solid transparent;
         }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            background-color: #334155;
-            color: #ffffff;
+        .sidebar .nav-link:hover {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+        .sidebar .nav-link.active {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            border-left: 3px solid #0284c7; /* Royal Blue Accent */
         }
         .card {
-            border: none;
+            border: 1px solid #e2e8f0;
             border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            background: #ffffff;
         }
         .table-responsive {
-            background: #fff;
+            background: #ffffff;
             border-radius: 0.75rem;
         }
     </style>
@@ -50,47 +60,45 @@
         <!-- Sidebar -->
         <div class="col-md-3 col-lg-2 px-0 sidebar d-flex flex-column">
             <div class="px-4 py-4">
-                <a class="navbar-brand text-white fs-4 d-flex align-items-center" href="/portal">
-                    <span class="fw-bold">Comanda</span><span class="text-primary fw-light ms-1">Manager</span>
+                <a class="navbar-brand text-dark fs-4 d-flex align-items-center" href="/portal">
+                    <span class="fw-bold">COMANDA</span><span class="text-primary fw-light ms-1" style="color: #0284c7 !important;">Manager</span>
                 </a>
             </div>
-            <hr class="mx-3 my-2 text-secondary">
+            <hr class="mx-3 my-2" style="color: #e2e8f0;">
             <ul class="nav flex-column mb-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/portal/dashboard">
-                        📊 Dashboard
+                    <a class="nav-link {{ Request::is('portal/dashboard') ? 'active' : '' }}" href="/portal/dashboard">
+                        <i class="bi bi-speedometer2 me-2"></i> Painel Geral
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/portal/licenses">
-                        🔑 Licenças & Contratos
+                    <a class="nav-link {{ Request::is('portal/licenses*') ? 'active' : '' }}" href="/portal/licenses">
+                        <i class="bi bi-key-fill me-2"></i> Licenças & Contratos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/portal/installations">
-                        💻 Instalações Físicas
+                    <a class="nav-link {{ Request::is('portal/installations*') ? 'active' : '' }}" href="/portal/installations">
+                        <i class="bi bi-cpu-fill me-2"></i> Instalações Físicas
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/portal/modules">
-                        🏷️ Catálogo de Módulos
+                    <a class="nav-link {{ Request::is('portal/modules*') ? 'active' : '' }}" href="/portal/modules">
+                        <i class="bi bi-plugin me-2"></i> Catálogo de Módulos
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/portal/audit">
-                        📜 Auditoria Comercial
+                    <a class="nav-link {{ Request::is('portal/audit*') ? 'active' : '' }}" href="/portal/audit">
+                        <i class="bi bi-shield-check me-2"></i> Auditoria Comercial
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('portal/help') ? 'active' : '' }}" href="/portal/help">
-                        ❓ Ajuda e Integração
+                    <a class="nav-link {{ Request::is('portal/help*') ? 'active' : '' }}" href="/portal/help">
+                        <i class="bi bi-question-circle-fill me-2"></i> Ajuda e Integração
                     </a>
                 </li>
-
             </ul>
-
             <div class="p-3">
-                <div class="d-flex align-items-center text-white bg-dark p-3 rounded">
+                <div class="d-flex align-items-center text-dark bg-light p-3 rounded border border-slate-200">
                     <div>
                         <div class="fw-bold">Admin Comercial</div>
                         <small class="text-muted">admin@manager.com</small>
@@ -98,6 +106,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- Main Content Area -->
         <div class="col-md-9 col-lg-10 px-md-4 py-4">
