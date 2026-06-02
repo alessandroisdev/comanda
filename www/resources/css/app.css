@@ -5,54 +5,196 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
 
-/* Customização Dark Mode Premium para Formulários e DataTables */
-.form-control, .form-select, .form-control:focus, .form-select:focus {
-    background-color: #0f172a !important; /* Slate 900 */
-    border-color: #1e293b !important; /* Slate 800 */
-    color: #f8fafc !important; /* Slate 50 */
+/* ==========================================================================
+   SISTEMA DE DESIGN DARK-PREMIUM DE ALTO CONTRASTE (CLIENTE www)
+   ========================================================================== */
+
+body {
+    background-color: #09090b !important; /* Zinc 950 */
+    color: #e4e4e7 !important; /* Zinc 200 - Legibilidade Premium */
 }
 
-.form-control:focus, .form-select:focus {
-    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important; /* Blue glow */
-    border-color: #3b82f6 !important;
+/* Tipografia de Cabeçalhos e Títulos */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    color: #ffffff !important;
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
-.form-label {
-    color: #94a3b8 !important; /* Slate 400 */
-    font-weight: 500;
+/* Sobrescritas Estritas de Contraste para Textos */
+p, span, li, dt, dd, label, legend, small {
+    color: inherit; /* Seguirá o herdado de containers bem definidos */
 }
 
-.card-premium {
-    background: #0f172a !important;
-    border: 1px solid #1e293b !important;
+.text-muted {
+    color: #a1a1aa !important; /* Zinc 400 */
 }
 
-/* Ajustes no DataTables */
-.dataTables_wrapper {
-    color: #f8fafc !important;
-}
-
-.table {
-    color: #f8fafc !important;
-}
-
-.table-hover tbody tr:hover {
-    background-color: rgba(30, 41, 59, 0.4) !important;
-}
-
-.page-link {
-    background-color: #0f172a !important;
-    border-color: #1e293b !important;
-    color: #94a3b8 !important;
-}
-
-.page-item.active .page-link {
-    background-color: #3b82f6 !important;
-    border-color: #3b82f6 !important;
-    color: #fff !important;
+.text-dark {
+    color: #f4f4f5 !important; /* Forçar claro no dark mode */
 }
 
 .text-slate-400 {
-    color: #94a3b8 !important;
+    color: #a1a1aa !important;
 }
 
+/* Tabelas e DataTables (Correção de Visibilidade Crítica) */
+.table {
+    color: #e4e4e7 !important;
+    border-color: rgba(63, 63, 70, 0.4) !important; /* Zinc 800 semi-transparente */
+    background-color: transparent !important;
+}
+
+.table > :not(caption) > * > * {
+    background-color: transparent !important;
+    color: inherit !important;
+    border-bottom-color: rgba(63, 63, 70, 0.4) !important;
+}
+
+.table th {
+    color: #ffffff !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: rgba(24, 24, 27, 0.6) !important; /* Fundo leve para cabeçalho */
+    border-bottom: 2px solid rgba(63, 63, 70, 0.6) !important;
+}
+
+.table td {
+    font-size: 0.9rem;
+    vertical-align: middle;
+    color: #e4e4e7 !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(39, 39, 42, 0.3) !important; /* Efeito hover sutil Zinc 800 */
+    color: #ffffff !important;
+}
+
+/* Customização de DataTables Wrapper */
+.dataTables_wrapper {
+    color: #e4e4e7 !important;
+}
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .dataTables_paginate {
+    color: #e4e4e7 !important;
+    font-size: 0.88rem;
+}
+
+.dataTables_wrapper select,
+.dataTables_wrapper input {
+    background-color: #18181b !important;
+    border: 1px solid rgba(63, 63, 70, 0.6) !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+    padding: 4px 8px !important;
+}
+
+/* Inputs e Formulários */
+.form-label {
+    color: #d4d4d8 !important; /* Zinc 300 - Extremamente Legível */
+    font-weight: 500;
+    font-size: 0.88rem;
+    margin-bottom: 0.35rem;
+}
+
+.form-control, .form-select {
+    background-color: #121214 !important; /* Fundo escuro controlado */
+    border: 1px solid rgba(63, 63, 70, 0.6) !important; /* Bordas visíveis Zinc 700 */
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    padding: 0.55rem 0.85rem !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.form-control::placeholder {
+    color: #52525b !important; /* Zinc 600 */
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #18181b !important;
+    border-color: #06b6d4 !important; /* Foco Cyan */
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15) !important;
+    color: #ffffff !important;
+}
+
+/* Cartões Premium */
+.card-premium {
+    background-color: #121214 !important; /* Fundo de card nítido */
+    border: 1px solid rgba(63, 63, 70, 0.5) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Links de Paginação */
+.page-link {
+    background-color: #121214 !important;
+    border-color: rgba(63, 63, 70, 0.5) !important;
+    color: #a1a1aa !important;
+    transition: all 0.2s;
+}
+
+.page-link:hover {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+    border-color: rgba(82, 82, 91, 0.6) !important;
+}
+
+.page-item.active .page-link {
+    background-color: #06b6d4 !important; /* Ativo Ciano */
+    border-color: #06b6d4 !important;
+    color: #ffffff !important;
+}
+
+.page-item.disabled .page-link {
+    background-color: #09090b !important;
+    border-color: rgba(63, 63, 70, 0.3) !important;
+    color: #3f3f46 !important;
+}
+
+/* Badges e Alertas */
+.alert-success {
+    background-color: rgba(16, 185, 129, 0.1) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    color: #34d399 !important;
+}
+
+.alert-danger {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #f87171 !important;
+}
+
+.alert-warning {
+    background-color: rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    color: #fbbf24 !important;
+}
+
+.alert-info {
+    background-color: rgba(6, 182, 212, 0.1) !important;
+    border-color: rgba(6, 182, 212, 0.3) !important;
+    color: #22d3ee !important;
+}
+
+/* Modais (Visibilidade Superior) */
+.modal-content {
+    background-color: #121214 !important;
+    border: 1px solid rgba(63, 63, 70, 0.6) !important;
+    color: #e4e4e7 !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.modal-header, .modal-footer {
+    border-color: rgba(63, 63, 70, 0.4) !important;
+}
+
+.btn-close {
+    filter: invert(1) grayscale(1) brightness(2) !important; /* Tornar X de fechar branco */
+}
