@@ -249,4 +249,18 @@ class PortalTest extends TestCase
         $response->assertViewIs('portal.audit');
         $response->assertSee('Auditoria Comercial');
     }
+
+    public function test_it_can_render_help_page(): void
+    {
+        $response = $this->get('/portal/help');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('portal.help');
+        $response->assertSee('Ajuda e Integração Técnica');
+        $response->assertSee('RSA-2048');
+        $response->assertSee('Hardware Fingerprint');
+    }
+
 }
+
+

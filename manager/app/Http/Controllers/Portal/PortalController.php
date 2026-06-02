@@ -313,4 +313,10 @@ class PortalController extends Controller
 
         return view('portal.audit', compact('logs'));
     }
+
+    public function help(): View
+    {
+        return view('portal.help');
+    }
 }
+

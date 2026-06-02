@@ -81,7 +81,14 @@
                         📜 Auditoria Comercial
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('portal/help') ? 'active' : '' }}" href="/portal/help">
+                        ❓ Ajuda e Integração
+                    </a>
+                </li>
+
             </ul>
+
             <div class="p-3">
                 <div class="d-flex align-items-center text-white bg-dark p-3 rounded">
                     <div>

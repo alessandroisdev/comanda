@@ -30,4 +30,6 @@ Route::prefix('portal')->group(function () {
     Route::post('/installations/{id}/toggle', [PortalController::class, 'toggleInstallation']);
 
     Route::get('/audit', [PortalController::class, 'audit']);
+    Route::get('/help', [PortalController::class, 'help']);
 });
+
