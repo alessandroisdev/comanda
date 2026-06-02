@@ -6,13 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Painel Administrativo') — Comanda</title>
 
-    <!-- Google Fonts: Outfit -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap Icons localizados ou CDN segura de ícones -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts & Bootstrap Icons carregados localmente via npm/Vite em app.css -->
 
     <!-- Vite Assets (Vite compilará localmente Bootstrap 5, DataTables.net e TypeScript) -->
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
@@ -282,7 +276,7 @@
     <!-- Scripts Bootstrap carregados dinamicamente via Vite global window -->
     @yield('scripts')
 
-    <!-- Registro do Service Worker PWA -->
+    <!-- Registro do Service Worker PWA e Acessibilidade de Modais -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -291,6 +285,16 @@
                     .catch((err) => console.error('[PWA] Falha ao registrar Service Worker:', err));
             });
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.modal').forEach((modal) => {
+                modal.addEventListener('hide.bs.modal', () => {
+                    if (document.activeElement instanceof HTMLElement) {
+                        document.activeElement.blur();
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

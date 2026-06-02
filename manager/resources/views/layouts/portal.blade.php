@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comanda — Portal Comercial Manager</title>
-    <!-- Bootstrap 5 Local CSS -->
-    <link href="http://localhost:8080/css/bootstrap.min.css" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css';">
+    <!-- Recursos compilados localmente via Vite (Bootstrap + Bootstrap Icons + Fontes) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body {
             background-color: #f4f6f9;
@@ -113,6 +113,19 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Scripts de bootstrap carregados localmente via Vite -->
+<script>
+    // Remove o foco do elemento ativo dentro do modal antes de fechá-lo
+    // para evitar erros de acessibilidade/aria-hidden nos navegadores.
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.modal').forEach((modal) => {
+            modal.addEventListener('hide.bs.modal', () => {
+                if (document.activeElement instanceof HTMLElement) {
+                    document.activeElement.blur();
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

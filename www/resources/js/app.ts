@@ -1,4 +1,5 @@
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
+(window as any).bootstrap = bootstrap;
 import jQuery from 'jquery';
 import DataTable from 'datatables.net-bs5';
 import { ComandaDataTable } from './core/datatable/ComandaDataTable';

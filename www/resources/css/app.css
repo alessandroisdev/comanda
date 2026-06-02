@@ -1,3 +1,7 @@
+@import '@fontsource/outfit/index.css';
+@import '@fontsource/inter/index.css';
+@import '@fontsource/instrument-sans/index.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
 

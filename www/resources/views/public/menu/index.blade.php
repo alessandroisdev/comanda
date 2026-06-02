@@ -23,15 +23,8 @@
     <meta name="twitter:description" content="{{ $seo['description'] }}">
     <meta name="twitter:image" content="{{ $seo['image'] }}">
 
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap 5 CSS via CDN rápida e segura de fallback -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/style.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Recursos compilados localmente via Vite (Bootstrap + Bootstrap Icons + Fontes) -->
+    @vite(['resources/css/app.css', 'resources/js/app.ts'])
     
     <!-- Manifesto PWA -->
     <link rel="manifest" href="/manifest.json">
@@ -214,8 +207,7 @@
         <i class="bi bi-wifi-off me-2 animate-pulse"></i> Modo Offline Ativo
     </div>
 
-    <!-- Scripts de Reatividade, Offline e SSE -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts de Reatividade, Offline e SSE (compilados localmente via Vite) -->
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             // 1. Detecção Realtime de Status Offline/Online

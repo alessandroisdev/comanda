@@ -7,9 +7,8 @@
     
     <title>Totem Autoatendimento — Comanda Premium</title>
     
-    <!-- Bootstrap 5 CSS e Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Recursos compilados localmente via Vite (Bootstrap + Bootstrap Icons + Fontes) -->
+    @vite(['resources/css/app.css', 'resources/js/app.ts'])
     
     <style>
         body {
@@ -196,8 +195,7 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts compilados localmente via Vite -->
     <script>
         let cart = [];
         let option = 'local';
