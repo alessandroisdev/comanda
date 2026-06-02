@@ -63,6 +63,21 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>
+                                        <button class="dropdown-item text-primary" type="button" data-bs-toggle="modal" data-bs-target="#editLicenseModal"
+                                            data-id="{{ $lic->id }}"
+                                            data-client-name="{{ $lic->client_name }}"
+                                            data-client-email="{{ $lic->client_email }}"
+                                            data-client-document="{{ $lic->client_document }}"
+                                            data-plan-name="{{ $lic->plan_name }}"
+                                            data-type="{{ $lic->type }}"
+                                            data-status="{{ $lic->status }}"
+                                            data-expires-at="{{ $lic->expires_at ? $lic->expires_at->format('Y-m-d') : '' }}"
+                                            data-modules="{{ json_encode($lic->modules->pluck('code')->toArray()) }}">
+                                            ✏️ Editar Dados
+                                        </button>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
                                         <form action="/portal/licenses/{{ $lic->id }}/renew" method="POST" class="d-inline p-0">
                                             @csrf
                                             <input type="hidden" name="expires_at" value="{{ \Carbon\Carbon::now()->addYear()->format('Y-m-d') }}">
@@ -166,4 +181,127 @@
         </div>
     </div>
 </div>
+
+<!-- Edit License Modal -->
+<div class="modal fade" id="editLicenseModal" tabindex="-1" aria-labelledby="editLicenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editLicenseModalLabel">Editar Licença Comercial</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nome do Cliente</label>
+                            <input type="text" name="client_name" class="form-control" required placeholder="Ex: Alessandro Dev">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">E-mail Comercial</label>
+                            <input type="email" name="client_email" class="form-control" required placeholder="Ex: alessandro@site.com">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Documento (CPF ou CNPJ)</label>
+                            <input type="text" name="client_document" class="form-control" required placeholder="Ex: 12.345.678/0001-99">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nome do Plano</label>
+                            <input type="text" name="plan_name" class="form-control" required placeholder="Ex: Enterprise Plan">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tipo de Licença</label>
+                            <select name="type" class="form-select">
+                                <option value="subscription">Subscription (Assinatura)</option>
+                                <option value="trial">Trial (Degustação)</option>
+                                <option value="perpetual">Perpetual (Vitalícia)</option>
+                                <option value="developer">Developer (Desenvolvimento)</option>
+                                <option value="internal">Internal (Uso Interno)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Status da Licença</label>
+                            <select name="status" class="form-select">
+                                <option value="active">Ativa</option>
+                                <option value="trial">Trial</option>
+                                <option value="expired">Expirada</option>
+                                <option value="suspended">Suspensa</option>
+                                <option value="cancelled">Cancelada</option>
+                                <option value="blocked">Bloqueada</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Data de Expiração</label>
+                            <input type="date" name="expires_at" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Módulos Comercializáveis do Catálogo</label>
+                        <div class="row">
+                            @foreach($modules as $mod)
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="modules[]" value="{{ $mod->code }}" id="edit_mod_{{ $mod->id }}">
+                                        <label class="form-check-input-label" for="edit_mod_{{ $mod->id }}">
+                                            {{ $mod->name }} (<small class="text-muted">{{ $mod->code }}</small>)
+                                        </label>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const editModal = document.getElementById('editLicenseModal');
+        if (editModal) {
+            editModal.addEventListener('show.bs.modal', (event) => {
+                const button = event.relatedTarget;
+                
+                // Extrai as informações dos data-* attributes
+                const id = button.getAttribute('data-id');
+                const clientName = button.getAttribute('data-client-name');
+                const clientEmail = button.getAttribute('data-client-email');
+                const clientDocument = button.getAttribute('data-client-document');
+                const planName = button.getAttribute('data-plan-name');
+                const type = button.getAttribute('data-type');
+                const status = button.getAttribute('data-status');
+                const expiresAt = button.getAttribute('data-expires-at');
+                const modules = JSON.parse(button.getAttribute('data-modules') || '[]');
+
+                // Atualiza a URL do formulário para submissão
+                const form = editModal.querySelector('form');
+                form.action = `/portal/licenses/${id}`;
+
+                // Popula os campos de input
+                editModal.querySelector('[name="client_name"]').value = clientName;
+                editModal.querySelector('[name="client_email"]').value = clientEmail;
+                editModal.querySelector('[name="client_document"]').value = clientDocument;
+                editModal.querySelector('[name="plan_name"]').value = planName;
+                editModal.querySelector('[name="type"]').value = type;
+                editModal.querySelector('[name="status"]').value = status;
+                editModal.querySelector('[name="expires_at"]').value = expiresAt;
+
+                // Marca os checkboxes dos módulos da licença
+                editModal.querySelectorAll('.form-check-input').forEach(checkbox => {
+                    checkbox.checked = modules.includes(checkbox.value);
+                });
+            });
+        }
+    });
+</script>
 @endsection

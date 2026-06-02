@@ -66,6 +66,45 @@ class PortalTest extends TestCase
         ]);
     }
 
+    public function test_it_can_update_license_via_portal(): void
+    {
+        /** @var License $license */
+        $license = License::create([
+            'uuid' => (string) Str::uuid(),
+            'client_name' => 'Original Name',
+            'client_email' => 'original@example.com',
+            'client_document' => '12345678901',
+            'plan_name' => 'Original Plan',
+            'type' => 'subscription',
+            'status' => 'active',
+            'issued_at' => Carbon::now(),
+            'expires_at' => Carbon::now()->addYear(),
+        ]);
+
+        $license->modules()->sync(Module::whereIn('code', ['pdv'])->pluck('id'));
+
+        $response = $this->post("/portal/licenses/{$license->id}", [
+            'client_name' => 'Updated Name',
+            'client_email' => 'updated@example.com',
+            'client_document' => '98765432100',
+            'plan_name' => 'Updated Plan',
+            'type' => 'subscription',
+            'status' => 'suspended',
+            'modules' => ['pdv', 'delivery'],
+            'expires_at' => Carbon::now()->addYear()->format('Y-m-d'),
+        ]);
+
+        $response->assertRedirect('/portal/licenses');
+        
+        $updatedLicense = License::findOrFail($license->id);
+        $this->assertEquals('Updated Name', $updatedLicense->client_name);
+        $this->assertEquals('updated@example.com', $updatedLicense->client_email);
+        $this->assertEquals('98765432100', $updatedLicense->client_document);
+        $this->assertEquals('Updated Plan', $updatedLicense->plan_name);
+        $this->assertEquals('suspended', $updatedLicense->status);
+        $this->assertEquals(['pdv', 'delivery'], $updatedLicense->modules()->pluck('code')->toArray());
+    }
+
     public function test_it_can_renew_license_via_portal(): void
     {
         /** @var License $license */

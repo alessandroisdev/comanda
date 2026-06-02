@@ -100,6 +100,61 @@ class PortalController extends Controller
         return redirect('/portal/licenses')->with('success', 'Licença emitida com sucesso!');
     }
 
+    public function updateLicense(Request $request, string $id): RedirectResponse
+    {
+        $request->validate([
+            'client_name' => 'required|string|max:150',
+            'client_email' => 'required|email|max:150',
+            'client_document' => 'required|string|max:30',
+            'plan_name' => 'required|string|max:100',
+            'type' => 'required|string|in:trial,subscription,perpetual,developer,internal',
+            'status' => 'required|string|in:active,trial,expired,suspended,cancelled,blocked',
+            'modules' => 'required|array',
+            'expires_at' => 'nullable|date',
+        ]);
+
+        DB::transaction(function () use ($request, $id) {
+            /** @var License $license */
+            $license = License::findOrFail($id);
+
+            $license->update([
+                'client_name' => $request->post('client_name'),
+                'client_email' => $request->post('client_email'),
+                'client_document' => $request->post('client_document'),
+                'plan_name' => $request->post('plan_name'),
+                'type' => $request->post('type'),
+                'status' => $request->post('status'),
+                'expires_at' => $request->post('expires_at') ? Carbon::parse($request->post('expires_at')) : null,
+            ]);
+
+            $moduleIds = Module::whereIn('code', $request->post('modules'))->pluck('id');
+            $license->modules()->sync($moduleIds);
+
+            // Re-assina a licença
+            $modulesKeys = $request->post('modules');
+            $activation = $license->activations()->where('status', 'active')->first();
+            $installationUuid = $activation ? $activation->installation_uuid : (string) Str::uuid();
+
+            $this->licenseIssuer->issue($license, $modulesKeys, $installationUuid, null);
+
+            // Log de auditoria
+            LicenseAuditLog::create([
+                'license_id' => $license->id,
+                'action' => 'edit',
+                'details' => [
+                    'client_name' => $license->client_name,
+                    'type' => $license->type,
+                    'status' => $license->status,
+                    'modules' => $modulesKeys,
+                ],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        });
+
+        return redirect('/portal/licenses')->with('success', 'Licença atualizada com sucesso!');
+    }
+
     public function renewLicense(Request $request, string $id): RedirectResponse
     {
         $request->validate([

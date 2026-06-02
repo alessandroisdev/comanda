@@ -17,6 +17,7 @@ Route::prefix('portal')->group(function () {
 
     Route::get('/licenses', [PortalController::class, 'licenses']);
     Route::post('/licenses', [PortalController::class, 'storeLicense']);
+    Route::post('/licenses/{id}', [PortalController::class, 'updateLicense']);
     Route::post('/licenses/{id}/renew', [PortalController::class, 'renewLicense']);
     Route::post('/licenses/{id}/suspend', [PortalController::class, 'suspendLicense']);
     Route::post('/licenses/{id}/cancel', [PortalController::class, 'cancelLicense']);
