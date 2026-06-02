@@ -105,6 +105,15 @@ Com a conclusão de todas as correções e testes, o ecossistema está certifica
 
 ---
 
+### 🔒 Hardening de Content Security Policy (CSP)
+*   **Problema:** Erro de CSP no console do navegador bloqueando a aplicação de folhas de estilo, execução do JavaScript do Bootstrap e carregamento de source maps (`.map`) vindos de `https://cdn.jsdelivr.net`.
+*   **Remediação:**
+    *   Atualizado o [SecurityHeadersMiddleware.php](file:///c:/MeusSites/alessandroisdev/comanda/www/app/Http/Middleware/SecurityHeadersMiddleware.php) no Cliente (`www`) para incluir `https://cdn.jsdelivr.net` nas diretivas de `script-src`, `style-src`, `font-src` e `connect-src`.
+    *   Atualizado o [SecurityHeadersMiddleware.php](file:///c:/MeusSites/alessandroisdev/comanda/manager/app/Http/Middleware/SecurityHeadersMiddleware.php) no Manager comercial para incluir as mesmas regras de permissão.
+    *   Isso liberou com sucesso o carregamento nativo e download de source maps no console dos navegadores de forma segura.
+
+---
+
 ## 📈 Homologação de Qualidade e Health Checks
 
 ### 1. Testes Automatizados
