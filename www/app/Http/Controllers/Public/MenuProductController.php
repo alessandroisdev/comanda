@@ -44,11 +44,17 @@ class MenuProductController extends Controller
      */
     public function show(string $uuid)
     {
-        $product = Cache::remember("product_json:{$uuid}", 600, function () use ($uuid) {
-            return Product::where('uuid', $uuid)
+        try {
+            $product = Cache::remember("product_json:{$uuid}", 600, function () use ($uuid) {
+                return Product::where('uuid', $uuid)
+                    ->where('status', 'active')
+                    ->firstOrFail();
+            });
+        } catch (\Throwable $e) {
+            $product = Product::where('uuid', $uuid)
                 ->where('status', 'active')
                 ->firstOrFail();
-        });
+        }
 
         return response()->json([
             'success' => true,

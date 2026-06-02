@@ -2,13 +2,13 @@
 
 --- Banco de Dados: comanda (mysql) ---
 Tabela: audit_logs
-  Registros: 0
+  Registros: 47
   Índices: PRIMARY (UNIQUE), audit_logs_uuid_unique (UNIQUE), audit_logs_action_index (INDEX), audit_logs_actor_id_index (INDEX), audit_logs_actor_type_index (INDEX)
   Foreign Keys: Nenhuma
   Colunas sem índice: ip_address, user_agent, payload_before, payload_after, context, created_at
 
 Tabela: backup_executions
-  Registros: 0
+  Registros: 6
   Índices: PRIMARY (UNIQUE)
   Foreign Keys: Nenhuma
   Colunas sem índice: type, status, started_at, finished_at, error_message, created_at, updated_at
@@ -21,7 +21,7 @@ Tabela: backup_policies
   Colunas sem índice: name, frequency, destination, retention_days, is_encrypted, created_at, updated_at
 
 Tabela: backups
-  Registros: 0
+  Registros: 2
   Índices: PRIMARY (UNIQUE)
   Foreign Keys: Nenhuma
   Colunas sem índice: filename, path, disk, checksum, size_bytes, is_encrypted, created_at, updated_at
@@ -73,14 +73,14 @@ Tabela: consents
   Colunas sem índice: purpose, consent_text, term_version, ip_address, user_agent, revoked_at, created_at, updated_at
 
 Tabela: coupons
-  Registros: 0
+  Registros: 3
   Índices: PRIMARY (UNIQUE), coupons_uuid_unique (UNIQUE), coupons_code_unique (UNIQUE), coupons_company_id_foreign (INDEX)
   Foreign Keys: company_id -> companies(id)
   Colunas sem índice: type, value, min_order_amount_cents, max_discount_cents, expires_at, usage_limit, used_count, is_active, created_at, updated_at, deleted_at
   ⚠️ CRÍTICAS SEM ÍNDICE: type, deleted_at
 
 Tabela: customers
-  Registros: 20
+  Registros: 21
   Índices: PRIMARY (UNIQUE), customers_uuid_unique (UNIQUE), customers_email_unique (UNIQUE), customers_document_unique (UNIQUE), customers_company_id_foreign (INDEX), customers_marketing_opt_in_index (INDEX), customers_deleted_at_index (INDEX), customers_status_index (INDEX)
   Foreign Keys: company_id -> companies(id)
   Colunas sem índice: name, password, phone, birth_date, remember_token, created_at, updated_at
@@ -110,7 +110,7 @@ Tabela: delivery_fees
   Colunas sem índice: price, estimated_minutes, created_at, updated_at
 
 Tabela: delivery_orders
-  Registros: 10
+  Registros: 18
   Índices: PRIMARY (UNIQUE), delivery_orders_uuid_unique (UNIQUE), delivery_orders_company_id_foreign (INDEX), delivery_orders_unit_id_foreign (INDEX), delivery_orders_order_id_foreign (INDEX), delivery_orders_customer_id_foreign (INDEX), delivery_orders_delivery_zone_id_foreign (INDEX), delivery_orders_status_index (INDEX)
   Foreign Keys: company_id -> companies(id), customer_id -> customers(id), delivery_zone_id -> delivery_zones(id), order_id -> orders(id), unit_id -> company_units(id)
   Colunas sem índice: recipient_name, recipient_phone, street, number, complement, neighborhood, city, state, zip_code, delivery_fee, estimated_delivery_time, tracking_code, created_at, updated_at
@@ -160,7 +160,7 @@ Tabela: jobs
   Colunas sem índice: payload, attempts, reserved_at, available_at, created_at
 
 Tabela: kitchen_tickets
-  Registros: 0
+  Registros: 7
   Índices: PRIMARY (UNIQUE), kitchen_tickets_uuid_unique (UNIQUE), kitchen_tickets_order_id_foreign (INDEX), kitchen_tickets_status_index (INDEX)
   Foreign Keys: order_id -> orders(id)
   Colunas sem índice: sent_at, started_at, ready_at, completed_at, created_at, updated_at
@@ -172,7 +172,7 @@ Tabela: legal_bases
   Colunas sem índice: name, description, law_article, created_at, updated_at
 
 Tabela: license_validations
-  Registros: 40
+  Registros: 72
   Índices: PRIMARY (UNIQUE), license_validations_license_id_foreign (INDEX)
   Foreign Keys: license_id -> licenses(id)
   Colunas sem índice: status, ip_address, details, created_at
@@ -192,19 +192,19 @@ Tabela: migrations
   Colunas sem índice: migration, batch
 
 Tabela: order_items
-  Registros: 20
+  Registros: 28
   Índices: PRIMARY (UNIQUE), order_items_uuid_unique (UNIQUE), order_items_order_id_foreign (INDEX), order_items_product_id_foreign (INDEX)
   Foreign Keys: order_id -> orders(id), product_id -> products(id)
   Colunas sem índice: quantity, unit_price_cents, total_price_cents, notes, created_at, updated_at
 
 Tabela: orders
-  Registros: 20
+  Registros: 28
   Índices: PRIMARY (UNIQUE), orders_uuid_unique (UNIQUE), orders_company_id_foreign (INDEX), orders_unit_id_foreign (INDEX), orders_session_id_foreign (INDEX), orders_employee_id_foreign (INDEX), orders_status_index (INDEX), orders_order_number_index (INDEX), orders_coupon_id_foreign (INDEX), orders_deleted_at_index (INDEX)
   Foreign Keys: company_id -> companies(id), coupon_id -> coupons(id), employee_id -> employees(id), session_id -> orders_sessions(id), unit_id -> company_units(id)
   Colunas sem índice: subtotal_cents, discount_cents, total_cents, discount_amount_cents, notes, created_at, updated_at
 
 Tabela: orders_sessions
-  Registros: 15
+  Registros: 23
   Índices: PRIMARY (UNIQUE), orders_sessions_uuid_unique (UNIQUE), orders_sessions_company_id_foreign (INDEX), orders_sessions_unit_id_foreign (INDEX), orders_sessions_table_id_foreign (INDEX), orders_sessions_opened_by_employee_id_foreign (INDEX), orders_sessions_closed_by_employee_id_foreign (INDEX), orders_sessions_status_index (INDEX), orders_sessions_opened_at_index (INDEX), orders_sessions_deleted_at_index (INDEX)
   Foreign Keys: closed_by_employee_id -> employees(id), company_id -> companies(id), opened_by_employee_id -> employees(id), table_id -> tables(id), unit_id -> company_units(id)
   Colunas sem índice: closed_at, people_count, notes, created_at, updated_at
@@ -222,13 +222,13 @@ Tabela: permissions
   Colunas sem índice: description, created_at, updated_at
 
 Tabela: print_jobs
-  Registros: 0
+  Registros: 12
   Índices: PRIMARY (UNIQUE), print_jobs_uuid_unique (UNIQUE), print_jobs_company_id_foreign (INDEX), print_jobs_unit_id_foreign (INDEX), print_jobs_status_index (INDEX), print_jobs_type_index (INDEX)
   Foreign Keys: company_id -> companies(id), unit_id -> company_units(id)
   Colunas sem índice: payload, attempts, created_at, updated_at
 
 Tabela: privacy_audit_logs
-  Registros: 20
+  Registros: 36
   Índices: PRIMARY (UNIQUE), privacy_audit_logs_uuid_unique (UNIQUE), privacy_audit_logs_company_id_foreign (INDEX), privacy_audit_logs_actor_type_actor_id_index (INDEX), privacy_audit_logs_entity_type_entity_uuid_index (INDEX), privacy_audit_logs_action_index (INDEX), privacy_audit_logs_correlation_id_index (INDEX)
   Foreign Keys: company_id -> companies(id)
   Colunas sem índice: ip_address, user_agent, created_at, updated_at

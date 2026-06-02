@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Services\Backup\BackupService;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
-use App\Services\Backup\BackupService;
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 $outputBuffer = "=== AUDITORIA LGPD FORENSE E SEGURANÇA DE DADOS (ETAPA P8) ===\n\n";
 

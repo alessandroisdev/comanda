@@ -1,0 +1,26 @@
+=== RESULTADO DA AUDITORIA FORENSE DE CONCORRENCIA SSE (BLOQUEIO 6) ===
+
+Carga SSE: 20 conexoes concorrentes
+  - Requisicoes normais com sucesso: 50/50
+  - Erros / Timeouts (HTTP 504/500): 0
+  - Latencia Media: 1215.47 ms
+  - Latencia P95: 1694.98 ms
+  - Latencia P99: 1714.89 ms
+  - Status do Bloco: PASS (FPM livre e rapido)
+
+Carga SSE: 50 conexoes concorrentes
+  - Requisicoes normais com sucesso: 50/50
+  - Erros / Timeouts (HTTP 504/500): 0
+  - Latencia Media: 551.33 ms
+  - Latencia P95: 1015.12 ms
+  - Latencia P99: 1062.74 ms
+  - Status do Bloco: PASS (FPM livre e rapido)
+
+Carga SSE: 100 conexoes concorrentes
+  - Requisicoes normais com sucesso: 50/50
+  - Erros / Timeouts (HTTP 504/500): 0
+  - Latencia Media: 951.87 ms
+  - Latencia P95: 1456.31 ms
+  - Latencia P99: 1518.89 ms
+  - Status do Bloco: PASS (FPM livre e rapido)
+

@@ -15,7 +15,7 @@ Produto para teste: Batata Rústica da Casa (Preço: R$ 28,90)
   - Sucesso: O checkout de quantidade negativa foi bloqueado (Mensagem: A quantidade de cada item deve ser maior que zero.)
 
 4. Executando Checkout Legítimo e Integração de Webhook...
-  - Checkout criado com sucesso! Order UUID: 019e867a-d669-7178-8010-2d10a0d1b35d | Transaction ID: asaas_tx_9a5135be90aaac24
+  - Checkout criado com sucesso! Order UUID: 019e8683-c3a6-73d5-bfd7-87c766638187 | Transaction ID: asaas_tx_fdaeee808e6e272e
     * Status inicial do Pedido: draft (Esperado: draft)
     * Status inicial do Delivery: pending (Esperado: pending)
     * Subtotal calculado: R$ 57,80
@@ -29,5 +29,5 @@ Produto para teste: Batata Rústica da Casa (Preço: R$ 28,90)
     * Ticket de Cozinha gerado: SIM (Esperado: SIM)
 
 6. Disparando Webhook DUPLICADO com mesma transação (Auditoria de Idempotência)...
-    * Chamadas webhook registradas no log: Antes=5, Depois=5
+    * Chamadas webhook registradas no log: Antes=6, Depois=6
     * Sucesso: Processamento de webhook duplicado bloqueado / idempotente.

@@ -19,12 +19,19 @@ class MenuCategoryController extends Controller
         $companyId = $request->get('company_id', 1);
         $cacheKey = "menu_categories_json:{$companyId}";
 
-        $categories = Cache::remember($cacheKey, 600, function () use ($companyId) {
-            return Category::where('company_id', $companyId)
+        try {
+            $categories = Cache::remember($cacheKey, 600, function () use ($companyId) {
+                return Category::where('company_id', $companyId)
+                    ->where('status', 'active')
+                    ->orderBy('sort_order')
+                    ->get();
+            });
+        } catch (\Throwable $e) {
+            $categories = Category::where('company_id', $companyId)
                 ->where('status', 'active')
                 ->orderBy('sort_order')
                 ->get();
-        });
+        }
 
         return response()->json([
             'success' => true,

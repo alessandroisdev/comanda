@@ -223,7 +223,11 @@ class CardapioController extends Controller
 
         foreach ($items as $itemData) {
             if (! isset($itemData['quantity']) || (int) $itemData['quantity'] <= 0) {
-                return response()->json(['success' => false, 'message' => 'A quantidade de cada item deve ser maior que zero.']);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A quantidade de cada item deve ser maior que zero.',
+                    'errors' => ['items' => ['A quantidade de cada item deve ser maior que zero.']],
+                ], 422);
             }
         }
 
@@ -312,7 +316,11 @@ class CardapioController extends Controller
 
         foreach ($items as $itemData) {
             if (! isset($itemData['quantity']) || (int) $itemData['quantity'] <= 0) {
-                return response()->json(['success' => false, 'message' => 'A quantidade de cada item deve ser maior que zero.']);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A quantidade de cada item deve ser maior que zero.',
+                    'errors' => ['items' => ['A quantidade de cada item deve ser maior que zero.']],
+                ], 422);
             }
         }
 
@@ -408,7 +416,11 @@ class CardapioController extends Controller
 
         foreach ($items as $itemData) {
             if (! isset($itemData['quantity']) || (int) $itemData['quantity'] <= 0) {
-                return response()->json(['success' => false, 'message' => 'A quantidade de cada item deve ser maior que zero.']);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A quantidade de cada item deve ser maior que zero.',
+                    'errors' => ['items' => ['A quantidade de cada item deve ser maior que zero.']],
+                ], 422);
             }
         }
 
