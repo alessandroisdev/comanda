@@ -1,0 +1,206 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  customer-app:
+    name: Customer App (www)
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: comanda_testing
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, mysql, zip, pdo_mysql, bcmath, openssl, gd
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Composer Cache & Install
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        working-directory: www
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('www/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer Dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        working-directory: www
+
+      # Composer Security Audit
+      - name: Composer Audit
+        run: composer audit
+        working-directory: www
+
+      # PHPStan static analysis
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse
+        working-directory: www
+
+      # Pint code style check
+      - name: Run Pint Check
+        run: vendor/bin/pint --test
+        working-directory: www
+
+      # Environment Setup
+      - name: Copy Env
+        run: cp .env.testing .env
+        working-directory: www
+
+      - name: Run Migrations
+        run: php artisan migrate --force
+        working-directory: www
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: comanda_testing
+          DB_USERNAME: root
+          DB_PASSWORD: ''
+
+      # PHPUnit Tests
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
+        working-directory: www
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: comanda_testing
+          DB_USERNAME: root
+          DB_PASSWORD: ''
+          REDIS_HOST: 127.0.0.1
+
+      # Node Caching, Install & Build
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        with:
+          path: www/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('www/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Install NPM Dependencies
+        run: npm ci
+        working-directory: www
+
+      - name: NPM Audit
+        run: npm audit --audit-level=high
+        working-directory: www
+
+      - name: Run Vite Build
+        run: npm run build
+        working-directory: www
+
+  manager-app:
+    name: Manager App
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: comanda_manager_testing
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, mysql, zip, pdo_mysql, bcmath, openssl, gd
+          coverage: none
+
+      # Composer Cache & Install
+      - name: Get Composer Cache Directory
+        id: composer-cache-manager
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        working-directory: manager
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache-manager.outputs.dir }}
+          key: ${{ runner.os }}-composer-manager-${{ hashFiles('manager/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-manager-
+
+      - name: Install Composer Dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        working-directory: manager
+
+      - name: Composer Audit
+        run: composer audit
+        working-directory: manager
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse
+        working-directory: manager
+
+      - name: Run Pint Check
+        run: vendor/bin/pint --test
+        working-directory: manager
+
+      - name: Copy Env
+        run: cp .env.example .env
+        working-directory: manager
+
+      - name: Run Migrations
+        run: php artisan migrate --force
+        working-directory: manager
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: comanda_manager_testing
+          DB_USERNAME: root
+          DB_PASSWORD: ''
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
+        working-directory: manager
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: comanda_manager_testing
+          DB_USERNAME: root
+          DB_PASSWORD: ''
