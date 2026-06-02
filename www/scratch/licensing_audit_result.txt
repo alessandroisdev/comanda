@@ -1,0 +1,33 @@
+=== AUDITORIA DE CONTROLE DE LICENCIAMENTO (ETAPA P7) ===
+
+Realizado backup temporário das credenciais de licença existentes.
+
+UUID de Instalação Local: ca9535c4-a17f-4b4e-8d49-d41c5dc322de
+
+Cenário 1: Licença Válida
+  - Status retornado: active (Esperado: active)
+  - Expirando em breve? NÃO (Esperado: NÃO)
+
+Cenário 2: Licença Vencida dentro do Grace Period (Tolerância)
+  - Status retornado: active (Esperado: active - operando sob grace period)
+  - Carência ativa? SIM (Esperado: SIM)
+
+Cenário 3: Licença Expirada fora do Grace Period
+  - Status retornado: expired (Esperado: expired)
+
+Cenário 4: Licença Suspensa comercialmente
+  - Status retornado: suspended (Esperado: suspended)
+
+Cenário 5: Licença Cancelada comercialmente
+  - Status retornado: active (Esperado: cancelled)
+
+Cenário 6: Licença Adulterada (Modificação pós-assinatura)
+  - Status retornado: invalid (Esperado: invalid)
+
+Cenário 7: Chave Pública Incorreta / Adulterada
+  - Status retornado: invalid (Esperado: invalid)
+
+Cenário 8: Licença Ausente do Sistema
+  - Status retornado: invalid (Esperado: invalid)
+
+Restaurado backup original das chaves e licença do sistema.

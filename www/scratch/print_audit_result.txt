@@ -1,0 +1,46 @@
+=== AUDITORIA DE IMPRESSÃO (ETAPA P5) ===
+
+Empresa ativa:  (ID: 74)
+Unidade ativa: Comanda Unidade Paulista (ID: 53)
+
+Tabela print_jobs limpa para a auditoria.
+
+1. Enfileirando 5 jobs de impressão concorrentes...
+  - Job enfileirado: UUID 019e8653-b24f-7234-8a0f-beadd03d5d30 | Destino: Delivery | Status: pending
+  - Job enfileirado: UUID 019e8653-b530-7041-a586-85010d52c918 | Destino: Totem | Status: pending
+  - Job enfileirado: UUID 019e8653-b539-7049-a82a-d0267e32cd8b | Destino: Delivery | Status: pending
+  - Job enfileirado: UUID 019e8653-b542-73a3-a59a-9479c65043b6 | Destino: Totem | Status: pending
+  - Job enfileirado: UUID 019e8653-b54f-728f-a83a-9e0fbfc55ce9 | Destino: Delivery | Status: pending
+Total de jobs no banco: 5 (Esperado: 5)
+
+2. Simulando o processamento dos jobs pelo spooler...
+Processing Job: UUID 019e8653-b24f-7234-8a0f-beadd03d5d30 (PED-AUDIT-001)
+  - Status atualizado para: processing
+  - Impresso com SUCESSO. Status final: printed
+Processing Job: UUID 019e8653-b530-7041-a586-85010d52c918 (PED-AUDIT-002)
+  - Status atualizado para: processing
+  - Impresso com SUCESSO. Status final: printed
+Processing Job: UUID 019e8653-b539-7049-a82a-d0267e32cd8b (PED-AUDIT-003)
+  - Status atualizado para: processing
+  - Impresso com SUCESSO. Status final: printed
+Processing Job: UUID 019e8653-b542-73a3-a59a-9479c65043b6 (PED-AUDIT-004)
+  - Status atualizado para: processing
+  - Simulando FALHA PERMANENTE de conexão...
+    * Tentativa 1: Falha de rede detectada.
+    * Tentativa 2: Falha de rede detectada.
+    * Tentativa 3: Falha de rede detectada.
+  - Tentativas esgotadas (3/3). Status final: failed
+Processing Job: UUID 019e8653-b54f-728f-a83a-9e0fbfc55ce9 (PED-AUDIT-005)
+  - Status atualizado para: processing
+  - Simulando FALHA RECUPERÁVEL (rede oscilando)...
+    * Tentativa 1: Falha temporária.
+    * Tentativa 2: Falha temporária.
+    * Tentativa 3: Conexão restabelecida. Impresso com SUCESSO.
+  - Status final: printed
+
+3. Verificação de integridade pós-execução:
+  - Jobs impressos (Printed): 4 (Esperado: 4)
+  - Jobs falhados (Failed): 1 (Esperado: 1)
+  - Jobs pendentes (Pending): 0 (Esperado: 0)
+  - Registros com UUIDs duplicados: 0 (Esperado: 0)
+✅ SUCESSO: Spooler concorrente e controle de retentativas auditados sem anomalias.

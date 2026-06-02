@@ -1,0 +1,17 @@
+=== AUDITORIA DE N+1 REAL (ETAPA P2) ===
+
+Cardápio Público:
+  Categorias carregadas: 4
+  Total queries disparadas: 2
+  Estratégia: Eager Loading (com with(['products']))
+
+Pedidos e itens (Index com Eager Loading):
+  Pedidos iterados: 10
+  Total queries disparadas: 5
+  Resultado: Sem N+1.
+
+Fila da Cozinha (KDS):
+  Tickets na fila: 0
+  Total queries disparadas: 1
+  Estratégia: Nested Eager Loading (with(['order.items.product', 'order.session.table']))
+

@@ -1,0 +1,45 @@
+=== AUDITORIA LGPD FORENSE E SEGURANÇA DE DADOS (ETAPA P8) ===
+
+1. Varrendo arquivos de logs em storage/logs/...
+  Arquivo: audit.json.log
+    - Padrão CPF: 0 correspondências encontradas.
+    - Padrão CPF_RAW: 0 correspondências encontradas.
+    - Padrão Cartão de Crédito: 0 correspondências encontradas.
+    - Padrão Chave Privada: 0 correspondências encontradas.
+  Arquivo: laravel-2026-06-01.log
+    - Padrão CPF: 0 correspondências encontradas.
+    - Padrão CPF_RAW: 1221 correspondências encontradas.
+    - Padrão Cartão de Crédito: 8 correspondências encontradas.
+      ⚠️ ALERTA CRÍTICO: Vazamento de Cartão de Crédito detectado no log!
+    - Padrão Chave Privada: 0 correspondências encontradas.
+  Arquivo: laravel-2026-06-02.log
+    - Padrão CPF: 0 correspondências encontradas.
+    - Padrão CPF_RAW: 1295 correspondências encontradas.
+    - Padrão Cartão de Crédito: 11 correspondências encontradas.
+      ⚠️ ALERTA CRÍTICO: Vazamento de Cartão de Crédito detectado no log!
+    - Padrão Chave Privada: 0 correspondências encontradas.
+  Arquivo: laravel.log
+    - Padrão CPF: 0 correspondências encontradas.
+    - Padrão CPF_RAW: 84 correspondências encontradas.
+    - Padrão Cartão de Crédito: 4 correspondências encontradas.
+      ⚠️ ALERTA CRÍTICO: Vazamento de Cartão de Crédito detectado no log!
+    - Padrão Chave Privada: 0 correspondências encontradas.
+  Arquivo: scheduler.log
+    - Padrão CPF: 0 correspondências encontradas.
+    - Padrão CPF_RAW: 0 correspondências encontradas.
+    - Padrão Cartão de Crédito: 0 correspondências encontradas.
+    - Padrão Chave Privada: 0 correspondências encontradas.
+  Arquivo: worker.log
+    - Padrão CPF: 0 correspondências encontradas.
+    - Padrão CPF_RAW: 0 correspondências encontradas.
+    - Padrão Cartão de Crédito: 0 correspondências encontradas.
+    - Padrão Chave Privada: 0 correspondências encontradas.
+
+2. Verificando dados pessoais sensíveis no Banco de Dados (Cartões e Chaves)...
+  - Tabela de cartões/crédito direto no banco: ✅ OK (Inexistente)
+  - Verificando coluna settings_json nas empresas...
+    ✅ OK (settings_json limpo)
+
+3. Auditando criptografia dos Backups (storage/app/backups/)...
+  - Nenhum arquivo de backup encontrado. Gerando um de teste...
+    * Falha ao gerar backup de teste: Falha no mysqldump (código 2): 

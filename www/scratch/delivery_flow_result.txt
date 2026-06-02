@@ -1,0 +1,33 @@
+=== AUDITORIA DE DELIVERY E FLUXO FINANCEIRO (ETAPA P6) ===
+
+Produto para teste: Batata Rústica da Casa (Preço: R$ 28,90)
+
+1. Testando cálculo de frete (ViaCEP integrado)...
+  - Frete calculado com sucesso: R$ 10,00 | Cidade: São Paulo
+
+2. Auditando regras de cupons...
+  - Subtotal base de teste: R$ 50,00
+  - Cupom DESC10 (10%): Desconto calculado: R$ 5,00 (Esperado: R$ 5,00)
+  - Cupom EXPIRADO (R$ 5,00): Desconto calculado: R$ 0,00 (Esperado: R$ 0,00)
+  - Cupom MINIMO (R$ 10,00 min R$ 100,00): Desconto calculado: R$ 0,00 (Esperado: R$ 0,00)
+
+3. Testando Vulnerabilidade Financeira de Quantidade Negativa...
+  - Sucesso: O checkout de quantidade negativa foi bloqueado (Mensagem: Valor de cobrança deve ser maior que zero.)
+
+4. Executando Checkout Legítimo e Integração de Webhook...
+  - Checkout criado com sucesso! Order UUID: 019e8654-4713-73b4-ac22-c7441c3b7477 | Transaction ID: asaas_tx_a40db39f9329eec5
+    * Status inicial do Pedido: draft (Esperado: draft)
+    * Status inicial do Delivery: pending (Esperado: pending)
+    * Subtotal calculado: R$ 57,80
+    * Desconto calculado (10%): R$ 5,78
+    * Frete cobrado: R$ 10,00
+    * Total final do pedido: R$ 62,02
+
+5. Disparando Webhook de Confirmação do Asaas...
+    * Status pós-webhook do Pedido: pending (Esperado: pending)
+    * Status pós-webhook do Delivery: confirmed (Esperado: confirmed)
+    * Ticket de Cozinha gerado: NÃO (Esperado: SIM)
+
+6. Disparando Webhook DUPLICADO com mesma transação (Auditoria de Idempotência)...
+    * Chamadas webhook registradas no log: Antes=1, Depois=2
+    * ⚠️ RISCO DE IDEMPOTÊNCIA: Processamento duplicou registros de auditoria financeira.
