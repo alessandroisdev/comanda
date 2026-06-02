@@ -91,6 +91,16 @@ class ModuleController extends Controller
         }
 
         $managerUrl = rtrim($request->input('manager_url'), '/');
+        
+        // Tradução automática de localhost/127.0.0.1 para 'nginx' para comunicação inter-container no Docker
+        $parsedUrl = parse_url($managerUrl);
+        if (isset($parsedUrl['host']) && in_array($parsedUrl['host'], ['localhost', '127.0.0.1'])) {
+            $port = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
+            $scheme = $parsedUrl['scheme'] ?? 'http';
+            $path = $parsedUrl['path'] ?? '';
+            $managerUrl = "{$scheme}://nginx{$port}{$path}";
+        }
+
         $licenseUuid = $request->input('license_uuid');
         $installationUuid = $this->licenseValidator->getLocalInstallationUuid();
 
