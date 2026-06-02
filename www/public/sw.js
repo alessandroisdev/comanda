@@ -34,12 +34,18 @@ self.addEventListener('activate', (event) => {
 
 // Intercepção de requisições de rede com estratégias dinâmicas
 self.addEventListener('fetch', (event) => {
+  // Pular requisições que não sejam do esquema HTTP ou HTTPS (como chrome-extension://)
+  if (!event.request.url.startsWith('http://') && !event.request.url.startsWith('https://')) {
+    return;
+  }
+
   const requestUrl = new URL(event.request.url);
 
   // 1. Pular requisições POST, PUT, DELETE, PATCH (métodos não-GET não podem ser cacheados)
   if (event.request.method !== 'GET') {
     return;
   }
+
 
   // 2. Canal SSE ou APIs operacionais em tempo real: Network-Only para evitar cache indesejado
   if (requestUrl.pathname.startsWith('/sse/') || requestUrl.pathname.startsWith('/api/')) {

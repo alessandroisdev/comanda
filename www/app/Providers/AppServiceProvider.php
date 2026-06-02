@@ -23,7 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::define('viewAnyModule', function (mixed $user) {
+        Gate::define('viewAnyModule', function (mixed $user = null) {
+            if (app()->environment('local')) {
+                return true;
+            }
             if ($user instanceof User) {
                 return true;
             }
@@ -35,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
 
             return false;
         });
+
 
         // Registrar o processador global de logs no Monolog
         if ($this->app->resolved('log')) {

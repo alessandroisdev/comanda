@@ -70,6 +70,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Módulos e Licenciamento
     Route::get('modules', [ModuleController::class, 'index'])->name('modules.index');
+    Route::post('modules/activate-online', [ModuleController::class, 'activateOnline'])->name('modules.activate-online');
+    Route::post('modules/activate-offline', [ModuleController::class, 'activateOffline'])->name('modules.activate-offline');
 
     // Categorias
     Route::post('categories/datatable', [CategoryController::class, 'datatable'])->name('categories.datatable');

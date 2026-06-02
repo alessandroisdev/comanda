@@ -38,7 +38,12 @@
 
         /* Glassmorphism Sidebar */
         .admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
             width: 270px;
+            height: 100dvh;
             background: rgba(18, 18, 20, 0.85); /* Zinc 900 equivalent translucent */
             backdrop-filter: blur(20px);
             border-right: 1px solid rgba(63, 63, 70, 0.3);
@@ -92,11 +97,26 @@
 
         /* Header de Ações */
         .admin-header {
+            position: fixed;
+            top: 0;
+            left: 270px;
+            right: 0;
             background: rgba(18, 18, 20, 0.6);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(63, 63, 70, 0.2);
             height: 70px;
+            z-index: 999;
         }
+
+        /* Wrapper do Conteúdo para compensar a sidebar e header fixos */
+        .admin-content-wrapper {
+            margin-left: 270px;
+            padding-top: 70px;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
 
         /* Cards Administrativos Premium */
         .card-premium {
@@ -151,129 +171,128 @@
     </style>
     @yield('styles')
 </head>
-<body class="h-100 d-flex flex-column">
+<body class="d-flex flex-column">
 
-    <div class="d-flex h-100 flex-row overflow-hidden">
-        <!-- Sidebar Esquerda -->
-        <aside class="admin-sidebar d-flex flex-column p-4 flex-shrink-0">
-            <div class="d-flex align-items-center mb-4 pb-2 border-bottom border-zinc-800" style="border-bottom-color: rgba(63, 63, 70, 0.3) !important;">
-                <span class="brand-logo">COMANDA<span style="color: #06b6d4;">.</span></span>
-            </div>
-
-            <!-- Navegação -->
-            <nav class="nav flex-column flex-grow-1 overflow-y-auto">
-                <a href="/" class="nav-link-custom {{ Request::is('/') ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-                <a href="/admin/companies" class="nav-link-custom {{ Request::is('admin/companies*') ? 'active' : '' }}">
-                    <i class="bi bi-building"></i> Empresas
-                </a>
-                <a href="/admin/units" class="nav-link-custom {{ Request::is('admin/units*') ? 'active' : '' }}">
-                    <i class="bi bi-geo-alt"></i> Unidades Físicas
-                </a>
-                <a href="/admin/users" class="nav-link-custom {{ Request::is('admin/users*') ? 'active' : '' }}">
-                    <i class="bi bi-people-fill"></i> Usuários Painel
-                </a>
-                <a href="/admin/employees" class="nav-link-custom {{ Request::is('admin/employees*') ? 'active' : '' }}">
-                    <i class="bi bi-person-badge-fill"></i> Equipe / Equipes
-                </a>
-                <a href="/admin/customers" class="nav-link-custom {{ Request::is('admin/customers*') ? 'active' : '' }}">
-                    <i class="bi bi-emoji-smile-fill"></i> Clientes
-                </a>
-                <a href="/admin/categories" class="nav-link-custom {{ Request::is('admin/categories*') ? 'active' : '' }}">
-                    <i class="bi bi-tags-fill"></i> Categorias Menu
-                </a>
-                <a href="/admin/products" class="nav-link-custom {{ Request::is('admin/products*') ? 'active' : '' }}">
-                    <i class="bi bi-box-seam-fill"></i> Catálogo Produtos
-                </a>
-
-                <div class="text-uppercase text-muted fw-bold px-3 pt-3 pb-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Operacional</div>
-                
-                <a href="/admin/tables" class="nav-link-custom {{ Request::is('admin/tables*') ? 'active' : '' }}">
-                    <i class="bi bi-grid-3x3-gap-fill"></i> Controle de Mesas
-                </a>
-                <a href="/admin/sessions" class="nav-link-custom {{ Request::is('admin/sessions*') ? 'active' : '' }}">
-                    <i class="bi bi-receipt-cutoff"></i> Comandas Operacionais
-                </a>
-                <a href="/admin/kitchen" class="nav-link-custom {{ Request::is('admin/kitchen*') ? 'active' : '' }}">
-                    <i class="bi bi-fire"></i> Fila Cozinha
-                </a>
-                <a href="/admin/cashier" class="nav-link-custom {{ Request::is('admin/cashier*') ? 'active' : '' }}">
-                    <i class="bi bi-cash-register"></i> Caixa Operacional
-                </a>
-
-                <div class="text-uppercase text-muted fw-bold px-3 pt-3 pb-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Configuração</div>
-
-                <a href="/admin/modules" class="nav-link-custom {{ Request::is('admin/modules*') ? 'active' : '' }}">
-                    <i class="bi bi-plugin"></i> Módulos & Licença
-                </a>
-            </nav>
-
-            <!-- Rodapé da Sidebar -->
-            <div class="mt-auto pt-3 border-top border-slate-800 d-flex align-items-center">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white font-semibold" style="width: 40px; height: 40px;">
-                        A
-                    </div>
-                    <div>
-                        <h6 class="m-0 text-white font-semibold" style="font-size: 0.9rem;">Administrador</h6>
-                        <span class="text-muted" style="font-size: 0.75rem;">admin@comanda.com</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Área de Conteúdo Direita -->
-        <div class="d-flex flex-column flex-grow-1 h-100 overflow-hidden">
-            <!-- Header do Topo -->
-            <header class="admin-header d-flex align-items-center justify-content-between px-4">
-                <div class="d-flex align-items-center">
-                    <h4 class="m-0 text-white fw-bold">@yield('page_title', 'Visão Geral')</h4>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                    <span class="badge bg-slate-800 border border-slate-700 text-slate-300 p-2 rounded-3">
-                        <i class="bi bi-clock-history me-1 text-primary"></i> 2026-06-01
-                    </span>
-                </div>
-            </header>
-
-            <!-- Corpo de Conteúdo Principal -->
-            <main class="flex-grow-1 overflow-y-auto p-4">
-                @php
-                    $licenseAlert = null;
-                    try {
-                        $licenseAlert = app(\App\Services\Licensing\LicenseManager::class)->getLicenseAlert();
-                    } catch (\Exception $e) {
-                        // Silencia em caso de migrações incompletas em testes
-                    }
-                @endphp
-
-                @if($licenseAlert)
-                    <div class="alert alert-{{ $licenseAlert['type'] }} bg-{{ $licenseAlert['type'] }}-subtle border border-{{ $licenseAlert['type'] }} text-{{ $licenseAlert['type'] }} alert-dismissible fade show rounded-3 mb-4" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {!! $licenseAlert['message'] !!}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                <!-- Alertas Globais de Sucesso ou Erro -->
-                @if(session('success'))
-                    <div class="alert alert-success bg-success-subtle border border-success text-success alert-dismissible fade show rounded-3 mb-4" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                @if(session('error'))
-                    <div class="alert alert-danger bg-danger-subtle border border-danger text-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                @yield('content')
-            </main>
+    <!-- Sidebar Esquerda -->
+    <aside class="admin-sidebar d-flex flex-column p-4 flex-shrink-0">
+        <div class="d-flex align-items-center mb-4 pb-2 border-bottom border-zinc-800" style="border-bottom-color: rgba(63, 63, 70, 0.3) !important;">
+            <span class="brand-logo">COMANDA<span style="color: #06b6d4;">.</span></span>
         </div>
+
+        <!-- Navegação -->
+        <nav class="nav flex-column flex-grow-1 overflow-y-auto">
+            <a href="/" class="nav-link-custom {{ Request::is('/') ? 'active' : '' }}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a href="/admin/companies" class="nav-link-custom {{ Request::is('admin/companies*') ? 'active' : '' }}">
+                <i class="bi bi-building"></i> Empresas
+            </a>
+            <a href="/admin/units" class="nav-link-custom {{ Request::is('admin/units*') ? 'active' : '' }}">
+                <i class="bi bi-geo-alt"></i> Unidades Físicas
+            </a>
+            <a href="/admin/users" class="nav-link-custom {{ Request::is('admin/users*') ? 'active' : '' }}">
+                <i class="bi bi-people-fill"></i> Usuários Painel
+            </a>
+            <a href="/admin/employees" class="nav-link-custom {{ Request::is('admin/employees*') ? 'active' : '' }}">
+                <i class="bi bi-person-badge-fill"></i> Equipe / Equipes
+            </a>
+            <a href="/admin/customers" class="nav-link-custom {{ Request::is('admin/customers*') ? 'active' : '' }}">
+                <i class="bi bi-emoji-smile-fill"></i> Clientes
+            </a>
+            <a href="/admin/categories" class="nav-link-custom {{ Request::is('admin/categories*') ? 'active' : '' }}">
+                <i class="bi bi-tags-fill"></i> Categorias Menu
+            </a>
+            <a href="/admin/products" class="nav-link-custom {{ Request::is('admin/products*') ? 'active' : '' }}">
+                <i class="bi bi-box-seam-fill"></i> Catálogo Produtos
+            </a>
+
+            <div class="text-uppercase text-muted fw-bold px-3 pt-3 pb-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Operacional</div>
+            
+            <a href="/admin/tables" class="nav-link-custom {{ Request::is('admin/tables*') ? 'active' : '' }}">
+                <i class="bi bi-grid-3x3-gap-fill"></i> Mesa
+            </a>
+            <a href="/admin/sessions" class="nav-link-custom {{ Request::is('admin/sessions*') ? 'active' : '' }}">
+                <i class="bi bi-receipt-cutoff"></i> Comandas Operacionais
+            </a>
+            <a href="/admin/kitchen" class="nav-link-custom {{ Request::is('admin/kitchen*') ? 'active' : '' }}">
+                <i class="bi bi-fire"></i> Fila Cozinha
+            </a>
+            <a href="/admin/cashier" class="nav-link-custom {{ Request::is('admin/cashier*') ? 'active' : '' }}">
+                <i class="bi bi-cash-register"></i> Caixa Operacional
+            </a>
+
+            <div class="text-uppercase text-muted fw-bold px-3 pt-3 pb-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">Configuração</div>
+
+            <a href="/admin/modules" class="nav-link-custom {{ Request::is('admin/modules*') ? 'active' : '' }}">
+                <i class="bi bi-plugin"></i> Módulos & Licença
+            </a>
+        </nav>
+
+        <!-- Rodapé da Sidebar -->
+        <div class="mt-auto pt-3 border-top border-slate-800 d-flex align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white font-semibold" style="width: 40px; height: 40px;">
+                    A
+                </div>
+                <div>
+                    <h6 class="m-0 text-white font-semibold" style="font-size: 0.9rem;">Administrador</h6>
+                    <span class="text-muted" style="font-size: 0.75rem;">admin@comanda.com</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Wrapper de Conteúdo Principal -->
+    <div class="admin-content-wrapper">
+        <!-- Header do Topo -->
+        <header class="admin-header d-flex align-items-center justify-content-between px-4">
+            <div class="d-flex align-items-center">
+                <h4 class="m-0 text-white fw-bold">@yield('page_title', 'Visão Geral')</h4>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-slate-800 border border-slate-700 text-slate-300 p-2 rounded-3">
+                    <i class="bi bi-clock-history me-1 text-primary"></i> 2026-06-01
+                </span>
+            </div>
+        </header>
+
+        <!-- Corpo de Conteúdo Principal -->
+        <main class="flex-grow-1 p-4">
+            @php
+                $licenseAlert = null;
+                try {
+                    $licenseAlert = app(\App\Services\Licensing\LicenseManager::class)->getLicenseAlert();
+                } catch (\Exception $e) {
+                    // Silencia em caso de migrações incompletas em testes
+                }
+            @endphp
+
+            @if($licenseAlert)
+                <div class="alert alert-{{ $licenseAlert['type'] }} bg-{{ $licenseAlert['type'] }}-subtle border border-{{ $licenseAlert['type'] }} text-{{ $licenseAlert['type'] }} alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> {!! $licenseAlert['message'] !!}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            <!-- Alertas Globais de Sucesso ou Erro -->
+            @if(session('success'))
+                <div class="alert alert-success bg-success-subtle border border-success text-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger bg-danger-subtle border border-danger text-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @yield('content')
+        </main>
     </div>
+
 
     <!-- Scripts Bootstrap carregados dinamicamente via Vite global window -->
     @yield('scripts')
